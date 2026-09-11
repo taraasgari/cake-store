@@ -1,0 +1,39 @@
+{
+  "kind": "perfume-store",
+  "branding": {
+    "site_name": "فروشگاه عطر",
+    "site_title": "عطر و ادکلن",
+    "site_description": "فروشگاه تخصصی عطر، ادکلن، سمپل و ست هدیه",
+    "primary_color": "#1D1A17",
+    "secondary_color": "#B89B65",
+    "accent_color": "#7A243F",
+    "background_color": "#FAF7F2",
+    "text_color": "#171717",
+    "footer_text": "فروشگاه تخصصی عطر و ادکلن"
+  },
+  "categories": [
+    "عطر زنانه",
+    "عطر مردانه",
+    "عطر یونی‌سکس",
+    "سمپل و دکانت",
+    "ست هدیه"
+  ],
+  "product_types": [
+    "Parfum",
+    "Eau de Parfum",
+    "Eau de Toilette",
+    "Eau de Cologne"
+  ],
+  "tags": [
+    "گرم",
+    "خنک",
+    "شیرین",
+    "تلخ",
+    "تند",
+    "چوبی",
+    "مرکباتی",
+    "گلی",
+    "روزمره",
+    "رسمی"
+  ]
+}

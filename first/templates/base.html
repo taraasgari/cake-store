@@ -1,0 +1,2708 @@
+{% load static custom_filters %}
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <meta
+        name="description"
+        content="{{ settings.site_description|default:'فروشگاه تخصصی محصولات آرایشی و مراقبتی' }}"
+    >
+
+    <meta
+        name="theme-color"
+        content="{{ settings.primary_color|default:'#ec407a' }}"
+    >
+
+    <title>
+        {% block title %}
+            {{ settings.site_title|default:'آرایشی شاپ' }}
+        {% endblock %}
+    </title>
+
+    {% if settings.favicon %}
+        <link
+            rel="icon"
+            href="{{ settings.favicon.url }}"
+        >
+    {% endif %}
+
+    <script>
+        try {
+            document.documentElement.dataset.theme =
+                localStorage.getItem(
+                    'arayeshi-theme'
+                ) || 'light';
+        } catch (error) {
+            document.documentElement.dataset.theme =
+                'light';
+        }
+    </script>
+
+    <link rel="stylesheet" href="{% static 'css/tailwind.min.css' %}">
+
+    <link
+        rel="stylesheet"
+        href="{% static 'vendor/fontawesome/css/all.min.css' %}"
+    >
+
+    <link
+        rel="stylesheet"
+        href="{% static 'vendor/vazir/font-face.css' %}"
+    >
+
+    <style>
+        :root {
+            --primary-color:
+                {{ settings.primary_color|default:'#ec407a' }};
+
+            --secondary-color:
+                {{ settings.secondary_color|default:'#d81b60' }};
+
+            --accent-color:
+                {{ settings.accent_color|default:'#ab47bc' }};
+
+            --bg-color:
+                {{ settings.background_color|default:'#fdf2f8' }};
+
+            --text-color:
+                {{ settings.text_color|default:'#1a1a2e' }};
+
+            --surface:
+                rgba(255, 255, 255, .9);
+
+            --surface-solid:
+                #ffffff;
+
+            --surface-soft:
+                #fff7fb;
+
+            --muted:
+                #6b7280;
+
+            --line:
+                rgba(236, 64, 122, .14);
+
+            --header:
+                rgba(255, 255, 255, .88);
+
+            --shadow:
+                0 22px 65px -35px
+                rgba(99, 25, 67, .48);
+        }
+
+[data-theme="dark"] {
+    --bg-color: #27272f !important;
+    --text-color: #f5f2f4 !important;
+    --surface: rgba(47, 47, 57, .94);
+    --surface-solid: #303039;
+    --surface-soft: #35323c;
+    --muted: #b8b3bd;
+    --line: rgba(255, 255, 255, .09);
+    --header: rgba(38, 38, 46, .94);
+    --shadow: 0 25px 70px -35px rgba(0, 0, 0, .9);
+    color-scheme: dark;
+}
+[data-theme="dark"] body,
+[data-theme="dark"] .site-main {
+    color: var(--text-color);
+    background-color: var(--bg-color);
+}
+        *,
+        *::before,
+        *::after {
+            box-sizing: border-box;
+        }
+
+        html {
+            scroll-behavior: smooth;
+        }
+
+        body {
+            min-height: 100vh;
+            margin: 0;
+
+            color:
+                var(--text-color);
+
+            background-color:
+                var(--bg-color);
+
+            font-family:
+                Vazir,
+                Tahoma,
+                sans-serif;
+
+            transition:
+                background-color .25s ease,
+                color .25s ease;
+
+            {% if settings.background_image %}
+                background-image:
+                    linear-gradient(
+                        rgba(
+                            253,
+                            242,
+                            248,
+                            .9
+                        ),
+                        rgba(
+                            253,
+                            242,
+                            248,
+                            .9
+                        )
+                    ),
+                    url(
+                        '{{ settings.background_image.url }}'
+                    );
+
+                background-size:
+                    cover;
+
+                background-position:
+                    center;
+
+                background-attachment:
+                    fixed;
+            {% endif %}
+        }
+
+        [data-theme="dark"] body {
+            {% if settings.background_image %}
+                background-image:
+                    linear-gradient(
+                        rgba(
+                            39,
+                            39,
+                            47,
+                            .92
+                        ),
+                        rgba(
+                            39,
+                            39,
+                            47,
+                            .92
+                        )
+                    ),
+                    url(
+                        '{{ settings.background_image.url }}'
+                    );
+            {% endif %}
+        }
+
+        button,
+        input,
+        textarea,
+        select {
+            font: inherit;
+        }
+
+        a {
+            color: inherit;
+            text-decoration: none;
+        }
+
+        img {
+            max-width: 100%;
+        }
+
+        [hidden] {
+            display: none !important;
+        }
+
+        .site-header {
+            position: sticky;
+            top: 0;
+            z-index: 50;
+
+            color:
+                var(--text-color);
+
+            background:
+                var(--header);
+
+            border-bottom:
+                1px solid
+                var(--line);
+
+            box-shadow:
+                0 12px 35px -30px
+                rgba(0, 0, 0, .55);
+
+            backdrop-filter:
+                blur(20px);
+
+            -webkit-backdrop-filter:
+                blur(20px);
+        }
+
+        .top-offer {
+            position: relative;
+            z-index: 60;
+
+            min-height: 35px;
+
+            display: flex;
+            align-items: center;
+            justify-content: center;
+
+            overflow: hidden;
+
+            padding:
+                .45rem 1rem;
+
+            color: white;
+
+            text-align: center;
+            font-size: .76rem;
+            font-weight: 800;
+
+            background:
+                linear-gradient(
+                    100deg,
+                    var(--secondary-color),
+                    var(--accent-color),
+                    var(--primary-color)
+                );
+        }
+
+        .top-offer::before {
+            content: "";
+
+            position: absolute;
+            inset: 0;
+
+            background:
+                linear-gradient(
+                    110deg,
+                    transparent 25%,
+                    rgba(
+                        255,
+                        255,
+                        255,
+                        .14
+                    ) 45%,
+                    transparent 65%
+                );
+
+            transform:
+                translateX(100%);
+
+            animation:
+                offerShine
+                7s
+                ease-in-out
+                infinite;
+        }
+
+        .top-offer > * {
+            position: relative;
+        }
+
+        .site-container {
+            width:
+                min(
+                    100% - 2rem,
+                    1440px
+                );
+
+            margin-inline:
+                auto;
+        }
+
+        .nav-row {
+            min-height:
+                76px;
+
+            display:
+                flex;
+
+            align-items:
+                center;
+
+            justify-content:
+                space-between;
+
+            gap:
+                1.15rem;
+        }
+
+        .brand-link {
+            display:
+                inline-flex;
+
+            align-items:
+                center;
+
+            gap:
+                .7rem;
+
+            min-width:
+                max-content;
+        }
+
+        .brand-mark {
+            position:
+                relative;
+
+            width:
+                49px;
+
+            height:
+                49px;
+
+            flex:
+                0 0 auto;
+
+            display:
+                grid;
+
+            place-items:
+                center;
+
+            overflow:
+                hidden;
+
+            border:
+                1px solid
+                var(--line);
+
+            border-radius:
+                16px;
+
+            color:
+                white;
+
+            background:
+                linear-gradient(
+                    135deg,
+                    var(--primary-color),
+                    var(--accent-color)
+                );
+
+            box-shadow:
+                0 12px 28px
+                rgba(
+                    216,
+                    27,
+                    96,
+                    .2
+                );
+        }
+
+        .brand-mark img {
+            width:
+                100%;
+
+            height:
+                100%;
+
+            object-fit:
+                contain;
+
+            padding:
+                5px;
+        }
+
+        .brand-mark i {
+            font-size:
+                1.35rem;
+        }
+
+        .brand-copy {
+            line-height:
+                1.25;
+        }
+
+        .brand-title {
+            display:
+                block;
+
+            font-size:
+                1.15rem;
+
+            font-weight:
+                950;
+        }
+
+        .brand-tagline {
+            display:
+                block;
+
+            margin-top:
+                .2rem;
+
+            color:
+                var(--muted);
+
+            font-size:
+                .58rem;
+
+            letter-spacing:
+                .14em;
+        }
+
+        .pink-gradient-text {
+            color:
+                var(--primary-color);
+
+            background:
+                linear-gradient(
+                    135deg,
+                    var(--primary-color),
+                    var(--secondary-color),
+                    var(--accent-color)
+                );
+
+            -webkit-background-clip:
+                text;
+
+            background-clip:
+                text;
+
+            -webkit-text-fill-color:
+                transparent;
+        }
+
+        .desktop-nav {
+            display:
+                flex;
+
+            align-items:
+                center;
+
+            justify-content:
+                center;
+
+            gap:
+                1.35rem;
+
+            min-width:
+                0;
+        }
+
+        .nav-link-pink {
+            position:
+                relative;
+            display: inline-flex;
+            align-items: center;
+
+            gap: .38rem;
+            padding: .6rem .08rem;
+
+            color: var(--text-color);
+
+            font-size: .78rem;
+            font-weight: 800;
+            white-space: nowrap;
+
+            transition: color .2s ease;
+        }
+
+        .nav-link-pink::after {
+            content: '';
+
+            position: absolute;
+            right: 0;
+            left: 0;
+            bottom: .15rem;
+
+            height: 2px;
+            border-radius: 999px;
+
+            background:
+                linear-gradient(
+                    90deg,
+                    var(--primary-color),
+                    var(--accent-color)
+                );
+
+            transform: scaleX(0);
+            transform-origin: right;
+
+            transition: transform .22s ease;
+        }
+
+        .nav-link-pink:hover {
+            color: var(--primary-color);
+        }
+
+        .nav-link-pink:hover::after {
+            transform: scaleX(1);
+        }
+
+        .global-nav-search {
+            position: relative;
+            width: clamp(210px, 20vw, 330px);
+            min-width: 180px;
+            height: 42px;
+            display: flex;
+            align-items: center;
+            overflow: hidden;
+            border: 1px solid var(--line);
+            border-radius: 14px;
+            background: var(--surface);
+            box-shadow:
+                inset 0 1px 0
+                rgba(255, 255, 255, .45);
+            transition:
+                border-color .2s ease,
+                box-shadow .2s ease,
+                transform .2s ease;
+        }
+
+        .global-nav-search:focus-within {
+            border-color: var(--primary-color);
+            box-shadow:
+                0 0 0 4px rgba(236, 64, 122, .08),
+                var(--shadow);
+            transform: translateY(-1px);
+        }
+
+        .global-nav-search input {
+            width: 100%;
+            min-width: 0;
+            height: 100%;
+            padding: 0 .95rem 0 2.8rem;
+            border: 0;
+            outline: 0;
+            color: var(--text-color);
+            background: transparent;
+            font-size: .72rem;
+            font-weight: 700;
+        }
+
+        .global-nav-search input::placeholder {
+            color: var(--muted);
+            opacity: .8;
+        }
+
+        .global-nav-search button {
+            position: absolute;
+            left: .35rem;
+            top: 50%;
+            width: 34px;
+            height: 34px;
+            display: grid;
+            place-items: center;
+            border: 0;
+            border-radius: 10px;
+            color: white;
+            background:
+                linear-gradient(
+                    135deg,
+                    var(--primary-color),
+                    var(--secondary-color)
+                );
+            cursor: pointer;
+            transform: translateY(-50%);
+            transition:
+                transform .18s ease,
+                box-shadow .18s ease;
+        }
+
+        .global-nav-search button:hover {
+            transform:
+                translateY(-50%)
+                scale(1.04);
+            box-shadow:
+                0 8px 20px
+                rgba(216, 27, 96, .2);
+        }
+
+        .nav-actions {
+            display: flex;
+            align-items: center;
+            gap: .45rem;
+        }
+
+        .round-action {
+            position: relative;
+
+            width: 40px;
+            height: 40px;
+            flex: 0 0 auto;
+
+            display: grid;
+            place-items: center;
+
+            border: 1px solid var(--line);
+            border-radius: 13px;
+
+            color: var(--text-color);
+            background: var(--surface);
+
+            cursor: pointer;
+            transition: .2s ease;
+        }
+
+        .round-action:hover {
+            color: var(--primary-color);
+            border-color: rgba(236, 64, 122, .35);
+
+            transform: translateY(-2px);
+            box-shadow: var(--shadow);
+        }
+
+        .cart-badge {
+            position: absolute;
+            top: -5px;
+            right: -5px;
+
+            min-width: 19px;
+            height: 19px;
+
+            display: grid;
+            place-items: center;
+
+            padding: 0 4px;
+
+            border: 2px solid var(--surface-solid);
+            border-radius: 999px;
+
+            color: white;
+            background: var(--secondary-color);
+
+            font-size: .58rem;
+            font-weight: 900;
+        }
+
+        .btn-pink,
+        .btn-pink-outline {
+            min-height: 40px;
+
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+
+            gap: .42rem;
+            padding: .55rem .9rem;
+
+            border-radius: 12px;
+
+            font-size: .72rem;
+            font-weight: 900;
+
+            transition: .2s ease;
+        }
+
+        .btn-pink {
+            color: white;
+
+            background:
+                linear-gradient(
+                    135deg,
+                    var(--primary-color),
+                    var(--secondary-color)
+                );
+
+            box-shadow:
+                0 11px 27px rgba(216, 27, 96, .2);
+        }
+
+        .btn-pink-outline {
+            color: var(--primary-color);
+            border: 1px solid rgba(236, 64, 122, .32);
+            background: rgba(236, 64, 122, .06);
+        }
+
+        .btn-pink:hover,
+        .btn-pink-outline:hover {
+            transform: translateY(-2px);
+        }
+
+        .owner-shortcut {
+            min-height: 38px;
+
+            display: inline-flex;
+            align-items: center;
+
+            gap: .35rem;
+            padding: .5rem .7rem;
+
+            border-radius: 11px;
+
+            color: white;
+            background: linear-gradient(135deg, #7c3aed, #a855f7);
+
+            font-size: .68rem;
+            font-weight: 900;
+
+            transition: .2s ease;
+        }
+
+        .owner-shortcut:hover {
+            transform: translateY(-2px);
+
+            box-shadow:
+                0 12px 28px rgba(124, 58, 237, .24);
+        }
+
+        .user-details {
+            position: relative;
+        }
+
+        .user-details > summary {
+            list-style: none;
+        }
+
+        .user-details > summary::-webkit-details-marker {
+            display: none;
+        }
+
+        .user-trigger {
+            min-height: 40px;
+
+            display: inline-flex;
+            align-items: center;
+
+            gap: .45rem;
+            padding: .48rem .72rem;
+
+            border: 1px solid var(--line);
+            border-radius: 12px;
+
+            color: var(--text-color);
+            background: var(--surface);
+
+            cursor: pointer;
+
+            font-size: .7rem;
+            font-weight: 850;
+        }
+
+        .user-menu {
+            position: absolute;
+            left: 0;
+            top: calc(100% + 10px);
+            z-index: 80;
+
+            width: min(290px, calc(100vw - 2rem));
+            max-height: min(72vh, 620px);
+
+            overflow-y: auto;
+            padding: .6rem;
+
+            border: 1px solid var(--line);
+            border-radius: 18px;
+
+            color: var(--text-color);
+            background: var(--surface-solid);
+
+            box-shadow:
+                0 25px 70px -25px rgba(0, 0, 0, .42);
+        }
+
+        .user-head {
+            padding: .65rem .7rem .8rem;
+            border-bottom: 1px solid var(--line);
+        }
+
+        .user-head strong {
+            display: block;
+            font-size: .8rem;
+        }
+
+        .user-head small {
+            display: block;
+
+            margin-top: .2rem;
+            overflow: hidden;
+
+            color: var(--muted);
+
+            font-size: .65rem;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        .menu-label {
+            padding: .65rem .65rem .3rem;
+
+            color: var(--muted);
+
+            font-size: .6rem;
+            font-weight: 900;
+        }
+
+        .menu-separator {
+            height: 1px;
+            margin: .45rem .25rem;
+            background: var(--line);
+        }
+
+        .menu-item {
+            display: flex;
+            align-items: center;
+
+            gap: .65rem;
+            padding: .62rem .7rem;
+
+            border-radius: 10px;
+
+            font-size: .72rem;
+
+            transition: .18s ease;
+        }
+
+        .menu-item i {
+            width: 18px;
+            color: var(--primary-color);
+            text-align: center;
+        }
+
+        .menu-item:hover {
+            color: var(--primary-color);
+            background: rgba(236, 64, 122, .07);
+        }
+
+        .menu-item.danger,
+        .menu-item.danger i {
+            color: #e11d48;
+        }
+
+        .mobile-menu {
+            display: none;
+
+            max-height: calc(100vh - 112px);
+            overflow-y: auto;
+
+            padding: 0 0 1rem;
+
+            border-top: 1px solid var(--line);
+            background: var(--surface-solid);
+        }
+
+        .mobile-menu.open {
+            display: block;
+        }
+
+        .mobile-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+
+            gap: .5rem;
+            padding-top: .8rem;
+        }
+
+        .mobile-link {
+            display: flex;
+            align-items: center;
+
+            gap: .55rem;
+            padding: .72rem .8rem;
+
+            border: 1px solid var(--line);
+            border-radius: 12px;
+
+            background: var(--surface-soft);
+
+            font-size: .72rem;
+            font-weight: 800;
+        }
+
+        .mobile-link i {
+            color: var(--primary-color);
+        }
+
+        .mobile-wide {
+            grid-column: 1 / -1;
+        }
+
+        .message-stack {
+            position: fixed;
+            z-index: 100;
+            top: 96px;
+            right: 1rem;
+
+            width: min(420px, calc(100vw - 2rem));
+
+            display: grid;
+            gap: .65rem;
+        }
+
+        .message-item {
+            display: flex;
+            align-items: center;
+
+            gap: .7rem;
+            padding: .85rem 1rem;
+
+            border: 1px solid rgba(255, 255, 255, .22);
+            border-radius: 14px;
+
+            color: white;
+
+            box-shadow:
+                0 18px 45px -18px rgba(0, 0, 0, .45);
+
+            backdrop-filter: blur(14px);
+            animation: messageIn .35s ease both;
+        }
+
+        .message-item.success {
+            background: rgba(5, 150, 105, .92);
+        }
+
+        .message-item.error {
+            background: rgba(225, 29, 72, .92);
+        }
+
+        .message-item.warning {
+            background: rgba(217, 119, 6, .94);
+        }
+
+        .message-item.info {
+            background: rgba(37, 99, 235, .92);
+        }
+
+        .message-item button {
+            width: 30px;
+            height: 30px;
+            margin-right: auto;
+
+            border: 0;
+            border-radius: 50%;
+
+            color: white;
+            background: rgba(255, 255, 255, .14);
+
+            cursor: pointer;
+        }
+
+        .site-main {
+            position: relative;
+            z-index: 1;
+
+            width: min(100% - 2rem, 1440px);
+            min-height: 55vh;
+
+            margin-inline: auto;
+            padding-block: 2rem;
+        }
+
+        .site-footer {
+            position: relative;
+            overflow: hidden;
+
+            margin-top: 4rem;
+
+            color: rgba(255, 255, 255, .8);
+
+            background:
+                linear-gradient(
+                    145deg,
+                    {{ settings.footer_bg_color|default:'#1a0a1a' }},
+                    #2d152b 52%,
+                    #17101e
+                );
+
+            border-top: 1px solid rgba(255, 255, 255, .07);
+        }
+
+        .site-footer::before {
+            content: '';
+
+            position: absolute;
+            width: 420px;
+            height: 420px;
+            right: -190px;
+            top: -260px;
+
+            border-radius: 50%;
+            background: rgba(236, 64, 122, .12);
+            filter: blur(2px);
+        }
+
+        .footer-grid {
+            position: relative;
+
+            display: grid;
+            grid-template-columns: 1.25fr .75fr .75fr 1fr;
+
+            gap: 2.5rem;
+            padding-block: 4rem 2.7rem;
+        }
+
+        .footer-brand {
+            display: flex;
+            align-items: center;
+            gap: .7rem;
+        }
+
+        .footer-logo {
+            width: 45px;
+            height: 45px;
+
+            display: grid;
+            place-items: center;
+
+            overflow: hidden;
+
+            border-radius: 14px;
+
+            color: white;
+
+            background:
+                linear-gradient(
+                    135deg,
+                    var(--primary-color),
+                    var(--accent-color)
+                );
+        }
+
+        .footer-logo img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+            padding: 4px;
+        }
+
+        .footer-description {
+            max-width: 380px;
+            margin-top: 1rem;
+
+            color: rgba(255, 255, 255, .54);
+
+            font-size: .75rem;
+            line-height: 2;
+        }
+
+        .footer-title {
+            margin: 0 0 1rem;
+
+            color: #f9a8d4;
+
+            font-size: .78rem;
+            font-weight: 900;
+        }
+
+        .footer-list {
+            display: grid;
+            gap: .7rem;
+
+            padding: 0;
+            margin: 0;
+
+            list-style: none;
+            font-size: .72rem;
+        }
+
+        .footer-list a {
+            transition: .18s ease;
+        }
+
+        .footer-list a:hover {
+            color: #f9a8d4;
+            padding-right: .25rem;
+        }
+
+        .footer-contact li {
+            display: flex;
+            align-items: flex-start;
+            gap: .55rem;
+        }
+
+        .footer-contact i {
+            width: 17px;
+            margin-top: .25rem;
+            color: #f9a8d4;
+            text-align: center;
+        }
+
+        .socials {
+            display: flex;
+            flex-wrap: wrap;
+
+            gap: .5rem;
+            margin-top: 1.2rem;
+        }
+
+        .socials a {
+            width: 38px;
+            height: 38px;
+
+            display: grid;
+            place-items: center;
+
+            border: 1px solid rgba(255, 255, 255, .1);
+            border-radius: 12px;
+
+            background: rgba(255, 255, 255, .05);
+
+            transition: .2s;
+        }
+
+        .socials a:hover {
+            color: white;
+            border-color: var(--primary-color);
+            background: var(--primary-color);
+
+            transform: translateY(-3px);
+        }
+
+        .footer-bottom {
+            position: relative;
+
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+
+            gap: 1rem;
+            padding: 1.15rem 0;
+
+            border-top: 1px solid rgba(255, 255, 255, .08);
+
+            color: rgba(255, 255, 255, .42);
+
+            font-size: .67rem;
+        }
+
+        .back-top {
+            position: fixed;
+            z-index: 45;
+            left: 1.2rem;
+            bottom: 1.2rem;
+
+            width: 43px;
+            height: 43px;
+
+            display: grid;
+            place-items: center;
+
+            border: 0;
+            border-radius: 14px;
+
+            color: white;
+
+            background:
+                linear-gradient(
+                    135deg,
+                    var(--primary-color),
+                    var(--accent-color)
+                );
+
+            box-shadow:
+                0 15px 35px rgba(171, 71, 188, .27);
+
+            cursor: pointer;
+
+            opacity: 0;
+            pointer-events: none;
+
+            transform: translateY(12px);
+            transition: .2s;
+        }
+
+        .back-top.show {
+            opacity: 1;
+            pointer-events: auto;
+            transform: none;
+        }
+
+        [data-theme="dark"] .bg-white,
+        [data-theme="dark"] .bg-white\/80,
+        [data-theme="dark"] .bg-white\/90 {
+            background-color: var(--surface-solid) !important;
+        }
+
+        [data-theme="dark"] .bg-gray-50,
+        [data-theme="dark"] .bg-gray-100 {
+            background-color: var(--surface-soft) !important;
+        }
+
+        [data-theme="dark"] .text-gray-900,
+        [data-theme="dark"] .text-gray-800,
+        [data-theme="dark"] .text-gray-700 {
+            color: var(--text-color) !important;
+        }
+
+        [data-theme="dark"] .text-gray-600,
+        [data-theme="dark"] .text-gray-500,
+        [data-theme="dark"] .text-gray-400 {
+            color: var(--muted) !important;
+        }
+
+        [data-theme="dark"] .border-gray-100,
+        [data-theme="dark"] .border-gray-200,
+        [data-theme="dark"] .border-pink-100\/30 {
+            border-color: var(--line) !important;
+        }
+
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: var(--bg-color);
+        }
+
+        ::-webkit-scrollbar-thumb {
+            border-radius: 999px;
+
+            background:
+                linear-gradient(
+                    var(--primary-color),
+                    var(--accent-color)
+                );
+        }
+
+        @keyframes offerShine {
+            0%,
+            60% {
+                transform: translateX(100%);
+            }
+
+            82%,
+            100% {
+                transform: translateX(-100%);
+            }
+        }
+
+        @keyframes messageIn {
+            from {
+                opacity: 0;
+                transform: translateX(25px);
+            }
+
+            to {
+                opacity: 1;
+                transform: none;
+            }
+        }
+
+        @media (max-width: 1180px) {
+            .global-nav-search {
+                width: clamp(180px, 18vw, 250px);
+            }
+
+            .desktop-nav {
+                gap: .8rem;
+            }
+
+            .desktop-nav .nav-link-pink {
+                font-size: .7rem;
+            }
+
+            .brand-tagline {
+                display: none;
+            }
+
+            .owner-shortcut span {
+                display: none;
+            }
+        }
+
+        @media (max-width: 980px) {
+            .nav-row {
+                flex-wrap: wrap;
+                gap: .6rem .75rem;
+                padding-block: .55rem;
+            }
+
+            .global-nav-search {
+                order: 3;
+                width: 100%;
+                max-width: none;
+                flex: 1 0 100%;
+            }
+
+            .desktop-nav,
+            .desktop-auth,
+            .desktop-user-name {
+                display: none !important;
+            }
+
+            .mobile-toggle {
+                display: grid !important;
+            }
+
+            .nav-row {
+                min-height: 68px;
+            }
+
+            .brand-mark {
+                width: 44px;
+                height: 44px;
+                border-radius: 14px;
+            }
+
+            .footer-grid {
+                grid-template-columns: 1fr 1fr;
+            }
+        }
+
+        @media (max-width: 640px) {
+            .global-nav-search {
+                height: 40px;
+            }
+
+            .global-nav-search input {
+                font-size: .68rem;
+            }
+
+            .site-container,
+            .site-main {
+                width: min(100% - 1.15rem, 1440px);
+            }
+
+            .top-offer {
+                min-height: 31px;
+                font-size: .65rem;
+            }
+
+            .brand-title {
+                max-width: 128px;
+                overflow: hidden;
+
+                font-size: .95rem;
+                text-overflow: ellipsis;
+                white-space: nowrap;
+            }
+
+            .nav-actions {
+                gap: .25rem;
+            }
+
+            .round-action {
+                width: 37px;
+                height: 37px;
+                border-radius: 11px;
+            }
+
+            .owner-shortcut {
+                width: 37px;
+                min-height: 37px;
+                justify-content: center;
+                padding: 0;
+            }
+
+            .user-trigger {
+                width: 37px;
+                min-height: 37px;
+                justify-content: center;
+                padding: 0;
+            }
+
+            .user-trigger .fa-chevron-down {
+                display: none;
+            }
+
+            .site-main {
+                padding-block: 1rem;
+            }
+
+            .message-stack {
+                top: 82px;
+                right: .58rem;
+                width: calc(100vw - 1.16rem);
+            }
+
+            .footer-grid {
+                grid-template-columns: 1fr;
+                gap: 2rem;
+                padding-block: 3rem 2rem;
+            }
+
+            .footer-bottom {
+                flex-direction: column;
+                text-align: center;
+            }
+
+            .back-top {
+                left: .75rem;
+                bottom: .75rem;
+            }
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+            *,
+            *::before,
+            *::after {
+                scroll-behavior: auto !important;
+                animation-duration: .01ms !important;
+                animation-iteration-count: 1 !important;
+                transition-duration: .01ms !important;
+            }
+        }
+    </style>
+
+    {% block extra_css %}{% endblock %}
+</head>
+
+<body>
+    <div
+        class="top-offer"
+        data-bsg-edit="top-bar"
+        data-bsg-name="نوار پیشنهاد بالای سایت"
+    >
+        <span
+            data-bsg-edit="top-bar-text"
+            data-bsg-name="متن نوار پیشنهاد"
+        >
+            <i class="fas fa-sparkles ml-1"></i>
+            ارسال رایگان برای سفارش‌های بالای ۵۰۰ هزار تومان
+        </span>
+    </div>
+
+    <header
+        class="site-header"
+        data-bsg-edit="navbar"
+        data-bsg-name="هدر و منوی سایت"
+    >
+        <div class="site-container">
+            <div class="nav-row">
+                <a
+                    href="{% url 'first:home' %}"
+                    class="brand-link"
+                    data-bsg-edit="logo-section"
+                    data-bsg-name="لوگو و نام سایت"
+                >
+                    <span
+                        class="brand-mark"
+                        data-bsg-edit="logo-image-container"
+                        data-bsg-name="کادر لوگو"
+                    >
+                        {% if settings.logo %}
+                            <img
+                                src="{{ settings.logo.url }}"
+                                alt="{{ settings.site_name }}"
+                                data-bsg-edit="logo-image"
+                                data-bsg-name="تصویر لوگو"
+                            >
+                        {% else %}
+                            <i
+                                class="fas fa-spa"
+                                data-bsg-edit="logo-icon"
+                                data-bsg-name="آیکن لوگو"
+                            ></i>
+                        {% endif %}
+                    </span>
+
+                    <span class="brand-copy">
+                        <strong
+                            class="brand-title pink-gradient-text"
+                            data-bsg-edit="site-name"
+                            data-bsg-name="نام سایت"
+                        >
+                            {{ settings.site_name|default:'آرایشی شاپ' }}
+                        </strong>
+
+                        <small
+                            class="brand-tagline"
+                            data-bsg-edit="site-tagline"
+                            data-bsg-name="زیرعنوان سایت"
+                        >
+                            LUXURY BEAUTY STORE
+                        </small>
+                    </span>
+                </a>
+
+                <nav
+                    class="desktop-nav"
+                    aria-label="منوی اصلی"
+                    data-bsg-edit="main-menu"
+                    data-bsg-name="لینک‌های منوی اصلی"
+                >
+                    <a
+                        class="nav-link-pink"
+                        href="{% url 'first:home' %}"
+                        data-bsg-edit="menu-home"
+                        data-bsg-name="لینک خانه"
+                    >
+                        <i class="fas fa-house"></i>
+                        خانه
+                    </a>
+
+                    <a
+                        class="nav-link-pink"
+                        href="{% url 'first:product_list' %}"
+                        data-bsg-edit="menu-products"
+                        data-bsg-name="لینک محصولات"
+                    >
+                        <i class="fas fa-border-all"></i>
+                        محصولات
+                    </a>
+
+                    <a
+                        class="nav-link-pink"
+                        href="{% url 'first:discounts' %}"
+                        data-bsg-edit="menu-discounts"
+                        data-bsg-name="لینک تخفیف‌ها"
+                    >
+                        <i class="fas fa-tags"></i>
+                        تخفیف‌ها
+                    </a>
+
+                    <a
+                        class="nav-link-pink"
+                        href="{% url 'first:best_sellers' %}"
+                        data-bsg-edit="menu-bestsellers"
+                        data-bsg-name="لینک پرفروش‌ها"
+                    >
+                        <i class="fas fa-crown"></i>
+                        پرفروش‌ها
+                    </a>
+
+                    {% if user.is_authenticated %}
+                        <a
+                            class="nav-link-pink"
+                            href="{% url 'first:user_orders' %}"
+                            data-bsg-edit="menu-orders"
+                            data-bsg-name="لینک سفارش‌ها"
+                        >
+                            <i class="fas fa-bag-shopping"></i>
+                            سفارش‌ها
+                        </a>
+                    {% endif %}
+                </nav>
+
+                <form
+                    class="global-nav-search"
+                    id="globalNavProductSearch"
+                    action="{% url 'first:search_products' %}"
+                    method="get"
+                    role="search"
+                    aria-label="جستجوی محصولات"
+                >
+                    <input
+                        type="search"
+                        name="q"
+                        value="{{ request.GET.q|default:'' }}"
+                        placeholder="جستجوی محصول..."
+                        autocomplete="off"
+                        aria-label="نام محصول را جستجو کنید"
+                    >
+                    <button
+                        type="submit"
+                        aria-label="جستجو"
+                        title="جستجو"
+                    >
+                        <i class="fas fa-magnifying-glass"></i>
+                    </button>
+                </form>
+
+                <div class="nav-actions">
+                    <button
+                        type="button"
+                        class="round-action"
+                        id="themeToggle"
+                        aria-label="تغییر حالت روشن و تاریک"
+                        title="حالت شب و روز"
+                        data-bsg-edit="theme-toggle"
+                        data-bsg-name="دکمه تغییر تم"
+                    >
+                        <i
+                            class="fas fa-moon"
+                            id="themeIcon"
+                        ></i>
+                    </button>
+
+                    {% if user.is_owner %}
+                        <a
+                            href="{% url 'first:customizer' %}"
+                            class="owner-shortcut"
+                            data-bsg-edit="owner-appearance-btn"
+                            data-bsg-name="دکمه استودیو طراحی"
+                        >
+                            <i class="fas fa-wand-magic-sparkles"></i>
+                            <span>طراحی</span>
+                        </a>
+                    {% endif %}
+
+                    <a
+                        href="{% url 'first:cart' %}"
+                        class="round-action"
+                        aria-label="سبد خرید"
+                        data-bsg-edit="cart-btn"
+                        data-bsg-name="دکمه سبد خرید"
+                    >
+                        <i class="fas fa-bag-shopping"></i>
+
+                        <span
+                            class="cart-badge"
+                            data-no-localize
+                        >
+                            {% if user.is_authenticated %}
+                                {{ user.cart.items.count|default:0 }}
+                            {% else %}
+                                0
+                            {% endif %}
+                        </span>
+                    </a>
+
+                    {% if user.is_authenticated %}
+                        <details class="user-details">
+                            <summary
+                                class="user-trigger"
+                                aria-label="منوی حساب کاربری"
+                            >
+                                <i class="fas fa-circle-user text-lg text-pink-500"></i>
+
+                                <span class="desktop-user-name">
+                                    {{ user.username|truncatechars:12 }}
+                                </span>
+
+                                <i class="fas fa-chevron-down text-[10px]"></i>
+                            </summary>
+
+                            <div class="user-menu">
+                                <div class="user-head">
+                                    <strong>
+                                        {{ user.get_full_name|default:user.username }}
+                                    </strong>
+
+                                    <small dir="ltr">
+                                        {{ user.email }}
+                                    </small>
+                                </div>
+
+                                <a
+                                    class="menu-item"
+                                    href="{% url 'first:profile' %}"
+                                >
+                                    <i class="fas fa-user"></i>
+                                    پروفایل من
+                                </a>
+
+                                <a
+                                    class="menu-item"
+                                    href="{% url 'first:user_orders' %}"
+                                >
+                                    <i class="fas fa-box"></i>
+                                    سفارش‌های من
+                                </a>
+
+                                <a
+                                    class="menu-item"
+                                    href="{% url 'first:wishlist' %}"
+                                >
+                                    <i class="fas fa-heart"></i>
+                                    علاقه‌مندی‌ها
+                                </a>
+
+
+
+                                {% if user.is_admin %}
+                                    <div class="menu-separator"></div>
+                                    <div class="menu-label">مدیریت فروشگاه</div>
+
+                                    <a
+                                        class="menu-item"
+                                        href="{% url 'first:admin_dashboard' %}"
+                                    >
+                                        <i class="fas fa-chart-pie"></i>
+                                        داشبورد مدیریت
+                                    </a>
+
+                                    {% if user.is_owner or 'products_view' in user_permissions %}
+                                        <a
+                                            class="menu-item"
+                                            href="{% url 'first:admin_products' %}"
+                                        >
+                                            <i class="fas fa-boxes-stacked"></i>
+                                            محصولات
+                                        </a>
+                                    {% endif %}
+
+                                    {% if user.is_owner or 'orders_view' in user_permissions %}
+                                        <a
+                                            class="menu-item"
+                                            href="{% url 'first:admin_orders' %}"
+                                        >
+                                            <i class="fas fa-receipt"></i>
+                                            سفارش‌ها
+                                        </a>
+                                    {% endif %}
+
+                                    {% if user.is_owner or 'reviews_view' in user_permissions %}
+                                        <a
+                                            class="menu-item"
+                                            href="{% url 'first:admin_reviews' %}"
+                                        >
+                                            <i class="fas fa-comments"></i>
+                                            نظرات
+                                        </a>
+                                    {% endif %}
+                                {% endif %}
+
+                                {% if user.is_owner %}
+                                    <div class="menu-separator"></div>
+                                    <div class="menu-label">ابزارهای مالک</div>
+
+                                    <a
+                                        class="menu-item"
+                                        href="{% url 'first:customizer' %}"
+                                    >
+                                        <i class="fas fa-wand-magic-sparkles"></i>
+                                        استودیو طراحی
+                                    </a>
+
+                                    <a
+                                        class="menu-item"
+                                        href="{% url 'first:warehouse' %}"
+                                    >
+                                        <i class="fas fa-warehouse"></i>
+                                        انبار
+                                    </a>
+
+                                    <a
+                                        class="menu-item"
+                                        href="{% url 'first:analytics_dashboard' %}"
+                                    >
+                                        <i class="fas fa-chart-line"></i>
+                                        آمار و گزارش
+                                    </a>
+        <a class="menu-item" href="{% url 'customer_care:admin_support_list' %}">
+            <i class="fas fa-headset"></i>
+            پشتیبانی
+        </a>
+
+        <a class="menu-item" href="{% url 'customer_care:admin_order_actions_list' %}">
+            <i class="fas fa-rotate-left"></i>
+            لغو و مرجوعی
+        </a>
+
+                                    <a
+                                        class="menu-item"
+                                        href="{% url 'first:admin_users' %}"
+                                    >
+                                        <i class="fas fa-users"></i>
+                                        کاربران
+                                    </a>
+
+                                    <a
+                                        class="menu-item"
+                                        href="{% url 'first:manage_admins' %}"
+                                    >
+                                        <i class="fas fa-user-shield"></i>
+                                        ادمین‌ها
+                                    </a>
+
+                                    <a
+                                        class="menu-item"
+                                        href="{% url 'first:site_settings' %}"
+                                    >
+                                        <i class="fas fa-gear"></i>
+                                        تنظیمات سایت
+                                    </a>
+                                {% endif %}
+
+                                <div class="menu-separator"></div>
+
+                                <form method="post" action="{% url 'first:logout' %}" class="inline-block">{% csrf_token %}<button type="submit" class="menu-item danger">
+                                    <i class="fas fa-arrow-right-from-bracket"></i>
+                                    خروج
+                                </button></form>
+                            </div>
+                        </details>
+                    {% else %}
+                        <div class="desktop-auth flex items-center gap-2">
+                            <a
+                                class="btn-pink-outline"
+                                href="{% url 'first:login' %}"
+                                data-bsg-edit="login-btn"
+                                data-bsg-name="دکمه ورود"
+                            >
+                                ورود
+                            </a>
+
+                            <a
+                                class="btn-pink"
+                                href="{% url 'first:signup' %}"
+                                data-bsg-edit="signup-btn"
+                                data-bsg-name="دکمه ثبت نام"
+                            >
+                                ثبت‌نام
+                            </a>
+                        </div>
+                    {% endif %}
+
+                    {% if not user.is_owner %}
+<button
+                        type="button"
+                        class="round-action mobile-toggle hidden"
+                        id="mobileMenuButton"
+                        aria-controls="mobileMenu"
+                        aria-expanded="false"
+                        aria-label="بازکردن منو"
+                        data-bsg-edit="mobile-menu-btn"
+                        data-bsg-name="دکمه منوی موبایل"
+                    >
+                        <i class="fas fa-bars"></i>
+                    </button>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        {% if not user.is_owner %}
+        <div
+            class="mobile-menu"
+            id="mobileMenu"
+            data-bsg-edit="mobile-menu"
+            data-bsg-name="منوی موبایل"
+        >
+            <div class="site-container">
+<nav
+                    class="mobile-grid"
+                    aria-label="منوی موبایل"
+                >
+                    <a
+                        class="mobile-link"
+                        href="{% url 'first:home' %}"
+                    >
+                        <i class="fas fa-house"></i>
+                        خانه
+                    </a>
+
+                    <a
+                        class="mobile-link"
+                        href="{% url 'first:product_list' %}"
+                    >
+                        <i class="fas fa-border-all"></i>
+                        محصولات
+                    </a>
+
+                    <a
+                        class="mobile-link"
+                        href="{% url 'first:discounts' %}"
+                    >
+                        <i class="fas fa-tags"></i>
+                        تخفیف‌ها
+                    </a>
+
+                    <a
+                        class="mobile-link"
+                        href="{% url 'first:best_sellers' %}"
+                    >
+                        <i class="fas fa-crown"></i>
+                        پرفروش‌ها
+                    </a>
+
+                    {% if user.is_authenticated %}
+                        <a
+                            class="mobile-link"
+                            href="{% url 'first:profile' %}"
+                        >
+                            <i class="fas fa-user"></i>
+                            پروفایل
+                        </a>
+
+                        <a
+                            class="mobile-link"
+                            href="{% url 'first:user_orders' %}"
+                        >
+                            <i class="fas fa-box"></i>
+                            سفارش‌ها
+                        </a>
+
+                        <a
+                            class="mobile-link"
+                            href="{% url 'first:wishlist' %}"
+                        >
+                            <i class="fas fa-heart"></i>
+                            علاقه‌مندی‌ها
+                        </a>
+                    {% else %}
+                        <a
+                            class="mobile-link"
+                            href="{% url 'first:login' %}"
+                        >
+                            <i class="fas fa-arrow-right-to-bracket"></i>
+                            ورود
+                        </a>
+
+                        <a
+                            class="mobile-link"
+                            href="{% url 'first:signup' %}"
+                        >
+                            <i class="fas fa-user-plus"></i>
+                            ثبت‌نام
+                        </a>
+                    {% endif %}
+
+                    <button
+                        type="button"
+                        class="mobile-link"
+                        id="mobileThemeToggle"
+                    >
+                        <i class="fas fa-circle-half-stroke"></i>
+                        <span id="mobileThemeText">حالت شب</span>
+                    </button>
+
+                    {% if user.is_admin %}
+                        <a
+                            class="mobile-link mobile-wide"
+                            href="{% url 'first:admin_dashboard' %}"
+                        >
+                            <i class="fas fa-chart-pie"></i>
+                            داشبورد مدیریت
+                        </a>
+
+                        {% if user.is_owner or 'products_view' in user_permissions %}
+                            <a
+                                class="mobile-link"
+                                href="{% url 'first:admin_products' %}"
+                            >
+                                <i class="fas fa-boxes-stacked"></i>
+                                محصولات
+                            </a>
+                        {% endif %}
+
+                        {% if user.is_owner or 'orders_view' in user_permissions %}
+                            <a
+                                class="mobile-link"
+                                href="{% url 'first:admin_orders' %}"
+                            >
+                                <i class="fas fa-receipt"></i>
+                                سفارش‌ها
+                            </a>
+                        {% endif %}
+                    {% endif %}
+
+                    {% if user.is_owner %}
+                        <a
+                            class="mobile-link mobile-wide"
+                            href="{% url 'first:customizer' %}"
+                        >
+                            <i class="fas fa-wand-magic-sparkles"></i>
+                            استودیو طراحی
+                        </a>
+
+                        <a
+                            class="mobile-link"
+                            href="{% url 'first:warehouse' %}"
+                        >
+                            <i class="fas fa-warehouse"></i>
+                            انبار
+                        </a>
+
+                        <a
+                            class="mobile-link"
+                            href="{% url 'first:analytics_dashboard' %}"
+                        >
+                            <i class="fas fa-chart-line"></i>
+                            آمار
+                        </a>
+        <a class="mobile-link" href="{% url 'customer_care:admin_support_list' %}">
+            <i class="fas fa-headset"></i>
+            پشتیبانی
+        </a>
+
+        <a class="mobile-link" href="{% url 'customer_care:admin_order_actions_list' %}">
+            <i class="fas fa-rotate-left"></i>
+            لغو و مرجوعی
+        </a>
+                    {% endif %}
+
+                    {% if user.is_authenticated %}
+                        <form method="post" action="{% url 'first:logout' %}" class="inline-block">{% csrf_token %}<button type="submit" class="mobile-link mobile-wide text-red-500">
+                            <i class="fas fa-arrow-right-from-bracket"></i>
+                            خروج
+                        </button></form>
+                    {% endif %}
+                </nav>
+            </div>
+        </div>
+        {% endif %}
+    </header>
+
+    {% if messages %}
+        <div
+            class="message-stack"
+            id="messageStack"
+            aria-live="polite"
+        >
+            {% for message in messages %}
+                <div
+                    class="message-item
+                        {% if message.tags == 'success' %}
+                            success
+                        {% elif message.tags == 'error' %}
+                            error
+                        {% elif message.tags == 'warning' %}
+                            warning
+                        {% else %}
+                            info
+                        {% endif %}
+                    "
+                >
+                    <i
+                        class="fas
+                            {% if message.tags == 'success' %}
+                                fa-circle-check
+                            {% elif message.tags == 'error' %}
+                                fa-circle-exclamation
+                            {% elif message.tags == 'warning' %}
+                                fa-triangle-exclamation
+                            {% else %}
+                                fa-circle-info
+                            {% endif %}
+                        "
+                    ></i>
+
+                    <span>{{ message }}</span>
+
+                    <button
+                        type="button"
+                        aria-label="بستن پیام"
+                    >
+                        <i class="fas fa-xmark"></i>
+                    </button>
+                </div>
+            {% endfor %}
+        </div>
+    {% endif %}
+
+    <main
+        class="site-main"
+        data-bsg-edit="main-content"
+        data-bsg-name="محتوای اصلی"
+    >
+        {% block content %}{% endblock %}
+    </main>
+
+    <footer
+        class="site-footer"
+        data-bsg-edit="footer"
+        data-bsg-name="فوتر سایت"
+    >
+        <div class="site-container">
+            <div class="footer-grid">
+                <section
+                    data-bsg-edit="footer-about"
+                    data-bsg-name="درباره فروشگاه در فوتر"
+                >
+                    <div class="footer-brand">
+                        <span class="footer-logo">
+                            {% if settings.logo %}
+                                <img
+                                    src="{{ settings.logo.url }}"
+                                    alt="{{ settings.site_name }}"
+                                >
+                            {% else %}
+                                <i class="fas fa-spa"></i>
+                            {% endif %}
+                        </span>
+
+                        <div>
+                            <strong
+                                class="pink-gradient-text"
+                                data-bsg-edit="footer-site-name"
+                                data-bsg-name="نام سایت در فوتر"
+                            >
+                                {{ settings.site_name|default:'آرایشی شاپ' }}
+                            </strong>
+
+                            <small
+                                style="
+                                    display: block;
+                                    margin-top: .2rem;
+                                    color: rgba(255, 255, 255, .38);
+                                    font-size: .58rem;
+                                    letter-spacing: .12em;
+                                "
+                            >
+                                LUXURY BEAUTY STORE
+                            </small>
+                        </div>
+                    </div>
+
+                    <p
+                        class="footer-description"
+                        data-bsg-edit="footer-description"
+                        data-bsg-name="توضیح فوتر"
+                    >
+                        {{ settings.site_description|default:'مرجع تخصصی محصولات آرایشی و مراقبتی با ضمانت اصالت و تجربه خریدی مطمئن.' }}
+                    </p>
+
+                    <div
+                        class="socials"
+                        data-bsg-edit="footer-social"
+                        data-bsg-name="شبکه‌های اجتماعی"
+                    >
+                        {% if settings.instagram %}
+                            <a
+                                href="{{ settings.instagram }}"
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                aria-label="اینستاگرام"
+                            >
+                                <i class="fab fa-instagram"></i>
+                            </a>
+                        {% endif %}
+
+                        {% if settings.telegram %}
+                            <a
+                                href="{{ settings.telegram }}"
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                aria-label="تلگرام"
+                            >
+                                <i class="fab fa-telegram"></i>
+                            </a>
+                        {% endif %}
+
+                        {% if settings.whatsapp %}
+                            <a
+                                href="{{ settings.whatsapp }}"
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                aria-label="واتساپ"
+                            >
+                                <i class="fab fa-whatsapp"></i>
+                            </a>
+                        {% endif %}
+
+                        {% if settings.youtube %}
+                            <a
+                                href="{{ settings.youtube }}"
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                aria-label="یوتیوب"
+                            >
+                                <i class="fab fa-youtube"></i>
+                            </a>
+                        {% endif %}
+                    </div>
+                </section>
+
+                <section
+                    data-bsg-edit="footer-links"
+                    data-bsg-name="دسترسی سریع فوتر"
+                >
+                    <h2 class="footer-title">دسترسی سریع</h2>
+
+                    <ul class="footer-list">
+                        <li>
+                            <a href="{% url 'first:product_list' %}">
+                                همه محصولات
+                            </a>
+                        </li>
+
+                        <li>
+                            <a href="{% url 'first:best_sellers' %}">
+                                پرفروش‌ترین‌ها
+                            </a>
+                        </li>
+
+                        <li>
+                            <a href="{% url 'first:discounts' %}">
+                                تخفیف‌های ویژه
+                            </a>
+                        </li>
+
+                        {% if user.is_authenticated %}
+                            <li>
+                                <a href="{% url 'first:wishlist' %}">
+                                    علاقه‌مندی‌ها
+                                </a>
+                            </li>
+                        {% endif %}
+                    </ul>
+                </section>
+
+                <section
+                    data-bsg-edit="footer-services"
+                    data-bsg-name="خدمات مشتریان فوتر"
+                >
+                    <h2 class="footer-title">
+                        خدمات مشتریان
+                    </h2>
+
+                    <ul class="footer-list">
+                        <li>
+                            <a href="{% url 'first:customer_service' 'shopping-guide' %}">
+                                راهنمای خرید
+                            </a>
+                        </li>
+
+                        <li>
+                            <a href="{% url 'first:customer_service' 'order-tracking' %}">
+                                پیگیری سفارش
+                            </a>
+                        </li>
+
+                        <li>
+                            <a href="{% url 'first:customer_service' 'shipping-returns' %}">
+                                ارسال، لغو و مرجوعی
+                            </a>
+                        </li>
+
+                        <li>
+                            <a href="{% url 'first:customer_service' 'faq' %}">
+                                پرسش‌های متداول
+                            </a>
+                        </li>
+
+                        <li>
+                            <a href="{% url 'first:customer_service' 'terms' %}">
+                                قوانین و مقررات
+                            </a>
+                        </li>
+
+                        <li>
+                            <a href="{% url 'first:customer_service' 'privacy' %}">
+                                حریم خصوصی
+                            </a>
+                        </li>
+
+                        <li>
+                            <a href="{% url 'first:customer_service' 'support' %}">
+                                تماس با پشتیبانی
+                            </a>
+                        </li>
+                    </ul>
+                </section>
+
+                <section
+                    data-bsg-edit="footer-contact"
+                    data-bsg-name="اطلاعات تماس فوتر"
+                >
+                    <h2 class="footer-title">تماس با ما</h2>
+
+                    <ul class="footer-list footer-contact">
+                        <li>
+                            <i class="fas fa-phone"></i>
+
+                            <span
+                                data-bsg-edit="footer-phone"
+                                data-bsg-name="شماره تماس"
+                            >
+                                {{ settings.phone|default:'۰۲۱-۱۲۳۴۵۶۷۸' }}
+                            </span>
+                        </li>
+
+                        <li>
+                            <i class="fas fa-envelope"></i>
+
+                            <span
+                                data-bsg-edit="footer-email"
+                                data-bsg-name="ایمیل"
+                            >
+                                {{ settings.email|default:'info@arayeshi.shop' }}
+                            </span>
+                        </li>
+
+                        <li>
+                            <i class="fas fa-location-dot"></i>
+
+                            <span
+                                data-bsg-edit="footer-address"
+                                data-bsg-name="آدرس"
+                            >
+                                {{ settings.address|default:'تهران' }}
+                            </span>
+                        </li>
+
+                        <li>
+                            <i class="fas fa-clock"></i>
+
+                            <span
+                                data-bsg-edit="footer-hours"
+                                data-bsg-name="ساعات پاسخگویی"
+                            >
+                                پاسخ‌گویی از ساعت ۹ تا ۲۱
+                            </span>
+                        </li>
+                    </ul>
+                </section>
+            </div>
+
+            <div class="footer-bottom">
+                <p
+                    data-bsg-edit="footer-copyright"
+                    data-bsg-name="متن کپی‌رایت"
+                >
+                    {{ settings.footer_text|default:'© ۱۴۰۴ آرایشی شاپ - تمامی حقوق محفوظ است' }}
+                </p>
+
+                <span>
+                    خرید امن، اصالت تضمین‌شده و پشتیبانی واقعی
+                </span>
+            </div>
+        </div>
+    </footer>
+
+    <button
+        type="button"
+        class="back-top"
+        id="backToTop"
+        aria-label="بازگشت به بالای صفحه"
+    >
+        <i class="fas fa-arrow-up"></i>
+    </button>
+
+    <script>
+        (function () {
+            'use strict';
+
+            const root =
+                document.documentElement;
+
+            const themeButton =
+                document.getElementById(
+                    'themeToggle'
+                );
+
+            const mobileThemeButton =
+                document.getElementById(
+                    'mobileThemeToggle'
+                );
+
+            const themeIcon =
+                document.getElementById(
+                    'themeIcon'
+                );
+
+            const mobileThemeText =
+                document.getElementById(
+                    'mobileThemeText'
+                );
+
+            const mobileButton =
+                document.getElementById(
+                    'mobileMenuButton'
+                );
+
+            const mobileMenu =
+                document.getElementById(
+                    'mobileMenu'
+                );
+
+            const backToTop =
+                document.getElementById(
+                    'backToTop'
+                );
+
+            function currentTheme() {
+                return root.dataset.theme === 'dark'
+                    ? 'dark'
+                    : 'light';
+            }
+
+            function applyTheme(theme) {
+                root.dataset.theme =
+                    theme;
+
+                try {
+                    localStorage.setItem(
+                        'arayeshi-theme',
+                        theme
+                    );
+                } catch (error) {}
+
+                if (themeIcon) {
+                    themeIcon.className =
+                        theme === 'dark'
+                            ? 'fas fa-sun'
+                            : 'fas fa-moon';
+                }
+
+                if (mobileThemeText) {
+                    mobileThemeText.textContent =
+                        theme === 'dark'
+                            ? 'حالت روز'
+                            : 'حالت شب';
+                }
+
+                if (themeButton) {
+                    themeButton.setAttribute(
+                        'aria-label',
+                        theme === 'dark'
+                            ? 'فعال‌کردن حالت روز'
+                            : 'فعال‌کردن حالت شب'
+                    );
+                }
+            }
+
+            function toggleTheme() {
+                applyTheme(
+                    currentTheme() === 'dark'
+                        ? 'light'
+                        : 'dark'
+                );
+            }
+
+            themeButton?.addEventListener(
+                'click',
+                toggleTheme
+            );
+
+            mobileThemeButton?.addEventListener(
+                'click',
+                toggleTheme
+            );
+
+            applyTheme(
+                currentTheme()
+            );
+
+            function closeMobileMenu() {
+                if (
+                    !mobileMenu ||
+                    !mobileButton
+                ) {
+                    return;
+                }
+
+                mobileMenu.classList.remove(
+                    'open'
+                );
+
+                mobileButton.setAttribute(
+                    'aria-expanded',
+                    'false'
+                );
+
+                const icon =
+                    mobileButton.querySelector(
+                        'i'
+                    );
+
+                if (icon) {
+                    icon.className =
+                        'fas fa-bars';
+                }
+            }
+
+            mobileButton?.addEventListener(
+                'click',
+                function () {
+                    const open =
+                        !mobileMenu.classList.contains(
+                            'open'
+                        );
+
+                    mobileMenu.classList.toggle(
+                        'open',
+                        open
+                    );
+
+                    mobileButton.setAttribute(
+                        'aria-expanded',
+                        String(open)
+                    );
+
+                    const icon =
+                        mobileButton.querySelector(
+                            'i'
+                        );
+
+                    if (icon) {
+                        icon.className =
+                            open
+                                ? 'fas fa-xmark'
+                                : 'fas fa-bars';
+                    }
+                }
+            );
+
+            mobileMenu
+                ?.querySelectorAll('a')
+                .forEach(function (link) {
+                    link.addEventListener(
+                        'click',
+                        closeMobileMenu
+                    );
+                });
+
+            document.addEventListener(
+                'click',
+                function (event) {
+                    if (
+                        mobileMenu?.classList.contains(
+                            'open'
+                        ) &&
+                        !mobileMenu.contains(
+                            event.target
+                        ) &&
+                        !mobileButton?.contains(
+                            event.target
+                        )
+                    ) {
+                        closeMobileMenu();
+                    }
+
+                    document
+                        .querySelectorAll(
+                            '.user-details[open]'
+                        )
+                        .forEach(
+                            function (details) {
+                                if (
+                                    !details.contains(
+                                        event.target
+                                    )
+                                ) {
+                                    details.removeAttribute(
+                                        'open'
+                                    );
+                                }
+                            }
+                        );
+                }
+            );
+
+            document.addEventListener(
+                'keydown',
+                function (event) {
+                    if (
+                        event.key !== 'Escape'
+                    ) {
+                        return;
+                    }
+
+                    closeMobileMenu();
+
+                    document
+                        .querySelectorAll(
+                            '.user-details[open]'
+                        )
+                        .forEach(
+                            function (details) {
+                                details.removeAttribute(
+                                    'open'
+                                );
+                            }
+                        );
+                }
+            );
+
+            document
+                .querySelectorAll(
+                    '.message-item'
+                )
+                .forEach(
+                    function (
+                        message,
+                        index
+                    ) {
+                        const close =
+                            message.querySelector(
+                                'button'
+                            );
+
+                        const remove =
+                            function () {
+                                message.style.opacity =
+                                    '0';
+
+                                message.style.transform =
+                                    'translateX(30px)';
+
+                                window.setTimeout(
+                                    function () {
+                                        message.remove();
+                                    },
+                                    250
+                                );
+                            };
+
+                        close?.addEventListener(
+                            'click',
+                            remove
+                        );
+
+                        window.setTimeout(
+                            remove,
+                            5500 +
+                            (index * 450)
+                        );
+                    }
+                );
+
+            function syncBackToTop() {
+                backToTop?.classList.toggle(
+                    'show',
+                    window.scrollY > 500
+                );
+            }
+
+            window.addEventListener(
+                'scroll',
+                syncBackToTop,
+                {
+                    passive: true
+                }
+            );
+
+            backToTop?.addEventListener(
+                'click',
+                function () {
+                    window.scrollTo({
+                        top: 0,
+                        behavior: 'smooth'
+                    });
+                }
+            );
+
+            syncBackToTop();
+
+            {% if settings.number_format|default:'persian' == 'persian' %}
+                const persianDigits =
+                    '۰۱۲۳۴۵۶۷۸۹';
+
+                const walker =
+                    document.createTreeWalker(
+                        document.body,
+                        NodeFilter.SHOW_TEXT
+                    );
+
+                const nodes =
+                    [];
+
+                while (
+                    walker.nextNode()
+                ) {
+                    nodes.push(
+                        walker.currentNode
+                    );
+                }
+
+                nodes.forEach(
+                    function (node) {
+                        const parent =
+                            node.parentElement;
+
+                        if (
+                            !parent ||
+                            parent.closest(
+                                'script,style,code,pre,input,textarea,[data-no-localize]'
+                            )
+                        ) {
+                            return;
+                        }
+
+                        node.nodeValue =
+                            node.nodeValue.replace(
+                                /\d/g,
+                                function (digit) {
+                                    return persianDigits[
+                                        Number(digit)
+                                    ];
+                                }
+                            );
+                    }
+                );
+            {% endif %}
+        })();
+    </script>
+
+    {% block extra_js %}{% endblock %}
+
+    {{ visual_customizer|json_script:"visual-customizer-data" }}
+
+    <script
+        src="{% static 'js/customizer.js' %}"
+    ></script>
+</body>
+</html>

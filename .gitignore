@@ -1,0 +1,46 @@
+# Secrets and local environment
+.env
+.env.*
+!.env.example
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+.Python
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+
+# Virtual environments
+.venv/
+venv/
+env/
+
+# Django local/runtime files
+db.sqlite3
+db.sqlite3-journal
+staticfiles/
+private_media/
+*.log
+
+# User uploaded files
+media/
+
+# IDE and operating system
+.idea/
+.vscode/
+.DS_Store
+Thumbs.db
+
+# Backups and archives
+*.dump
+*.sqlite3.bak
+*.zip
+
+# Local repair / backup artifacts
+*.backup
+.arayeshi_patch_backups/
+arayeshi_fix_*.py
+arayeshi_v*.py
+node_modules/

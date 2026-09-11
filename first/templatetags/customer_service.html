@@ -1,0 +1,729 @@
+{% extends 'base.html' %}
+
+{% block title %}
+    {{ page.title }} |
+    {{ settings.site_name|default:'آرایشی شاپ' }}
+{% endblock %}
+
+{% block extra_css %}
+<style>
+    .service-page {
+        --service-pink:
+            var(--primary-color, #ec407a);
+
+        --service-purple:
+            var(--accent-color, #ab47bc);
+
+        padding:
+            1rem 0 3rem;
+    }
+
+    .service-hero {
+        position:
+            relative;
+
+        overflow:
+            hidden;
+
+        padding:
+            clamp(2rem, 5vw, 4.5rem);
+
+        border:
+            1px solid
+            var(--line);
+
+        border-radius:
+            30px;
+
+        color:
+            white;
+
+        background:
+            linear-gradient(
+                135deg,
+                #35112f,
+                #771d5a 55%,
+                #a62872
+            );
+
+        box-shadow:
+            var(--shadow);
+    }
+
+    .service-hero::after {
+        content:
+            "";
+
+        position:
+            absolute;
+
+        width:
+            320px;
+
+        height:
+            320px;
+
+        left:
+            -100px;
+
+        top:
+            -170px;
+
+        border-radius:
+            50%;
+
+        background:
+            rgba(255, 255, 255, .1);
+    }
+
+    .service-hero-content {
+        position:
+            relative;
+
+        z-index:
+            1;
+
+        max-width:
+            780px;
+    }
+
+    .service-icon {
+        width:
+            64px;
+
+        height:
+            64px;
+
+        display:
+            grid;
+
+        place-items:
+            center;
+
+        margin-bottom:
+            1.25rem;
+
+        border:
+            1px solid
+            rgba(255, 255, 255, .22);
+
+        border-radius:
+            20px;
+
+        background:
+            rgba(255, 255, 255, .12);
+
+        font-size:
+            1.7rem;
+
+        backdrop-filter:
+            blur(10px);
+    }
+
+    .service-eyebrow {
+        margin:
+            0 0 .45rem;
+
+        color:
+            #fbcfe8;
+
+        font-size:
+            .78rem;
+
+        font-weight:
+            900;
+    }
+
+    .service-hero h1 {
+        margin:
+            0;
+
+        font-size:
+            clamp(1.8rem, 5vw, 3.2rem);
+
+        font-weight:
+            950;
+    }
+
+    .service-intro {
+        max-width:
+            680px;
+
+        margin:
+            1rem 0 0;
+
+        color:
+            rgba(255, 255, 255, .78);
+
+        font-size:
+            clamp(.85rem, 2vw, 1rem);
+
+        line-height:
+            2;
+    }
+
+    .service-updated {
+        display:
+            inline-flex;
+
+        align-items:
+            center;
+
+        gap:
+            .45rem;
+
+        margin-top:
+            1.25rem;
+
+        padding:
+            .45rem .75rem;
+
+        border-radius:
+            999px;
+
+        color:
+            #fce7f3;
+
+        background:
+            rgba(255, 255, 255, .1);
+
+        font-size:
+            .68rem;
+
+        font-weight:
+            800;
+    }
+
+    .service-layout {
+        display:
+            grid;
+
+        grid-template-columns:
+            minmax(0, 1fr) 280px;
+
+        gap:
+            1.5rem;
+
+        margin-top:
+            1.5rem;
+
+        align-items:
+            start;
+    }
+
+    .service-content,
+    .service-side {
+        display:
+            grid;
+
+        gap:
+            1rem;
+    }
+
+    .service-card,
+    .service-side-card {
+        padding:
+            clamp(1.15rem, 3vw, 1.7rem);
+
+        border:
+            1px solid
+            var(--line);
+
+        border-radius:
+            22px;
+
+        color:
+            var(--text-color);
+
+        background:
+            var(--surface-solid);
+
+        box-shadow:
+            0 18px 50px -38px
+            rgba(71, 20, 55, .6);
+    }
+
+    .service-card h2 {
+        margin:
+            0 0 .75rem;
+
+        color:
+            var(--service-pink);
+
+        font-size:
+            1rem;
+
+        font-weight:
+            950;
+    }
+
+    .service-card p,
+    .service-list {
+        margin:
+            0;
+
+        color:
+            var(--muted);
+
+        font-size:
+            .8rem;
+
+        line-height:
+            2;
+    }
+
+    .service-list {
+        display:
+            grid;
+
+        gap:
+            .55rem;
+
+        padding:
+            .8rem 1.2rem 0 0;
+    }
+
+    .service-list li::marker {
+        color:
+            var(--service-pink);
+    }
+
+    .service-note {
+        display:
+            flex;
+
+        gap:
+            .65rem;
+
+        margin-top:
+            1rem;
+
+        padding:
+            .85rem 1rem;
+
+        border:
+            1px solid
+            rgba(236, 64, 122, .18);
+
+        border-radius:
+            14px;
+
+        color:
+            var(--text-color);
+
+        background:
+            rgba(236, 64, 122, .07);
+
+        font-size:
+            .72rem;
+
+        line-height:
+            1.9;
+    }
+
+    .service-note i {
+        margin-top:
+            .25rem;
+
+        color:
+            var(--service-pink);
+    }
+
+    .service-side-card h2 {
+        margin:
+            0 0 .9rem;
+
+        font-size:
+            .82rem;
+
+        font-weight:
+            950;
+    }
+
+    .service-nav {
+        display:
+            grid;
+
+        gap:
+            .4rem;
+    }
+
+    .service-nav a {
+        display:
+            flex;
+
+        align-items:
+            center;
+
+        justify-content:
+            space-between;
+
+        gap:
+            .5rem;
+
+        padding:
+            .7rem .8rem;
+
+        border-radius:
+            12px;
+
+        color:
+            var(--muted);
+
+        font-size:
+            .7rem;
+
+        font-weight:
+            800;
+
+        transition:
+            .18s ease;
+    }
+
+    .service-nav a:hover,
+    .service-nav a.active {
+        color:
+            var(--service-pink);
+
+        background:
+            rgba(236, 64, 122, .08);
+    }
+
+    .service-action,
+    .support-link {
+        min-height:
+            44px;
+
+        display:
+            flex;
+
+        align-items:
+            center;
+
+        justify-content:
+            center;
+
+        gap:
+            .55rem;
+
+        padding:
+            .7rem 1rem;
+
+        border-radius:
+            13px;
+
+        color:
+            white;
+
+        background:
+            linear-gradient(
+                135deg,
+                var(--service-pink),
+                var(--service-purple)
+            );
+
+        font-size:
+            .74rem;
+
+        font-weight:
+            900;
+
+        transition:
+            .2s ease;
+    }
+
+    .service-action:hover,
+    .support-link:hover {
+        transform:
+            translateY(-2px);
+
+        box-shadow:
+            0 14px 32px
+            rgba(171, 71, 188, .22);
+    }
+
+    .support-grid {
+        display:
+            grid;
+
+        grid-template-columns:
+            repeat(2, minmax(0, 1fr));
+
+        gap:
+            .7rem;
+
+        margin-top:
+            .9rem;
+    }
+
+    .support-link.secondary {
+        color:
+            var(--service-pink);
+
+        border:
+            1px solid
+            rgba(236, 64, 122, .25);
+
+        background:
+            rgba(236, 64, 122, .07);
+    }
+
+    @media (max-width: 880px) {
+        .service-layout {
+            grid-template-columns:
+                1fr;
+        }
+
+        .service-side {
+            order:
+                -1;
+        }
+
+        .service-nav {
+            grid-template-columns:
+                repeat(2, minmax(0, 1fr));
+        }
+    }
+
+    @media (max-width: 560px) {
+        .service-page {
+            padding-top:
+                0;
+        }
+
+        .service-hero {
+            border-radius:
+                20px;
+        }
+
+        .service-nav,
+        .support-grid {
+            grid-template-columns:
+                1fr;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<article class="service-page">
+    <header class="service-hero">
+        <div class="service-hero-content">
+            <div class="service-icon">
+                <i class="fas {{ page.icon }}"></i>
+            </div>
+
+            <p class="service-eyebrow">
+                {{ page.eyebrow }}
+            </p>
+
+            <h1>
+                {{ page.title }}
+            </h1>
+
+            <p class="service-intro">
+                {{ page.intro }}
+            </p>
+
+            {% if page.updated_at %}
+                <span class="service-updated">
+                    <i class="fas fa-calendar-check"></i>
+
+                    آخرین به‌روزرسانی:
+                    {{ page.updated_at }}
+                </span>
+            {% endif %}
+        </div>
+    </header>
+
+    <div class="service-layout">
+        <div class="service-content">
+            {% for section in page.sections %}
+                <section class="service-card">
+                    <h2>
+                        {{ section.title }}
+                    </h2>
+
+                    {% if section.body %}
+                        <p>
+                            {{ section.body }}
+                        </p>
+                    {% endif %}
+
+                    {% if section.items %}
+                        <ul class="service-list">
+                            {% for item in section.items %}
+                                <li>
+                                    {{ item }}
+                                </li>
+                            {% endfor %}
+                        </ul>
+                    {% endif %}
+
+                    {% if section.note %}
+                        <div class="service-note">
+                            <i class="fas fa-circle-info"></i>
+
+                            <span>
+                                {{ section.note }}
+                            </span>
+                        </div>
+                    {% endif %}
+                </section>
+            {% empty %}
+                <section class="service-card">
+                    <h2>اطلاعات این صفحه</h2>
+
+                    <p>
+                        محتوای این صفحه به‌زودی تکمیل می‌شود.
+                    </p>
+                </section>
+            {% endfor %}
+
+            {% if page_slug == 'support' %}
+                <section class="service-card">
+                    <h2>راه‌های ارتباطی</h2>
+
+                    <p>
+                        برای ارتباط با پشتیبانی یکی از
+                        راه‌های زیر را انتخاب کنید.
+                    </p>
+
+                    <div class="support-grid">
+                        {% if settings.email %}
+                            <a
+                                class="support-link"
+                                href="mailto:{{ settings.email }}"
+                            >
+                                <i class="fas fa-envelope"></i>
+                                {{ settings.email }}
+                            </a>
+                        {% endif %}
+
+                        {% if settings.phone %}
+                            <a
+                                class="support-link secondary"
+                                href="tel:{{ settings.phone }}"
+                            >
+                                <i class="fas fa-phone"></i>
+                                {{ settings.phone }}
+                            </a>
+                        {% endif %}
+
+                        {% if settings.whatsapp %}
+                            <a
+                                class="support-link secondary"
+                                href="{{ settings.whatsapp }}"
+                                target="_blank"
+                                rel="noopener noreferrer"
+                            >
+                                <i class="fab fa-whatsapp"></i>
+                                واتساپ
+                            </a>
+                        {% endif %}
+
+                        {% if settings.telegram %}
+                            <a
+                                class="support-link secondary"
+                                href="{{ settings.telegram }}"
+                                target="_blank"
+                                rel="noopener noreferrer"
+                            >
+                                <i class="fab fa-telegram"></i>
+                                تلگرام
+                            </a>
+                        {% endif %}
+                    </div>
+                </section>
+            {% endif %}
+
+            {% if page.action %}
+                {% if page.action.url_name %}
+                    <a
+                        class="service-action"
+                        href="{% url page.action.url_name %}"
+                    >
+                        {{ page.action.label }}
+                        <i class="fas fa-arrow-left"></i>
+                    </a>
+                {% elif page.action.page_slug %}
+                    <a
+                        class="service-action"
+                        href="{% url 'first:customer_service' page.action.page_slug %}"
+                    >
+                        {{ page.action.label }}
+                        <i class="fas fa-arrow-left"></i>
+                    </a>
+                {% endif %}
+            {% endif %}
+        </div>
+
+        <aside class="service-side">
+            <div class="service-side-card">
+                <h2>خدمات مشتریان</h2>
+
+                <nav
+                    class="service-nav"
+                    aria-label="صفحات خدمات مشتریان"
+                >
+                    <a
+                        class="{% if page_slug == 'shopping-guide' %}active{% endif %}"
+                        href="{% url 'first:customer_service' 'shopping-guide' %}"
+                    >
+                        راهنمای خرید
+                        <i class="fas fa-angle-left"></i>
+                    </a>
+
+                    <a
+                        class="{% if page_slug == 'order-tracking' %}active{% endif %}"
+                        href="{% url 'first:customer_service' 'order-tracking' %}"
+                    >
+                        پیگیری سفارش
+                        <i class="fas fa-angle-left"></i>
+                    </a>
+
+                    <a
+                        class="{% if page_slug == 'shipping-returns' %}active{% endif %}"
+                        href="{% url 'first:customer_service' 'shipping-returns' %}"
+                    >
+                        ارسال و مرجوعی
+                        <i class="fas fa-angle-left"></i>
+                    </a>
+
+                    <a
+                        class="{% if page_slug == 'faq' %}active{% endif %}"
+                        href="{% url 'first:customer_service' 'faq' %}"
+                    >
+                        پرسش‌های متداول
+                        <i class="fas fa-angle-left"></i>
+                    </a>
+
+                    <a
+                        class="{% if page_slug == 'terms' %}active{% endif %}"
+                        href="{% url 'first:customer_service' 'terms' %}"
+                    >
+                        قوانین و مقررات
+                        <i class="fas fa-angle-left"></i>
+                    </a>
+
+                    <a
+                        class="{% if page_slug == 'privacy' %}active{% endif %}"
+                        href="{% url 'first:customer_service' 'privacy' %}"
+                    >
+                        حریم خصوصی
+                        <i class="fas fa-angle-left"></i>
+                    </a>
+
+                    <a
+                        class="{% if page_slug == 'support' %}active{% endif %}"
+                        href="{% url 'first:customer_service' 'support' %}"
+                    >
+                        تماس با پشتیبانی
+                        <i class="fas fa-angle-left"></i>
+                    </a>
+                </nav>
+            </div>
+        </aside>
+    </div>
+</article>
+{% endblock %}

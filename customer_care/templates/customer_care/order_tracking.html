@@ -1,0 +1,86 @@
+{% extends 'base.html' %}
+
+{% block title %}پیگیری سفارش{% endblock %}
+
+{% block content %}
+<div class="max-w-3xl mx-auto px-4 py-12">
+    <div class="bg-white/90 rounded-3xl shadow-xl p-6 md:p-8">
+        <h1 class="text-2xl font-black mb-2">پیگیری سفارش</h1>
+
+        {% if user.is_authenticated %}
+        <p class="text-gray-500 mb-6">
+            چون وارد حساب خودتان هستید، فقط کد سفارش را وارد کنید.
+        </p>
+
+        <form method="post" class="space-y-4">
+            {% csrf_token %}
+            <div>
+                <label class="block text-sm font-bold mb-2">کد سفارش</label>
+                <input name="order_number"
+                       placeholder="مثلاً 42857508"
+                       inputmode="numeric"
+                       autocomplete="off"
+                       dir="ltr"
+                       class="w-full rounded-xl border-2 border-gray-200 p-3 focus:border-pink-500 outline-none"
+                       required>
+            </div>
+            <button class="w-full bg-pink-600 text-white rounded-xl py-3 font-bold">
+                مشاهده وضعیت سفارش
+            </button>
+        </form>
+        {% else %}
+        <p class="text-gray-500 mb-6">
+            برای حفظ حریم خصوصی، کد سفارش و شماره تلفن ثبت‌شده روی سفارش را وارد کنید.
+        </p>
+
+        <form method="post" class="space-y-4">
+            {% csrf_token %}
+            {{ form.as_p }}
+            <button class="w-full bg-pink-600 text-white rounded-xl py-3 font-bold">
+                مشاهده وضعیت سفارش
+            </button>
+        </form>
+        {% endif %}
+
+        {% if searched %}
+        <div class="mt-8 border-t pt-6">
+            {% if order %}
+            <h2 class="font-black text-xl" dir="ltr">
+                #{{ order.order_number }}
+            </h2>
+
+            <div class="grid md:grid-cols-2 gap-3 mt-4 text-sm">
+                <div class="bg-gray-50 rounded-xl p-4">
+                    <b>وضعیت:</b>
+                    {{ order.get_status_display }}
+                </div>
+                <div class="bg-gray-50 rounded-xl p-4">
+                    <b>تاریخ ثبت:</b>
+                    {{ order.created_at|date:"Y/m/d H:i" }}
+                </div>
+                <div class="bg-gray-50 rounded-xl p-4">
+                    <b>مبلغ:</b>
+                    {{ order.total|floatformat:0 }} تومان
+                </div>
+                <div class="bg-gray-50 rounded-xl p-4">
+                    <b>روش پرداخت:</b>
+                    {{ order.get_payment_method_display }}
+                </div>
+            </div>
+
+            {% if user.is_authenticated %}
+            <a href="{% url 'first:order_detail' order.order_number %}"
+               class="block text-center mt-5 py-3 rounded-xl bg-gray-900 text-white font-bold">
+                مدیریت این سفارش
+            </a>
+            {% endif %}
+            {% else %}
+            <div class="bg-red-50 text-red-700 rounded-xl p-4">
+                سفارشی با اطلاعات واردشده پیدا نشد.
+            </div>
+            {% endif %}
+        </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

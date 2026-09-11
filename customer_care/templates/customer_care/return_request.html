@@ -1,0 +1,30 @@
+{% extends 'base.html' %}
+{% block title %}درخواست مرجوعی{% endblock %}
+{% block content %}
+<div class="max-w-3xl mx-auto px-4 py-10">
+  <div class="bg-white rounded-3xl shadow p-7">
+    <h1 class="text-2xl font-bold mb-2">مرجوعی سفارش #{{ order.order_number }}</h1>
+    <p class="text-gray-500 mb-6">کالاهای بازشده یا مصرف‌شده ممکن است طبق قوانین فروشگاه قابل مرجوعی نباشند؛ موارد معیوب، آسیب‌دیده یا اشتباه ارسال‌شده توسط پشتیبانی بررسی می‌شوند.</p>
+    <p class="text-xs text-gray-500 mb-4">تعداد قابل مرجوعی در سمت سرور با مرجوعی‌های قبلی کنترل می‌شود.</p>
+    <form method="post" class="space-y-4">
+      {% csrf_token %}
+      {{ form.non_field_errors }}
+      {{ form.reason.label_tag }} {{ form.reason }}
+      {{ form.description.label_tag }} {{ form.description }}
+      <div class="space-y-3 mt-5">
+        {% for item in order.items.all %}
+          <div class="border rounded-2xl p-4">
+            <label class="flex items-center gap-3">
+              <input type="checkbox" name="item_{{ item.pk }}">
+              <span class="font-bold">{{ item.product_name }}</span>
+            </label>
+            <label class="block text-sm mt-3">تعداد (حداکثر {{ item.quantity }})</label>
+            <input class="rounded-xl border p-2 mt-1" type="number" min="1" max="{{ item.quantity }}" value="1" name="qty_{{ item.pk }}">
+          </div>
+        {% endfor %}
+      </div>
+      <button class="w-full bg-pink-600 text-white py-3 rounded-xl font-bold">ثبت درخواست مرجوعی</button>
+    </form>
+  </div>
+</div>
+{% endblock %}
