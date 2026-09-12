@@ -37,8 +37,8 @@
 {% if user|has_permission:'site_settings' %}<a class="pa-nav-link {% if request.resolver_match.url_name == 'number_format_settings' %}active{% endif %}" href="{% url 'first:number_format_settings' %}"><i class="fa-solid fa-hashtag"></i><span>فرمت اعداد</span></a>{% endif %}
 {% if user.is_owner or user.is_superuser %}<a class="pa-nav-link {% if request.resolver_match.url_name == 'customizer' %}active{% endif %}" href="{% url 'first:customizer' %}"><i class="fa-solid fa-wand-magic-sparkles"></i><span>طراحی بصری</span></a>{% endif %}
 {% if user.is_owner or user.is_superuser %}<a class="pa-nav-link" href="{% url 'first:manage_admins' %}">مدیریت ادمین‌ها</a><a class="pa-nav-link" href="{% url 'first:manage_admin_permissions' %}">دسترسی ادمین‌ها</a>{% endif %}
-{% if user|has_permission:'support_view' %}<a class="pa-nav-link" href="{% url 'customer_care:admin_support_list' %}">پشتیبانی</a>{% endif %}
-{% if user|has_permission:'returns_manage' %}<a class="pa-nav-link" href="{% url 'customer_care:admin_order_actions_list' %}">لغو و مرجوعی</a>{% endif %}
+{% if user|has_permission:'support_view' %}<a class="pa-nav-link {% if request.resolver_match.url_name == 'admin_support_list' or request.resolver_match.url_name == 'admin_support_detail' %}active{% endif %}" href="{% url 'customer_care:admin_support_list' %}"><i class="fa-solid fa-headset"></i><span>پشتیبانی</span></a>{% endif %}
+{% if user|has_permission:'returns_manage' %}<a class="pa-nav-link {% if request.resolver_match.url_name == 'admin_order_actions_list' or request.resolver_match.url_name == 'admin_order_action_detail' %}active{% endif %}" href="{% url 'customer_care:admin_order_actions_list' %}"><i class="fa-solid fa-arrow-rotate-left"></i><span>لغو و مرجوعی</span></a>{% endif %}
 </nav>
     <div class="pa-sidebar-foot">
       <a href="{% url 'first:home' %}"><i class="fa-solid fa-arrow-up-right-from-square"></i><span>مشاهده فروشگاه</span></a>

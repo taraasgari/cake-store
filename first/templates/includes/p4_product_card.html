@@ -1,15 +1,30 @@
 {% load custom_filters %}
 <article class="p4-product-card">
+  {% if product.slug %}
   <a class="p4-product-media" href="{% url 'first:product_detail' product.slug %}">
     <div class="p4-product-badges">{% if product.is_new %}<span>NEW</span>{% endif %}{% if product.is_best_seller %}<span>ICON</span>{% endif %}{% if product.discount_percent %}<span class="sale">-{{ product.discount_percent|format_number }}%</span>{% endif %}</div>
     {% if product.main_image %}<img src="{{ product.main_image.url }}" alt="{{ product.name }}" loading="lazy">{% else %}<div class="p4-empty-bottle">V</div>{% endif %}
   </a>
+  {% else %}
+  <div class="p4-product-media" aria-disabled="true">
+    <div class="p4-product-badges">{% if product.is_new %}<span>NEW</span>{% endif %}{% if product.is_best_seller %}<span>ICON</span>{% endif %}{% if product.discount_percent %}<span class="sale">-{{ product.discount_percent|format_number }}%</span>{% endif %}</div>
+    {% if product.main_image %}<img src="{{ product.main_image.url }}" alt="{{ product.name }}" loading="lazy">{% else %}<div class="p4-empty-bottle">V</div>{% endif %}
+  </div>
+  {% endif %}
   <div class="p4-product-info">
     <small>{{ product.brand.name|default:'PERFUME HOUSE' }}</small>
-    <a class="p4-product-title" href="{% url 'first:product_detail' product.slug %}">{{ product.name }}</a>
+    {% if product.slug %}<a class="p4-product-title" href="{% url 'first:product_detail' product.slug %}">{{ product.name }}</a>{% else %}<span class="p4-product-title">{{ product.name }}</span>{% endif %}
     <div class="p4-product-bottom">
       <div class="p4-price"><strong>{{ product.final_price|price_format }}</strong><span>تومان</span>{% if product.discount_percent %}<del>{{ product.price|price_format }}</del>{% endif %}</div>
-      {% if product.has_variants %}<a class="p4-round" href="{% url 'first:product_detail' product.slug %}"><i class="fa-solid fa-arrow-left"></i></a>{% else %}<form method="post" action="{% url 'first:add_to_cart' product.id %}">{% csrf_token %}<button class="p4-round" type="submit"><i class="fa-solid fa-bag-shopping"></i></button></form>{% endif %}
+      {% if product.has_variants %}
+        {% if product.slug %}<a class="p4-round" href="{% url 'first:product_detail' product.slug %}"><i class="fa-solid fa-arrow-left"></i></a>{% else %}<span class="p4-round" aria-disabled="true"><i class="fa-solid fa-minus"></i></span>{% endif %}
+      {% else %}
+        {% if product.id %}
+        <form method="post" action="{% url 'first:add_to_cart' product.id %}">{% csrf_token %}<button class="p4-round" type="submit"><i class="fa-solid fa-bag-shopping"></i></button></form>
+        {% else %}
+        <span class="p4-round" aria-disabled="true" title="این محصول در حال حاضر قابل افزودن به سبد نیست"><i class="fa-solid fa-minus"></i></span>
+        {% endif %}
+      {% endif %}
     </div>
   </div>
 </article>

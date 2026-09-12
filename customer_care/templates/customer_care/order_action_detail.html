@@ -1,23 +1,54 @@
 {% extends 'perfume_base.html' %}
-{% block title %}جزئیات درخواست{% endblock %}
+{% load custom_filters %}
+{% block title %}جزئیات {{ action.get_kind_display }}{% endblock %}
 {% block content %}
-<div class="max-w-3xl mx-auto px-4 py-10">
-  <div class="bg-white rounded-3xl shadow p-7">
-    <h1 class="text-2xl font-bold">{{ action.get_kind_display }}</h1>
-    <div class="grid md:grid-cols-2 gap-3 mt-5">
-      <div class="bg-gray-50 p-4 rounded-xl"><b>سفارش:</b> #{{ action.order.order_number }}</div>
-      <div class="bg-gray-50 p-4 rounded-xl"><b>وضعیت:</b> {{ action.get_status_display }}</div>
-      <div class="bg-gray-50 p-4 rounded-xl"><b>دلیل:</b> {{ action.get_reason_display }}</div>
-      <div class="bg-gray-50 p-4 rounded-xl"><b>مبلغ:</b> {{ action.refund_amount }} تومان</div>
-    </div>
-    {% if action.description %}<div class="mt-4 bg-gray-50 p-4 rounded-xl">{{ action.description }}</div>{% endif %}
-    {% if action.admin_note %}<div class="mt-4 bg-purple-50 p-4 rounded-xl"><b>پیام مدیریت:</b><br>{{ action.admin_note }}</div>{% endif %}
-    {% if action.items.exists %}
-      <h2 class="font-bold mt-6 mb-2">اقلام مرجوعی</h2>
-      {% for item in action.items.all %}
-        <div class="flex justify-between border-b py-2"><span>{{ item.order_item.product_name }}</span><span>{{ item.quantity }} عدد</span></div>
-      {% endfor %}
-    {% endif %}
+<style>
+  .rd-page{max-width:1120px;margin:0 auto;padding:54px 28px 90px;direction:rtl;color:#f6eee5}.rd-head{display:flex;justify-content:space-between;align-items:flex-end;gap:20px;margin-bottom:26px}.rd-kicker{display:block;color:#c89a4b;letter-spacing:.2em;font:700 11px/1.4 sans-serif;margin-bottom:10px}.rd-head h1{margin:0;color:#fff7ee;font-size:clamp(28px,3vw,44px)}.rd-head p{margin:9px 0 0;color:#a99a8c}.rd-actions{display:flex;gap:8px;flex-wrap:wrap}.rd-btn{display:inline-flex;align-items:center;gap:8px;padding:11px 14px;border:1px solid #493722;border-radius:10px;background:#15100c;color:#f0d3a5;text-decoration:none}
+  .rd-status{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:22px}.rd-stat{background:linear-gradient(180deg,#17110d,#120e0b);border:1px solid #392b1d;border-radius:14px;padding:16px}.rd-stat span{display:block;color:#8e8175;font-size:11px;margin-bottom:8px}.rd-stat b{color:#f8efe6;font-size:14px}.rd-stat.status-pending b,.rd-stat.status-approved b,.rd-stat.status-received b,.rd-stat.status-refund_pending b{color:#e1b45f}.rd-stat.status-refunded b,.rd-stat.status-closed b{color:#7fd5a7}.rd-stat.status-rejected b{color:#ef8c8c}
+  .rd-grid{display:grid;grid-template-columns:minmax(0,1fr) 310px;gap:22px;align-items:start}.rd-card{background:linear-gradient(180deg,#17110d,#120e0b);border:1px solid #392b1d;border-radius:17px;padding:22px}.rd-card h2{margin:0 0 16px;color:#fff;font-size:18px}.rd-note{padding:15px;border-radius:12px;background:#100c09;border:1px solid #33271c;color:#c9bbae;line-height:2;white-space:pre-line}.rd-admin{margin-top:13px;border-color:#594224;background:#1a130c}.rd-admin b{display:block;color:#d7aa5c;margin-bottom:6px}.rd-items{display:grid;gap:10px}.rd-item{display:grid;grid-template-columns:minmax(0,1fr) 80px 130px;gap:12px;align-items:center;padding:14px;border:1px solid #32271c;border-radius:12px;background:#100d0a}.rd-item strong{color:#f8efe6}.rd-item span{color:#aa9b8d;font-size:12px}.rd-side{position:sticky;top:120px}.rd-side-row{display:flex;justify-content:space-between;gap:12px;padding:12px 0;border-bottom:1px solid #2d2319;color:#9e9083}.rd-side-row b{color:#f4eadd}.rd-timeline{margin-top:18px;display:grid;gap:10px}.rd-step{display:flex;align-items:center;gap:10px;color:#82766b;font-size:12px}.rd-step i{width:10px;height:10px;border-radius:50%;background:#3b3025;box-shadow:0 0 0 4px rgba(59,48,37,.32)}.rd-step.on{color:#e7d3b5}.rd-step.on i{background:#c89a4b;box-shadow:0 0 0 4px rgba(200,154,75,.14)}
+  @media(max-width:850px){.rd-status{grid-template-columns:1fr 1fr}.rd-grid{grid-template-columns:1fr}.rd-side{position:static;order:-1}.rd-head{align-items:flex-start;flex-direction:column}.rd-page{padding:34px 16px 70px}.rd-item{grid-template-columns:1fr 70px}}
+</style>
+<section class="rd-page">
+  <header class="rd-head">
+    <div><span class="rd-kicker">REQUEST DETAILS</span><h1>{{ action.get_kind_display }}</h1><p>وضعیت و جزئیات درخواست مربوط به سفارش #{{ action.order.order_number }}</p></div>
+    <div class="rd-actions"><a class="rd-btn" href="{% url 'first:order_detail' action.order.order_number %}"><i class="fa-solid fa-box"></i> سفارش</a><a class="rd-btn" href="{% url 'customer_care:order_actions_home' %}"><i class="fa-solid fa-arrow-right"></i> درخواست‌های من</a></div>
+  </header>
+
+  <section class="rd-status">
+    <div class="rd-stat"><span>شماره سفارش</span><b>#{{ action.order.order_number }}</b></div>
+    <div class="rd-stat status-{{ action.status }}"><span>وضعیت درخواست</span><b>{{ action.get_status_display }}</b></div>
+    <div class="rd-stat"><span>دلیل</span><b>{{ action.get_reason_display }}</b></div>
+    <div class="rd-stat"><span>مبلغ قابل بازگشت</span><b>{{ action.refund_amount|price_format }} تومان</b></div>
+  </section>
+
+  <div class="rd-grid">
+    <main class="rd-card">
+      <h2>جزئیات درخواست</h2>
+      {% if action.description %}<div class="rd-note">{{ action.description }}</div>{% else %}<div class="rd-note">توضیح اضافه‌ای برای این درخواست ثبت نشده است.</div>{% endif %}
+      {% if action.admin_note %}<div class="rd-note rd-admin"><b><i class="fa-solid fa-headset"></i> پیام مدیریت</b>{{ action.admin_note }}</div>{% endif %}
+
+      {% if action.items.exists %}
+      <h2 style="margin-top:28px">اقلام مرجوعی</h2>
+      <div class="rd-items">
+        {% for item in action.items.all %}
+        <article class="rd-item"><strong>{{ item.order_item.product_name }}</strong><span>{{ item.quantity }} عدد</span><span>{{ item.line_amount|price_format }} تومان</span></article>
+        {% endfor %}
+      </div>
+      {% endif %}
+    </main>
+
+    <aside class="rd-card rd-side">
+      <h2>پیگیری درخواست</h2>
+      <div class="rd-side-row"><span>ثبت درخواست</span><b>{{ action.created_at|date:"Y/m/d H:i" }}</b></div>
+      <div class="rd-side-row"><span>آخرین بروزرسانی</span><b>{{ action.updated_at|date:"Y/m/d H:i" }}</b></div>
+      {% if action.resolved_at %}<div class="rd-side-row"><span>زمان پایان</span><b>{{ action.resolved_at|date:"Y/m/d H:i" }}</b></div>{% endif %}
+      <div class="rd-timeline">
+        <div class="rd-step on"><i></i> ثبت درخواست</div>
+        <div class="rd-step {% if action.status != 'pending' %}on{% endif %}"><i></i> بررسی پشتیبانی</div>
+        <div class="rd-step {% if action.status == 'received' or action.status == 'refund_pending' or action.status == 'refunded' or action.status == 'closed' %}on{% endif %}"><i></i> دریافت / پردازش کالا</div>
+        <div class="rd-step {% if action.status == 'refunded' or action.status == 'closed' %}on{% endif %}"><i></i> تکمیل درخواست</div>
+      </div>
+    </aside>
   </div>
-</div>
+</section>
 {% endblock %}

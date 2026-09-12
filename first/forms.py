@@ -113,23 +113,24 @@ class SignUpForm(UserCreationForm):
 # ============================================
 
 class LoginForm(forms.Form):
-    phone = forms.CharField(
-        max_length=20,
+    username = forms.CharField(
+        max_length=150,
         widget=forms.TextInput(attrs={
-            'class': 'form-control w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:border-pink-500 focus:ring-4 focus:ring-pink-100 transition-all outline-none bg-white/50',
-            'placeholder': 'شماره تلفن',
+            'class': 'form-control',
+            'placeholder': 'نام کاربری',
             'dir': 'ltr',
-            'inputmode': 'tel',
-            'autocomplete': 'tel',
+            'autocomplete': 'username',
+            'autocapitalize': 'none',
+            'spellcheck': 'false',
         }),
         error_messages={
-            'required': 'وارد کردن شماره تلفن الزامی است',
+            'required': 'وارد کردن نام کاربری الزامی است',
         },
     )
 
     password = forms.CharField(
         widget=forms.PasswordInput(attrs={
-            'class': 'form-control w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:border-pink-500 focus:ring-4 focus:ring-pink-100 transition-all outline-none bg-white/50',
+            'class': 'form-control',
             'placeholder': 'رمز عبور',
             'dir': 'ltr',
             'autocomplete': 'current-password',
@@ -139,44 +140,12 @@ class LoginForm(forms.Form):
         },
     )
 
-    def clean_phone(self):
-        # Normal users keep phone login.
-        # Superuser/owner can submit username or email; the view restricts
-        # that fallback to active superusers only.
-        identifier = (self.cleaned_data.get('phone') or '').strip()
+    def clean_username(self):
+        username = (self.cleaned_data.get('username') or '').strip()
+        if not username:
+            raise ValidationError('نام کاربری را وارد کنید')
+        return username
 
-        if not identifier:
-            raise ValidationError(
-                'شماره تلفن یا نام کاربری مالک را وارد کنید'
-            )
-
-        translation = str.maketrans(
-            '۰۱۲۳۴۵۶۷۸۹٠١٢٣٤٥٦٧٨٩',
-            '01234567890123456789',
-        )
-
-        normalized = identifier.translate(translation)
-        normalized = re.sub(r'[\s\-()]', '', normalized)
-
-        if normalized.startswith('+98'):
-            normalized = '0' + normalized[3:]
-        elif normalized.startswith('0098'):
-            normalized = '0' + normalized[4:]
-        elif normalized.startswith('98') and len(normalized) == 12:
-            normalized = '0' + normalized[2:]
-
-        if re.fullmatch(r'09\d{9}', normalized):
-            return normalized
-
-        if (
-            len(identifier) <= 254
-            and re.fullmatch(r'[A-Za-z0-9_.@+\-]+', identifier)
-        ):
-            return identifier
-
-        raise ValidationError(
-            'شماره تلفن معتبر یا نام کاربری/ایمیل مالک را وارد کنید'
-        )
 
 # ============================================
 # فرم ویرایش پروفایل

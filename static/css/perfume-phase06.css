@@ -565,3 +565,33 @@ html[data-perfume-theme="day"] .p6-track-original textarea{
   .p6-tracking-heading h1{font-size:48px!important}
   .p6-tracking-art{display:none}
 }
+
+
+/* v23: warm day-mode chrome — lighter than night, still premium and low-glare. */
+html[data-perfume-theme="day"] .p4-top-strip,
+html[data-perfume-theme="day"] .phase04-topbar{
+  background:linear-gradient(90deg,#5c3b27,#6a472f 52%,#563721)!important;
+  color:#f1dfc9!important;
+  border-bottom-color:rgba(233,195,132,.24)!important;
+}
+html[data-perfume-theme="day"] .p4-top-strip i,
+html[data-perfume-theme="day"] .phase04-topbar i{color:#e1b96f!important}
+
+html[data-perfume-theme="day"] .p4-footer,
+html[data-perfume-theme="day"] .phase04-footer,
+html[data-perfume-theme="day"] .phase-footer{
+  background:linear-gradient(180deg,#342419,#281b13)!important;
+  color:#f2e6d6!important;
+  border-top-color:rgba(218,178,112,.25)!important;
+}
+html[data-perfume-theme="day"] .p4-footer h2,
+html[data-perfume-theme="day"] .phase04-footer h2,
+html[data-perfume-theme="day"] .phase-footer h2{color:#f5eadb!important}
+html[data-perfume-theme="day"] .p4-footer p,
+html[data-perfume-theme="day"] .p4-footer a,
+html[data-perfume-theme="day"] .phase04-footer p,
+html[data-perfume-theme="day"] .phase04-footer a,
+html[data-perfume-theme="day"] .phase-footer p,
+html[data-perfume-theme="day"] .phase-footer a{color:#c7b39e!important}
+html[data-perfume-theme="day"] .p4-footer input{color:#f4eadf!important}
+html[data-perfume-theme="day"] .p4-footer input::placeholder{color:#aa927b!important}

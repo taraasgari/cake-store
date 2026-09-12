@@ -1,6 +1,41 @@
 {% extends 'perfume_base.html' %}{% load custom_filters %}
 {% block title %}پرفروش‌ترین عطرها | {{ settings.site_name|default:'فروشگاه عطر' }}{% endblock %}
 {% block content %}
-<section class="p4-feature-hero"><div class="p4-wrap p4-feature-inner"><div><span class="p4-kicker">MOST WANTED</span><h1>پرفروش‌ترین<br><em>عطرها</em></h1><p>انتخاب‌هایی که بیشترین استقبال را از طرف خریداران داشته‌اند.</p><a class="p4-outline" href="{% url 'first:product_list' %}">مشاهده همه کالکشن <i class="fa-solid fa-arrow-left"></i></a></div><div class="p4-feature-circle"><i class="fa-solid fa-crown"></i><b>BEST<br>SELLERS</b></div></div></section>
-<section class="p4-wrap p4-listing"><div class="p4-listing-head"><div><span class="p4-kicker">CUSTOMER FAVORITES</span><h2>محبوب‌ترین انتخاب‌ها</h2></div><a href="{% url 'first:product_list' %}">همه محصولات ←</a></div><div class="p4-grid p4-grid-4">{% firstof products best_sellers page_obj as listing %}{% for product in listing %}{% include 'includes/p4_product_card.html' %}{% empty %}<div class="p4-empty"><div class="p4-empty-icon"><i class="fa-solid fa-crown"></i></div><span>BEST SELLERS</span><h2>هنوز محصول پرفروشی ثبت نشده.</h2><p>با ثبت سفارش‌ها، محبوب‌ترین محصولات اینجا نمایش داده می‌شوند.</p><a href="{% url 'first:product_list' %}">مشاهده همه عطرها</a></div>{% endfor %}</div></section>
+<section class="p4-feature-hero">
+  <div class="p4-wrap p4-feature-inner">
+    <div>
+      <span class="p4-kicker">MOST WANTED</span>
+      <h1>پرفروش‌ترین<br><em>عطرها</em></h1>
+      <p>فقط محصولاتی که در مدیریت فروشگاه به‌عنوان «پرفروش» مشخص شده‌اند اینجا نمایش داده می‌شوند.</p>
+      <a class="p4-outline" href="{% url 'first:product_list' %}">مشاهده همه کالکشن <i class="fa-solid fa-arrow-left"></i></a>
+    </div>
+    <div class="p4-feature-circle"><span class="p4-native-mark p4-mark-crown" aria-hidden="true"></span><b>BEST<br>SELLERS</b></div>
+  </div>
+</section>
+<section class="p4-wrap p4-listing">
+  <div class="p4-listing-head">
+    <div><span class="p4-kicker">CUSTOMER FAVORITES</span><h2>محبوب‌ترین انتخاب‌ها</h2></div>
+    <a href="{% url 'first:product_list' %}">همه محصولات ←</a>
+  </div>
+  <div class="p4-grid p4-grid-4">
+    {% for product in page_obj %}
+      {% include 'includes/p4_product_card.html' %}
+    {% empty %}
+      <div class="p4-empty">
+        <div class="p4-empty-icon"><i class="fa-solid fa-crown"></i></div>
+        <span>BEST SELLERS</span>
+        <h2>هنوز محصول پرفروشی مشخص نشده.</h2>
+        <p>از پنل مدیریت، گزینه «پرفروش» را برای محصول دلخواه فعال کنید.</p>
+        <a href="{% url 'first:product_list' %}">مشاهده همه عطرها</a>
+      </div>
+    {% endfor %}
+  </div>
+  {% if page_obj.has_other_pages %}
+  <nav class="p4-pagination" aria-label="صفحه‌بندی">
+    {% if page_obj.has_previous %}<a href="?page={{ page_obj.previous_page_number }}">قبلی</a>{% endif %}
+    <span>{{ page_obj.number }} / {{ page_obj.paginator.num_pages }}</span>
+    {% if page_obj.has_next %}<a href="?page={{ page_obj.next_page_number }}">بعدی</a>{% endif %}
+  </nav>
+  {% endif %}
+</section>
 {% endblock %}

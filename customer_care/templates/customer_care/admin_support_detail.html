@@ -1,30 +1,36 @@
-{% extends 'perfume_base.html' %}
-{% block title %}پاسخگویی پشتیبانی{% endblock %}
-{% block content %}
-<div class="max-w-5xl mx-auto px-4 py-10">
-  <a class="text-pink-600" href="{% url 'customer_care:admin_support_list' %}">← تیکت‌ها</a>
-  <div class="bg-white rounded-3xl shadow p-7 mt-4">
-    <h1 class="text-2xl font-bold">{{ ticket.subject }}</h1>
-    <div class="text-sm text-gray-500 mt-2">{{ ticket.reference }} · {{ ticket.user.phone }} · {{ ticket.get_status_display }}</div>
-    <div class="space-y-3 mt-6">
-      {% for message in ticket.messages.all %}
-        <div class="{% if message.is_staff_reply %}bg-purple-50{% else %}bg-gray-50{% endif %} rounded-2xl p-4">
-          <b class="text-xs">{% if message.is_staff_reply %}مدیریت{% else %}کاربر{% endif %}</b>
-          <div class="whitespace-pre-line mt-2">{{ message.body }}</div>
-        </div>
-      {% endfor %}
+{% extends 'dashboard/perfume_admin_base.html' %}{% load static %}
+{% block admin_title %}پاسخگویی پشتیبانی{% endblock %}
+{% block extra_css %}<link rel="stylesheet" href="{% static 'css/perfume-admin-care.css' %}">{% endblock %}
+{% block admin_content %}
+<div class="care-detail">
+  <div><a class="care-link-btn" href="{% url 'customer_care:admin_support_list' %}"><i class="fa-solid fa-arrow-right"></i> بازگشت به تیکت‌ها</a></div>
+  <section class="care-detail-head">
+    <div class="care-detail-head-top">
+      <div><span class="pa-eyebrow">{{ ticket.reference }}</span><h1>{{ ticket.subject }}</h1><div class="care-detail-sub"><span><i class="fa-regular fa-user"></i>{{ ticket.user.get_full_name|default:ticket.user.username }}</span>{% if ticket.user.phone %}<span dir="ltr"><i class="fa-solid fa-phone"></i>{{ ticket.user.phone }}</span>{% endif %}{% if ticket.order %}<span><i class="fa-solid fa-receipt"></i>سفارش #{{ ticket.order.order_number }}</span>{% endif %}</div></div>
+      <span class="care-status care-status-{{ ticket.status }}">{{ ticket.get_status_display }}</span>
     </div>
-    <form method="post" action="{% url 'customer_care:admin_support_reply' ticket.reference %}" class="mt-6">
-      {% csrf_token %}{{ message_form.as_p }}
-      <button class="bg-pink-600 text-white px-5 py-3 rounded-xl">ارسال پاسخ</button>
-    </form>
-    <form method="post" action="{% url 'customer_care:admin_support_status' ticket.reference %}" class="mt-4 flex gap-2">
-      {% csrf_token %}
-      <select name="status" class="border rounded-xl p-3">
-        {% for value,label in ticket.STATUS_CHOICES %}<option value="{{ value }}" {% if ticket.status == value %}selected{% endif %}>{{ label }}</option>{% endfor %}
-      </select>
-      <button class="bg-gray-900 text-white px-5 rounded-xl">تغییر وضعیت</button>
-    </form>
-  </div>
+  </section>
+
+  <section class="care-form-card">
+    <h2>گفتگو</h2>
+    <div class="care-thread">
+      {% for message in ticket.messages.all %}
+      <article class="care-message {% if message.is_staff_reply %}staff{% else %}user{% endif %}">
+        <div class="care-message-head"><strong>{% if message.is_staff_reply %}مدیریت فروشگاه{% else %}{{ ticket.user.get_full_name|default:ticket.user.username }}{% endif %}</strong><small>{{ message.created_at|date:'Y/m/d H:i' }}</small></div>
+        <div class="care-message-body">{{ message.body }}</div>
+      </article>
+      {% empty %}<div class="care-empty"><i class="fa-regular fa-message"></i><h2>پیامی ثبت نشده</h2></div>{% endfor %}
+    </div>
+  </section>
+
+  <section class="care-form-card">
+    <h2>ارسال پاسخ</h2>
+    <form method="post" action="{% url 'customer_care:admin_support_reply' ticket.reference %}">{% csrf_token %}<label for="{{ message_form.body.id_for_label }}">پیام مدیریت</label>{{ message_form.body }}{% if message_form.body.errors %}{{ message_form.body.errors }}{% endif %}<button class="care-submit" type="submit"><i class="fa-solid fa-paper-plane"></i> ارسال پاسخ</button></form>
+  </section>
+
+  <section class="care-form-card">
+    <h2>وضعیت تیکت</h2>
+    <form method="post" action="{% url 'customer_care:admin_support_status' ticket.reference %}" class="care-inline-form">{% csrf_token %}<label><span>وضعیت</span><select name="status">{% for value,label in ticket.STATUS_CHOICES %}<option value="{{ value }}" {% if ticket.status == value %}selected{% endif %}>{{ label }}</option>{% endfor %}</select></label><button class="care-submit" type="submit"><i class="fa-solid fa-check"></i> ثبت وضعیت</button></form>
+  </section>
 </div>
 {% endblock %}

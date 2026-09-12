@@ -1,4 +1,4 @@
-{% load static %}
+{% load static custom_filters %}
 <!doctype html>
 <html lang="fa" dir="rtl" data-perfume-theme="night">
 <head>
@@ -20,6 +20,21 @@ try{const t=localStorage.getItem('velora-theme');document.documentElement.datase
     <link rel="stylesheet" href="{% static 'css/perfume-phase07-v2.css' %}">
     <link rel="stylesheet" href="{% static 'css/perfume-phase08.css' %}">
     <link rel="stylesheet" href="{% static 'css/perfume-phase10.css' %}">
+    <link rel="stylesheet" href="{% static 'css/perfume-account-menu.css' %}">
+<style>
+/* Reliable decorative hero marks: pure CSS, so they never depend on an icon font glyph. */
+.p4-native-mark{position:relative;display:inline-block;width:72px;height:72px;color:#c9954d;vertical-align:middle;box-sizing:border-box}
+.p4-native-mark::before,.p4-native-mark::after{content:"";position:absolute;box-sizing:border-box}
+.p4-mark-bottle::before{width:32px;height:46px;left:20px;bottom:4px;border:2px solid currentColor;border-radius:5px 5px 10px 10px}
+.p4-mark-bottle::after{width:16px;height:10px;left:28px;top:4px;border:2px solid currentColor;border-bottom:0;border-radius:3px 3px 0 0;box-shadow:0 10px 0 -6px currentColor}
+.p4-mark-offer::before{width:30px;height:30px;left:12px;top:22px;border:2px solid currentColor;transform:rotate(45deg);border-radius:4px}
+.p4-mark-offer::after{width:22px;height:22px;right:10px;top:12px;border:2px solid currentColor;transform:rotate(45deg);border-radius:4px;background:rgba(201,149,77,.06)}
+.p4-mark-service{border:1.5px solid rgba(201,149,77,.72);border-radius:50%}
+.p4-mark-service::before{width:72px;height:32px;left:-1px;top:19px;border:1.5px solid currentColor;border-radius:50%;transform:rotate(-24deg)}
+.p4-mark-service::after{width:18px;height:18px;left:26px;top:26px;border:2px solid currentColor;border-radius:50%;background:#130e0a}
+.p4-mark-crown::before{width:11px;height:28px;left:10px;bottom:14px;border:2px solid currentColor;border-top-width:5px;box-shadow:20px -10px 0 -2px #130e0a,20px -10px 0 0 currentColor,40px 0 0 -2px #130e0a,40px 0 0 0 currentColor}
+.p4-mark-crown::after{width:54px;height:2px;left:9px;bottom:10px;background:currentColor;box-shadow:0 7px 0 currentColor}
+</style>
 {% block extra_css %}{% endblock %}
 </head>
 <body class="velora-body">
@@ -49,7 +64,43 @@ try{const t=localStorage.getItem('velora-theme');document.documentElement.datase
 
       <div class="p4-actions">
         <button type="button" class="p4-icon" data-theme-toggle title="حالت روز و شب"><i class="fa-regular fa-moon night-i"></i><i class="fa-regular fa-sun day-i"></i></button>
-        {% if user.is_authenticated %}<a class="p4-icon" href="{% url 'first:profile' %}" title="حساب"><i class="fa-regular fa-user"></i></a>{% else %}<a class="p4-icon" href="{% url 'first:login' %}" title="ورود"><i class="fa-regular fa-user"></i></a>{% endif %}
+        {% if user.is_authenticated %}
+        <details class="p4-account-menu" data-p4-account-menu>
+          <summary class="p4-account-trigger" title="حساب کاربری" aria-label="منوی حساب کاربری">
+            <span class="p4-account-trigger-avatar">{{ user.username|first|upper }}</span>
+            <span class="p4-account-trigger-name">{{ user.get_full_name|default:user.username }}</span>
+            <i class="fa-solid fa-chevron-down"></i>
+          </summary>
+          <div class="p4-account-dropdown">
+            <div class="p4-account-head">
+              <span class="p4-account-avatar">{{ user.username|first|upper }}</span>
+              <span>
+                <strong>{{ user.get_full_name|default:user.username }}</strong>
+                <small dir="ltr">{{ user.email|default:'بدون ایمیل' }}</small>
+              </span>
+            </div>
+            <nav class="p4-account-links">
+              <a href="{% url 'first:profile' %}"><i class="fa-regular fa-user"></i><span>پروفایل من</span></a>
+              <a href="{% url 'first:wishlist' %}"><i class="fa-regular fa-heart"></i><span>علاقه‌مندی‌ها</span></a>
+              <a href="{% url 'first:user_orders' %}"><i class="fa-solid fa-box"></i><span>سفارش‌های من</span></a>
+              <a href="{% url 'customer_care:support_home' %}"><i class="fa-solid fa-headset"></i><span>پشتیبانی و درخواست‌ها</span></a>
+              {% if user|has_permission:'dashboard' %}
+              <span class="p4-account-divider"></span>
+              <a href="{% url 'first:admin_dashboard' %}"><i class="fa-solid fa-gauge-high"></i><span>پنل مدیریت</span></a>
+              {% endif %}
+              {% if user.is_owner or user.is_superuser %}
+              <a href="{% url 'first:customizer' %}"><i class="fa-solid fa-wand-magic-sparkles"></i><span>طراحی بصری سایت</span></a>
+              {% endif %}
+            </nav>
+            <form method="post" action="{% url 'first:logout' %}" class="p4-account-logout">
+              {% csrf_token %}
+              <button type="submit"><i class="fa-solid fa-arrow-right-from-bracket"></i><span>خروج</span></button>
+            </form>
+          </div>
+        </details>
+        {% else %}
+        <a class="p4-icon" href="{% url 'first:login' %}" title="ورود"><i class="fa-regular fa-user"></i></a>
+        {% endif %}
         <a class="p4-icon" href="{% url 'first:wishlist' %}" title="علاقه‌مندی‌ها"><i class="fa-regular fa-heart"></i></a>
         <a class="p4-cart" href="{% url 'first:cart' %}"><i class="fa-solid fa-bag-shopping"></i><span>سبد خرید</span></a>
         <button type="button" class="p4-menu-button" data-p4-menu-open><span></span><span></span></button>
@@ -79,7 +130,14 @@ try{const t=localStorage.getItem('velora-theme');document.documentElement.datase
     <a href="{% url 'first:discounts' %}"><span>04</span>تخفیف‌ها</a>
     <a href="{% url 'first:customer_service' 'shopping-guide' %}"><span>05</span>راهنمای خرید</a>
     <a href="{% url 'customer_care:order_tracking' %}"><span>06</span>پیگیری سفارش</a>
-    {% if user.is_authenticated %}<a href="{% url 'first:profile' %}"><span>07</span>حساب کاربری</a>{% else %}<a href="{% url 'first:login' %}"><span>07</span>ورود / ثبت‌نام</a>{% endif %}
+    {% if user.is_authenticated %}
+    <a href="{% url 'first:profile' %}"><span>07</span>حساب کاربری</a>
+    <a href="{% url 'first:wishlist' %}"><span>08</span>علاقه‌مندی‌ها</a>
+    <a href="{% url 'first:user_orders' %}"><span>09</span>سفارش‌های من</a>
+    {% if user|has_permission:'dashboard' %}<a href="{% url 'first:admin_dashboard' %}"><span>10</span>پنل مدیریت</a>{% endif %}
+    {% else %}
+    <a href="{% url 'first:login' %}"><span>07</span>ورود / ثبت‌نام</a>
+    {% endif %}
   </nav>
 </aside>
 
@@ -98,13 +156,12 @@ try{const t=localStorage.getItem('velora-theme');document.documentElement.datase
 </footer>
 
 <script src="{% static 'js/perfume-phase01.js' %}"></script>
-<script src="{% static 'js/perfume-phase03-final.js' %}"></script>
+<script src="{% static 'js/perfume-phase03-final.js' %}?v=18"></script>
 <script src="{% static 'js/perfume-phase04.js' %}"></script>
 {% block extra_js %}{% endblock %}
     <script src="{% static 'js/perfume-phase06.js' %}"></script>
     <script src="{% static 'js/perfume-phase07-v2.js' %}"></script>
-    {{ settings.customizer_rules|default:'[]'|json_script:'perfume-visual-rules' }}
-    <div id="perfume-theme-values" hidden data-primary="{{ settings.primary_color|default:'#C9954D' }}" data-secondary="{{ settings.secondary_color|default:'#75471F' }}" data-accent="{{ settings.accent_color|default:'#E3C286' }}" data-bg="{{ settings.background_color|default:'#090706' }}" data-text="{{ settings.text_color|default:'#F7F0E7' }}"></div>
-    <script src="{% static 'js/perfume-visual-runtime.js' %}"></script>
+    {{ visual_customizer|json_script:"visual-customizer-data" }}
+    <script src="{% static 'js/customizer.js' %}"></script>
 </body>
 </html>

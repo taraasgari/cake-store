@@ -1,27 +1,13 @@
-{% extends 'perfume_base.html' %}
-{% block title %}بررسی درخواست{% endblock %}
-{% block content %}
-<div class="max-w-4xl mx-auto px-4 py-10">
-  <a class="text-pink-600" href="{% url 'customer_care:admin_order_actions_list' %}">← درخواست‌ها</a>
-  <div class="bg-white rounded-3xl shadow p-7 mt-4">
-    <h1 class="text-2xl font-bold">{{ action.get_kind_display }} · سفارش #{{ action.order.order_number }}</h1>
-    <div class="grid md:grid-cols-2 gap-3 mt-5">
-      <div class="bg-gray-50 rounded-xl p-4">کاربر: {{ action.user.phone }}</div>
-      <div class="bg-gray-50 rounded-xl p-4">وضعیت: {{ action.get_status_display }}</div>
-      <div class="bg-gray-50 rounded-xl p-4">دلیل: {{ action.get_reason_display }}</div>
-      <div class="bg-gray-50 rounded-xl p-4">مبلغ: {{ action.refund_amount }} تومان</div>
-    </div>
-    {% if action.items.exists %}
-      <h2 class="font-bold mt-6 mb-2">اقلام</h2>
-      {% for item in action.items.all %}
-        <div class="flex justify-between border-b py-2"><span>{{ item.order_item.product_name }}</span><span>{{ item.quantity }} عدد</span></div>
-      {% endfor %}
-    {% endif %}
-    <form method="post" action="{% url 'customer_care:admin_order_action_update' action.pk %}" class="mt-6 space-y-4">
-      {% csrf_token %}
-      {{ status_form.as_p }}
-      <button class="bg-gray-900 text-white px-6 py-3 rounded-xl">ثبت وضعیت</button>
-    </form>
-  </div>
+{% extends 'dashboard/perfume_admin_base.html' %}{% load static custom_filters %}
+{% block admin_title %}بررسی درخواست{% endblock %}
+{% block extra_css %}<link rel="stylesheet" href="{% static 'css/perfume-admin-care.css' %}">{% endblock %}
+{% block admin_content %}
+<div class="care-detail">
+  <div><a class="care-link-btn" href="{% url 'customer_care:admin_order_actions_list' %}"><i class="fa-solid fa-arrow-right"></i> بازگشت به درخواست‌ها</a></div>
+  <section class="care-detail-head"><div class="care-detail-head-top"><div><span class="pa-eyebrow">ORDER #{{ action.order.order_number }}</span><h1>{{ action.get_kind_display }}</h1><div class="care-detail-sub"><span><i class="fa-regular fa-user"></i>{{ action.user.get_full_name|default:action.user.username }}</span>{% if action.user.phone %}<span dir="ltr"><i class="fa-solid fa-phone"></i>{{ action.user.phone }}</span>{% endif %}</div></div><span class="care-status care-status-{{ action.status }}">{{ action.get_status_display }}</span></div></section>
+  <section class="care-info-grid"><div class="care-info"><small>نوع درخواست</small><strong>{{ action.get_kind_display }}</strong></div><div class="care-info"><small>دلیل</small><strong>{{ action.get_reason_display }}</strong></div><div class="care-info"><small>مبلغ قابل بازگشت</small><strong>{{ action.refund_amount|price_format }} تومان</strong></div><div class="care-info"><small>وضعیت</small><strong>{{ action.get_status_display }}</strong></div></section>
+  {% if action.description %}<section class="care-form-card"><h2>توضیحات مشتری</h2><div class="care-message-body">{{ action.description }}</div></section>{% endif %}
+  {% if action.items.exists %}<section class="care-form-card"><h2>اقلام درخواست</h2><div class="care-items">{% for item in action.items.all %}<div class="care-item"><span>{{ item.order_item.product_name }}</span><strong>{{ item.quantity|format_number }} عدد</strong></div>{% endfor %}</div></section>{% endif %}
+  <section class="care-form-card"><h2>به‌روزرسانی درخواست</h2><form method="post" action="{% url 'customer_care:admin_order_action_update' action.pk %}">{% csrf_token %}<label for="{{ status_form.status.id_for_label }}">وضعیت</label>{{ status_form.status }}<label for="{{ status_form.admin_note.id_for_label }}" style="margin-top:12px">یادداشت مدیریت</label>{{ status_form.admin_note }}{% if status_form.errors %}{{ status_form.errors }}{% endif %}<button class="care-submit" type="submit"><i class="fa-solid fa-floppy-disk"></i> ثبت وضعیت</button></form></section>
 </div>
 {% endblock %}

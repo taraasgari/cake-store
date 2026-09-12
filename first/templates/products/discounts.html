@@ -1,6 +1,41 @@
 {% extends 'perfume_base.html' %}{% load custom_filters %}
 {% block title %}تخفیف‌های ویژه | {{ settings.site_name|default:'فروشگاه عطر' }}{% endblock %}
 {% block content %}
-<section class="p4-feature-hero"><div class="p4-wrap p4-feature-inner"><div><span class="p4-kicker">PRIVATE OFFERS</span><h1>تخفیف‌های<br><em>ویژه</em></h1><p>پیشنهادهای محدود و قیمت‌های ویژه برای عطرهای منتخب فروشگاه.</p><a class="p4-outline" href="{% url 'first:product_list' %}">مشاهده همه محصولات <i class="fa-solid fa-arrow-left"></i></a></div><div class="p4-feature-circle"><i class="fa-solid fa-tags"></i><b>PRIVATE<br>SALE</b></div></div></section>
-<section class="p4-wrap p4-listing"><div class="p4-listing-head"><div><span class="p4-kicker">LIMITED EDIT</span><h2>پیشنهادهای امروز</h2></div><a href="{% url 'first:product_list' %}">همه محصولات ←</a></div><div class="p4-grid p4-grid-4">{% firstof products discounted_products page_obj as listing %}{% for product in listing %}{% include 'includes/p4_product_card.html' %}{% empty %}<div class="p4-empty"><div class="p4-empty-icon"><i class="fa-solid fa-tags"></i></div><span>NO ACTIVE OFFERS</span><h2>فعلاً تخفیف فعالی وجود ندارد.</h2><p>پیشنهادهای تازه در همین صفحه نمایش داده خواهند شد.</p><a href="{% url 'first:product_list' %}">مشاهده همه عطرها</a></div>{% endfor %}</div></section>
+<section class="p4-feature-hero">
+  <div class="p4-wrap p4-feature-inner">
+    <div>
+      <span class="p4-kicker">PRIVATE OFFERS</span>
+      <h1>تخفیف‌های<br><em>ویژه</em></h1>
+      <p>محصولات دارای قیمت تخفیف‌خورده و محصولاتی که در مدیریت با «پیشنهاد ویژه» مشخص شده‌اند.</p>
+      <a class="p4-outline" href="{% url 'first:product_list' %}">مشاهده همه محصولات <i class="fa-solid fa-arrow-left"></i></a>
+    </div>
+    <div class="p4-feature-circle"><span class="p4-native-mark p4-mark-offer" aria-hidden="true"></span><b>PRIVATE<br>SALE</b></div>
+  </div>
+</section>
+<section class="p4-wrap p4-listing">
+  <div class="p4-listing-head">
+    <div><span class="p4-kicker">SELECTED OFFERS</span><h2>پیشنهادهای فعال فروشگاه</h2></div>
+    <a href="{% url 'first:product_list' %}">همه محصولات ←</a>
+  </div>
+  <div class="p4-grid p4-grid-4">
+    {% for product in page_obj %}
+      {% include 'includes/p4_product_card.html' %}
+    {% empty %}
+      <div class="p4-empty">
+        <div class="p4-empty-icon"><i class="fa-solid fa-tags"></i></div>
+        <span>PRIVATE OFFERS</span>
+        <h2>فعلاً پیشنهاد ویژه‌ای فعال نیست.</h2>
+        <p>برای نمایش محصول در این بخش، قیمت تخفیف ثبت کنید یا گزینه «پیشنهاد ویژه» را فعال کنید.</p>
+        <a href="{% url 'first:product_list' %}">مشاهده همه عطرها</a>
+      </div>
+    {% endfor %}
+  </div>
+  {% if page_obj.has_other_pages %}
+  <nav class="p4-pagination" aria-label="صفحه‌بندی">
+    {% if page_obj.has_previous %}<a href="?page={{ page_obj.previous_page_number }}">قبلی</a>{% endif %}
+    <span>{{ page_obj.number }} / {{ page_obj.paginator.num_pages }}</span>
+    {% if page_obj.has_next %}<a href="?page={{ page_obj.next_page_number }}">بعدی</a>{% endif %}
+  </nav>
+  {% endif %}
+</section>
 {% endblock %}

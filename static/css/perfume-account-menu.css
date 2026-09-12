@@ -1,0 +1,22 @@
+.p4-account-trigger{min-height:50px;max-width:180px;padding:0 11px 0 8px;border:1px solid var(--p-line);display:flex;align-items:center;gap:8px;background:var(--p-surface);color:var(--p-text);cursor:pointer}.p4-account-trigger-avatar{width:30px;height:30px;flex:0 0 30px;border:1px solid var(--p-line-strong);border-radius:50%;display:grid;place-items:center;background:linear-gradient(145deg,var(--p-gold-pale),var(--p-gold-deep));color:#171008;font-family:Georgia,"Times New Roman",serif;font-size:12px;font-weight:800}.p4-account-trigger-name{max-width:94px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:9px;font-weight:800}.p4-account-trigger>i{color:var(--p-gold);font-size:8px;transition:.18s}.p4-account-menu[open] .p4-account-trigger>i{transform:rotate(180deg)}
+.p4-account-menu{position:relative;direction:rtl}
+.p4-account-menu>summary{list-style:none;cursor:pointer}
+.p4-account-menu>summary::-webkit-details-marker{display:none}
+.p4-account-menu[open]>summary{border-color:var(--p-line-strong);color:var(--p-gold-pale);background:var(--p-surface-2)}
+.p4-account-dropdown{position:absolute;top:calc(100% + 14px);left:0;width:300px;padding:12px;border:1px solid var(--p-line-strong);background:color-mix(in srgb,var(--p-surface) 97%,transparent);box-shadow:0 28px 90px rgba(0,0,0,.34);backdrop-filter:blur(24px);z-index:260}
+.p4-account-dropdown:before{content:"";position:absolute;top:-7px;left:18px;width:12px;height:12px;transform:rotate(45deg);border-top:1px solid var(--p-line-strong);border-left:1px solid var(--p-line-strong);background:var(--p-surface)}
+.p4-account-head{display:grid;grid-template-columns:44px minmax(0,1fr);gap:11px;align-items:center;padding:10px 8px 14px;margin-bottom:7px;border-bottom:1px solid var(--p-line)}
+.p4-account-avatar{width:44px;height:44px;border:1px solid var(--p-line-strong);border-radius:50%;display:grid;place-items:center;background:linear-gradient(145deg,var(--p-gold-pale),var(--p-gold-deep));color:#171008;font-family:Georgia,"Times New Roman",serif;font-size:18px;font-weight:800}
+.p4-account-head strong{display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:var(--p-text);font-size:12px}
+.p4-account-head small{display:block;margin-top:2px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:var(--p-muted);font-size:9px}
+.p4-account-links{display:grid;gap:2px}
+.p4-account-links a,.p4-account-logout button{min-height:42px;padding:0 11px;border:0;display:flex;align-items:center;gap:10px;background:transparent;color:var(--p-text)!important;font:inherit;font-size:10px;font-weight:700;text-align:right;cursor:pointer;transition:.18s ease}
+.p4-account-links a i,.p4-account-logout i{width:22px;color:var(--p-gold);text-align:center}
+.p4-account-links a:hover,.p4-account-logout button:hover{background:rgba(201,149,77,.10);color:var(--p-gold-pale)!important;transform:translateX(-2px)}
+.p4-account-divider{height:1px;margin:6px 4px;background:var(--p-line)}
+.p4-account-logout{margin:7px 0 0;padding-top:7px;border-top:1px solid var(--p-line)}
+.p4-account-logout button{width:100%;color:#d89082!important}
+.p4-account-logout button i{color:#c77969}
+html[data-perfume-theme=day] .p4-account-dropdown{background:rgba(255,250,244,.98);box-shadow:0 28px 70px rgba(91,65,37,.17)}
+html[data-perfume-theme=day] .p4-account-dropdown:before{background:#fffaf4}
+@media(max-width:760px){.p4-account-trigger{width:46px;height:46px;min-height:46px;padding:0;justify-content:center;border-color:transparent;background:transparent}.p4-account-trigger-avatar{width:34px;height:34px;flex-basis:34px}.p4-account-trigger-name,.p4-account-trigger>i{display:none}.p4-account-dropdown{position:fixed;top:112px;right:12px;left:12px;width:auto;max-height:calc(100vh - 130px);overflow:auto}.p4-account-dropdown:before{display:none}}

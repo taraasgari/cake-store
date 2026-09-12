@@ -22,14 +22,15 @@
           {% csrf_token %}
 
           <div class="auth-field">
-            <label for="id_phone">شماره تلفن / ورود مالک</label>
+            <label for="id_username">نام کاربری</label>
             <div class="auth-input">
-              <i class="fa-solid fa-mobile-screen-button"></i>
-              <input type="text" name="phone" id="id_phone" inputmode="tel"
-                     autocomplete="tel" placeholder="09123456789 یا owner"
-                     value="{{ form.phone.value|default:'' }}" required>
+              <i class="fa-regular fa-user"></i>
+              <input type="text" name="username" id="id_username"
+                     autocomplete="username" autocapitalize="none" spellcheck="false"
+                     placeholder="نام کاربری"
+                     value="{{ form.username.value|default:'' }}" required>
             </div>
-            {% if form.phone.errors %}<small class="auth-field-error">{{ form.phone.errors.0 }}</small>{% endif %}
+            {% if form.username.errors %}<small class="auth-field-error">{{ form.username.errors.0 }}</small>{% endif %}
           </div>
 
           <div class="auth-field">

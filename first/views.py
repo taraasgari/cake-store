@@ -11,7 +11,7 @@ from django.core.exceptions import ValidationError
 from django.core.paginator import Paginator
 from django.db import transaction
 from django.db.models import F, Max, Q, Sum
-from django.http import Http404, JsonResponse
+from django.http import Http404, HttpResponse, JsonResponse
 from django.shortcuts import get_object_or_404, redirect, render
 from django.utils import timezone
 from django.utils.http import url_has_allowed_host_and_scheme
@@ -333,11 +333,11 @@ _CUSTOMIZER_STYLES = {
 }
 
 _CUSTOMIZER_DEFAULT_THEME = {
-    'primary': '#ec407a',
-    'secondary': '#d81b60',
-    'accent': '#ab47bc',
-    'bg': '#fdf2f8',
-    'text': '#1a1a2e',
+    'primary': '#c9954d',
+    'secondary': '#75471f',
+    'accent': '#e3c286',
+    'bg': '#090706',
+    'text': '#f7f0e7',
 }
 
 
@@ -345,9 +345,26 @@ _CUSTOMIZER_DEFAULT_THEME = {
 # ویوهای اصلی و احراز هویت
 # ============================================
 
+# The first perfume hero is a theme asset, not a SliderImage database record.
+# Older local installs may still contain the same image as an uploaded slider from
+# before it became part of the theme.  Ignore only those known legacy records so
+# the built-in slide stays visible until the merchant adds a genuinely custom one.
+_THEME_DEFAULT_SLIDER_BASENAMES = {
+    'perfume-default-slider.png',
+    'ChatGPT_Image_Sep_12_2026_01_02_26_AM.png',
+}
+
+
+def _is_legacy_theme_slider(slider):
+    image_name = str(getattr(getattr(slider, 'image', None), 'name', '') or '')
+    basename = image_name.replace('\\', '/').rsplit('/', 1)[-1]
+    return basename in _THEME_DEFAULT_SLIDER_BASENAMES
+
+
 def home(request):
-    """صفحه اصلی فروشگاه با اسلایدر و مجموعه‌های منتخب محصول."""
-    sliders = list(SliderImage.objects.filter(is_active=True).order_by('order', 'id'))
+    """صفحه اصلی فروشگاه با اسلایدر ثابت قالب یا اسلایدرهای سفارشی فروشنده."""
+    slider_rows = SliderImage.objects.filter(is_active=True).order_by('order', 'id')
+    sliders = [slider for slider in slider_rows if not _is_legacy_theme_slider(slider)]
     for slider in sliders:
         try:
             slider.safe_link = safe_slider_link(slider.link)
@@ -357,8 +374,9 @@ def home(request):
 
     featured_products = active_products.filter(is_featured=True).select_related('category', 'brand')[:8]
     new_products = active_products.filter(is_new=True).select_related('category', 'brand')[:8]
-    best_sellers = active_products.filter(is_best_seller=True).select_related('category', 'brand')[:8]
+    best_sellers = active_products.filter(is_best_seller=True).select_related('category', 'brand').order_by('-sales_count', '-updated_at', '-id')[:8]
     discounted_products = active_products.filter(
+        Q(is_featured=True) |
         Q(discount_price__isnull=False, discount_price__lt=F('price')) |
         Q(
             variants__is_active=True,
@@ -387,7 +405,6 @@ def home(request):
 
 def login_view(request):
     from django.core.cache import cache
-    from django.db.models import Q
     from django.utils.http import url_has_allowed_host_and_scheme
     import hashlib
 
@@ -400,41 +417,22 @@ def login_view(request):
         form = LoginForm(request.POST)
 
         if form.is_valid():
-            identifier = form.cleaned_data['phone']
+            identifier = form.cleaned_data['username']
             password = form.cleaned_data['password']
 
-            remote_addr = request.META.get(
-                'REMOTE_ADDR',
-                'unknown',
-            )
-
-            raw_key = (
-                f'{settings.SECRET_KEY}:'
-                f'{remote_addr}:'
-                f'{identifier}'
-            )
-
+            remote_addr = request.META.get('REMOTE_ADDR', 'unknown')
+            raw_key = f'{settings.SECRET_KEY}:{remote_addr}:{identifier.casefold()}'
             throttle_key = (
                 'perfume-login:'
-                + hashlib.sha256(
-                    raw_key.encode('utf-8')
-                ).hexdigest()
+                + hashlib.sha256(raw_key.encode('utf-8')).hexdigest()
             )
-
-            attempts = int(
-                cache.get(throttle_key, 0)
-                or 0
-            )
+            attempts = int(cache.get(throttle_key, 0) or 0)
 
             if attempts >= 8:
                 messages.error(
                     request,
-                    (
-                        'تعداد تلاش‌های ورود بیش از حد مجاز است. '
-                        '۱۵ دقیقه بعد دوباره تلاش کنید.'
-                    ),
+                    'تعداد تلاش‌های ورود بیش از حد مجاز است. ۱۵ دقیقه بعد دوباره تلاش کنید.',
                 )
-
                 return render(
                     request,
                     'login.html',
@@ -442,29 +440,16 @@ def login_view(request):
                     status=429,
                 )
 
+            # Resolve the real username case-insensitively so old owner/admin
+            # accounts continue to work even if their stored casing differs.
             user_obj = (
                 User.objects
-                .filter(
-                    phone=identifier,
-                    is_active=True,
-                )
+                .filter(username__iexact=identifier, is_active=True)
+                .only('id', 'username')
                 .first()
             )
 
-            if user_obj is None:
-                user_obj = (
-                    User.objects
-                    .filter(
-                        Q(username__iexact=identifier)
-                        | Q(email__iexact=identifier),
-                        is_active=True,
-                        is_superuser=True,
-                    )
-                    .first()
-                )
-
             user = None
-
             if user_obj is not None:
                 user = authenticate(
                     request,
@@ -476,13 +461,15 @@ def login_view(request):
                 cache.delete(throttle_key)
                 login(request, user)
 
-                messages.success(
-                    request,
-                    '✨ خوش آمدید!',
-                )
+                # Honour the existing "remember me" checkbox.
+                if request.POST.get('remember'):
+                    request.session.set_expiry(60 * 60 * 24 * 30)
+                else:
+                    request.session.set_expiry(0)
+
+                messages.success(request, '✨ خوش آمدید!')
 
                 next_page = request.GET.get('next')
-
                 if (
                     next_page
                     and url_has_allowed_host_and_scheme(
@@ -495,27 +482,14 @@ def login_view(request):
 
                 if user.is_superuser:
                     return redirect('first:owner_panel')
-
                 return redirect('first:home')
 
-            cache.set(
-                throttle_key,
-                attempts + 1,
-                timeout=900,
-            )
-
-            messages.error(
-                request,
-                '❌ اطلاعات ورود یا رمز عبور اشتباه است',
-            )
+            cache.set(throttle_key, attempts + 1, timeout=900)
+            messages.error(request, '❌ نام کاربری یا رمز عبور اشتباه است')
     else:
         form = LoginForm()
 
-    return render(
-        request,
-        'login.html',
-        {'form': form},
-    )
+    return render(request, 'login.html', {'form': form})
 
 def signup_view(request):
     if request.user.is_authenticated:
@@ -1133,7 +1107,10 @@ def owner_change_password(request):
 @permission_required('site_settings')
 def site_settings(request):
     site = SiteSettings.get_settings()
-    sliders = SliderImage.objects.all().order_by('order')
+    sliders = [
+        slider for slider in SliderImage.objects.all().order_by('order')
+        if not _is_legacy_theme_slider(slider)
+    ]
 
     status = 200
     if request.method == 'POST':
@@ -1349,20 +1326,78 @@ def search_products(request, *args, **kwargs):
 # ============================================
 
 def best_sellers(request, *args, **kwargs):
-    return _core_best_sellers(
+    """Public best-seller listing driven only by real Product rows."""
+    products = (
+        Product.objects.filter(is_active=True, is_best_seller=True)
+        .exclude(slug__isnull=True)
+        .exclude(slug='')
+        .select_related('category', 'brand')
+        .prefetch_related('variants')
+        .order_by('-sales_count', '-updated_at', '-id')
+    )
+    page_obj = Paginator(products, 12).get_page(request.GET.get('page'))
+    return render(
         request,
-        *args,
-        **kwargs,
-        product_model=Product,
+        'products/best_sellers.html',
+        {
+            'page_obj': page_obj,
+            'title': 'پرفروش‌ترین محصولات',
+        },
     )
 
 
 def discounts(request, *args, **kwargs):
-    return _core_discounts(
+    """Show manually featured offers plus products with a real discount."""
+    public_products = (
+        Product.objects.filter(is_active=True)
+        .exclude(slug__isnull=True)
+        .exclude(slug='')
+        .select_related('category', 'brand')
+        .prefetch_related('variants')
+        .order_by('-updated_at', '-id')
+    )
+
+    offer_products = []
+    for product in public_products:
+        has_discount = bool(
+            product.discount_price is not None
+            and product.discount_price < product.price
+        )
+
+        if not has_discount and product.has_variants:
+            for variant in product.variants.all():
+                if not getattr(variant, 'is_active', True):
+                    continue
+                variant_discount = getattr(variant, 'discount_price', None)
+                if variant_discount is None:
+                    continue
+                base_price = getattr(variant, 'price', None) or product.price
+                if variant_discount < base_price:
+                    has_discount = True
+                    break
+
+        # The admin's "پیشنهاد ویژه" checkbox must also place the product
+        # in this public offers collection, even when no reduced price is set.
+        if product.is_featured or has_discount:
+            offer_products.append(product)
+
+    offer_products.sort(
+        key=lambda product: (
+            1 if product.is_featured else 0,
+            int(getattr(product, 'discount_percent', 0) or 0),
+            product.updated_at,
+            product.id,
+        ),
+        reverse=True,
+    )
+    page_obj = Paginator(offer_products, 12).get_page(request.GET.get('page'))
+    return render(
         request,
-        *args,
-        **kwargs,
-        product_model=Product,
+        'products/discounts.html',
+        {
+            'page_obj': page_obj,
+            'title': 'تخفیف‌ها و پیشنهادهای ویژه',
+        },
     )
 
 
@@ -1578,17 +1613,54 @@ def checkout(request):
         )
         return redirect('first:cart')
 
+    def _checkout_context(*, field_errors=None, values=None):
+        if values is None:
+            values = request.session.pop(
+                'checkout_draft',
+                None,
+            )
+
+        if field_errors is None:
+            field_errors = request.session.pop(
+                'checkout_errors',
+                {},
+            )
+
+        if values is None:
+            values = {
+                'address': request.user.address or '',
+                'postal_code': '',
+                'phone': request.user.phone or '',
+                'payment_method': 'cash',
+                'note': '',
+            }
+
+        return {
+            'cart': cart,
+            'items': cart.items.all(),
+            'final_price': cart.final_price,
+            'total_items': cart.total_items,
+            'user': request.user,
+            'checkout_values': values,
+            'checkout_errors': field_errors or {},
+        }
+
     if request.method == 'POST':
+        submitted_values = {
+            'address': request.POST.get('address', ''),
+            'postal_code': request.POST.get('postal_code', ''),
+            'phone': request.POST.get('phone', ''),
+            'payment_method': request.POST.get('payment_method', 'cash'),
+            'note': request.POST.get('note', ''),
+        }
+
         try:
             payload = _core_checkout_payload(
-                address=request.POST.get('address'),
-                postal_code=request.POST.get('postal_code'),
-                phone=request.POST.get('phone'),
-                payment_method=request.POST.get(
-                    'payment_method',
-                    'online',
-                ),
-                note=request.POST.get('note'),
+                address=submitted_values['address'],
+                postal_code=submitted_values['postal_code'],
+                phone=submitted_values['phone'],
+                payment_method=submitted_values['payment_method'],
+                note=submitted_values['note'],
                 allowed_payment_methods=dict(
                     Order.PAYMENT_METHODS
                 ),
@@ -1599,7 +1671,7 @@ def checkout(request):
                     "لطفاً تمام فیلدهای الزامی را پر کنید"
                 ),
                 'invalid_address': (
-                    "آدرس تحویل معتبر نیست"
+                    "آدرس تحویل باید حداقل ۱۰ کاراکتر باشد"
                 ),
                 'invalid_phone': (
                     "شماره تماس باید یک شماره موبایل "
@@ -1621,23 +1693,39 @@ def checkout(request):
                 ),
             }
 
+            field_by_code = {
+                'invalid_address': 'address',
+                'invalid_phone': 'phone',
+                'invalid_postal': 'postal_code',
+                'note_too_long': 'note',
+                'invalid_payment': 'payment_method',
+                'online_disabled': 'payment_method',
+            }
+
+            field_errors = {}
+            if exc.code == 'required_fields':
+                if not str(submitted_values['address']).strip():
+                    field_errors['address'] = 'آدرس تحویل را وارد کنید.'
+                if not str(submitted_values['postal_code']).strip():
+                    field_errors['postal_code'] = 'کد پستی را وارد کنید.'
+                if not str(submitted_values['phone']).strip():
+                    field_errors['phone'] = 'شماره تماس را وارد کنید.'
+            elif exc.code in field_by_code:
+                field_errors[field_by_code[exc.code]] = error_messages[exc.code]
+
             messages.error(
                 request,
-                error_messages[exc.code],
+                error_messages.get(
+                    exc.code,
+                    'اطلاعات واردشده معتبر نیست.',
+                ),
             )
 
-            if exc.code == 'required_fields':
-                return render(
-                    request,
-                    'cart/checkout.html',
-                    {
-                        'cart': cart,
-                        'items': cart.items.all(),
-                        'final_price': cart.final_price,
-                        'total_items': cart.total_items,
-                    },
-                )
-
+            # Keep the submitted values across the redirect so a single
+            # invalid field never clears the customer's address/phone/note.
+            # The redirect preserves the existing PRG behaviour and tests.
+            request.session['checkout_draft'] = submitted_values
+            request.session['checkout_errors'] = field_errors
             return redirect('first:checkout')
 
         try:
@@ -1687,14 +1775,6 @@ def checkout(request):
             )
             return redirect('first:cart')
 
-        messages.success(
-            request,
-            (
-                "سفارش شما با موفقیت ثبت شد. "
-                f"شماره سفارش: {order.order_number}"
-            ),
-        )
-
         return redirect(
             'first:order_success',
             order_number=order.order_number,
@@ -1703,13 +1783,7 @@ def checkout(request):
     return render(
         request,
         'cart/checkout.html',
-        {
-            'cart': cart,
-            'items': cart.items.all(),
-            'final_price': cart.final_price,
-            'total_items': cart.total_items,
-            'user': request.user,
-        },
+        _checkout_context(),
     )
 
 
@@ -1741,6 +1815,13 @@ def order_detail(request, order_number):
         user=request.user,
     )
 
+    status_flow = ['pending', 'paid', 'processing', 'shipped', 'delivered']
+    status_index = (
+        status_flow.index(order.status)
+        if order.status in status_flow
+        else -1
+    )
+
     return render(
         request,
         'cart/order_detail.html',
@@ -1752,6 +1833,7 @@ def order_detail(request, order_number):
             'open_return_request': (
                 open_return_request
             ),
+            'status_index': status_index,
         },
     )
 
@@ -2153,22 +2235,124 @@ def admin_delete_product(request, product_id):
     )
 
 
+def _admin_orders_for_request(request):
+    orders = (
+        _core_admin_order_queryset(Order)
+        .select_related('user')
+        .prefetch_related('items')
+    )
+
+    query = (request.GET.get('q') or '').strip()
+    status = (request.GET.get('status') or '').strip()
+    payment = (request.GET.get('payment') or '').strip()
+    sort = (request.GET.get('sort') or 'newest').strip()
+
+    if query:
+        orders = orders.filter(
+            Q(order_number__icontains=query)
+            | Q(user__username__icontains=query)
+            | Q(user__email__icontains=query)
+            | Q(phone__icontains=query)
+        )
+
+    valid_statuses = {value for value, _ in Order.STATUS_CHOICES}
+    if status in valid_statuses:
+        orders = orders.filter(status=status)
+    else:
+        status = ''
+
+    if payment == 'paid':
+        orders = orders.filter(is_paid=True)
+    elif payment == 'unpaid':
+        orders = orders.filter(is_paid=False)
+    else:
+        payment = ''
+
+    sort_map = {
+        'newest': ('-created_at',),
+        'oldest': ('created_at',),
+        'amount_desc': ('-total', '-created_at'),
+        'amount_asc': ('total', '-created_at'),
+        'paid_first': ('-is_paid', '-created_at'),
+        'unpaid_first': ('is_paid', '-created_at'),
+    }
+    ordering = sort_map.get(sort, sort_map['newest'])
+    if sort not in sort_map:
+        sort = 'newest'
+    orders = orders.order_by(*ordering)
+
+    return orders, {
+        'q': query,
+        'status': status,
+        'payment': payment,
+        'sort': sort,
+    }
+
+
 @permission_required('orders_view')
 def admin_orders(request):
-    orders = _core_admin_order_queryset(
-        Order
-    )
-    paginator = Paginator(
-        orders,
-        20,
-    )
-    page_obj = paginator.get_page(
-        request.GET.get('page')
-    )
+    orders, filters = _admin_orders_for_request(request)
+
+    paginator = Paginator(orders, 20)
+    page_obj = paginator.get_page(request.GET.get('page'))
+
+    query_params = request.GET.copy()
+    if 'page' in query_params:
+        query_params.pop('page')
+
     return render(
         request,
         'dashboard/admin_orders.html',
-        {'page_obj': page_obj},
+        {
+            'page_obj': page_obj,
+            'filters': filters,
+            'status_choices': Order.STATUS_CHOICES,
+            'query_string': query_params.urlencode(),
+        },
+    )
+
+
+@permission_required('orders_view')
+def admin_orders_pdf(request):
+    from .order_pdf import build_orders_pdf
+
+    orders, filters = _admin_orders_for_request(request)
+
+    raw_selected = (request.GET.get('selected') or '').strip()
+    selected_ids = []
+    if raw_selected:
+        for value in raw_selected.split(','):
+            value = value.strip()
+            if value.isdigit():
+                selected_ids.append(int(value))
+
+    if selected_ids:
+        orders = orders.filter(pk__in=selected_ids)
+
+    pdf_bytes = build_orders_pdf(
+        orders,
+        filters=filters,
+        selected=bool(selected_ids),
+    )
+    response = HttpResponse(pdf_bytes, content_type='application/pdf')
+    stamp = timezone.localtime().strftime('%Y%m%d-%H%M')
+    response['Content-Disposition'] = (
+        f'attachment; filename="orders-{stamp}.pdf"'
+    )
+    return response
+
+
+@permission_required('orders_view')
+def admin_order_detail(request, order_id):
+    order = get_object_or_404(
+        Order.objects.select_related('user').prefetch_related('items'),
+        pk=order_id,
+    )
+
+    return render(
+        request,
+        'dashboard/admin_order_detail.html',
+        {'order': order},
     )
 
 
@@ -3272,9 +3456,30 @@ def customizer_reset(request):
         )
 
     try:
-        result = _core_reset_customizer_state(
-            SiteSettings.get_settings()
-        )
+        site = SiteSettings.get_settings()
+        result = _core_reset_customizer_state(site)
+
+        # shop_core is shared with older storefronts whose reset palette is
+        # cosmetics-specific. This perfume app restores its own canonical
+        # palette after clearing visual rules.
+        theme = _CUSTOMIZER_DEFAULT_THEME.copy()
+        site.customizer_theme = theme
+        site.primary_color = theme['primary']
+        site.secondary_color = theme['secondary']
+        site.accent_color = theme['accent']
+        site.background_color = theme['bg']
+        site.text_color = theme['text']
+        site.save(update_fields=[
+            'customizer_theme',
+            'primary_color',
+            'secondary_color',
+            'accent_color',
+            'background_color',
+            'text_color',
+            'updated_at',
+        ])
+        result['theme'] = theme
+
         return JsonResponse({
             'success': True,
             **result,

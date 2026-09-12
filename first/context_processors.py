@@ -6,11 +6,11 @@ from .models import SiteSettings
 
 
 DEFAULT_CUSTOMIZER_THEME = {
-    'primary': '#ec407a',
-    'secondary': '#d81b60',
-    'accent': '#ab47bc',
-    'bg': '#fdf2f8',
-    'text': '#1a1a2e',
+    'primary': '#c9954d',
+    'secondary': '#75471f',
+    'accent': '#e3c286',
+    'bg': '#090706',
+    'text': '#f7f0e7',
 }
 
 
@@ -60,10 +60,20 @@ def site_settings(request):
         ),
     }
 
+    # Keep this permission gate in sync with ``owner_required``.
+    # A Django superuser is treated as the store owner throughout the
+    # admin/owner panel, even when the custom ``role`` field is still
+    # ``user`` (which is exactly how a normal createsuperuser account is
+    # created).  Previously the visual editor only checked ``is_owner``;
+    # that made the studio page open for a superuser while the iframe
+    # silently disabled every editing listener.
     can_edit = bool(
         user and
         user.is_authenticated and
-        getattr(user, 'is_owner', False)
+        (
+            getattr(user, 'is_superuser', False) or
+            getattr(user, 'is_owner', False)
+        )
     )
 
     return {

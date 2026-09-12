@@ -1,108 +1,227 @@
 {% extends 'perfume_base.html' %}
-{% load static %}
+{% load custom_filters %}
 
-{% block title %}💰 تسویه حساب{% endblock %}
+{% block title %}تسویه حساب | {{ settings.site_name|default:'فروشگاه عطر' }}{% endblock %}
+
+{% block extra_css %}
+<style>
+  .p8-checkout-layout{
+    display:grid;
+    grid-template-columns:minmax(0,1.6fr) minmax(310px,.72fr);
+    gap:18px;
+    align-items:start;
+  }
+  .p8-checkout-card,
+  .p8-checkout-summary{
+    border:1px solid var(--p-line);
+    background:linear-gradient(145deg,var(--p-surface),var(--p-surface-2));
+    box-shadow:0 18px 45px rgba(0,0,0,.08);
+  }
+  .p8-checkout-card{padding:30px}
+  .p8-checkout-summary{padding:28px;position:sticky;top:22px}
+  .p8-checkout-title{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:18px;
+    margin-bottom:26px;
+    padding-bottom:18px;
+    border-bottom:1px solid var(--p-line);
+  }
+  .p8-checkout-title h2,
+  .p8-checkout-summary h2{margin:5px 0 0!important;font-size:26px!important}
+  .p8-checkout-title i{
+    width:48px;height:48px;display:grid;place-items:center;
+    border:1px solid var(--p-line-strong);border-radius:50%;color:var(--p-gold);
+  }
+  .p8-checkout-form{display:grid;gap:18px}
+  .p8-checkout-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+  .p8-field{display:grid;gap:8px}
+  .p8-field.full{grid-column:1/-1}
+  .p8-field label{
+    display:flex;align-items:center;gap:7px;color:var(--p-text);font-size:12px;font-weight:800;
+  }
+  .p8-field label i{color:var(--p-gold);font-size:11px}
+  .p8-field input,
+  .p8-field textarea{
+    width:100%;min-height:50px;padding:12px 14px;border:1px solid var(--p-line-strong);
+    border-radius:0;outline:none;color:var(--p-text);background:var(--p-bg);
+    transition:border-color .18s,box-shadow .18s,background .18s;
+  }
+  .p8-field textarea{min-height:120px;resize:vertical;line-height:1.9}
+  .p8-field input:focus,
+  .p8-field textarea:focus{
+    border-color:var(--p-gold);box-shadow:0 0 0 3px rgba(188,137,68,.10);
+  }
+  .p8-field input::placeholder,
+  .p8-field textarea::placeholder{color:var(--p-muted)}
+  .p8-payment{
+    display:grid;gap:10px;padding:17px;border:1px solid var(--p-line);background:var(--p-bg);
+  }
+  .p8-payment-option{
+    display:flex;align-items:center;gap:12px;min-height:52px;padding:11px 14px;
+    border:1px solid var(--p-line-strong);cursor:pointer;transition:.18s;
+  }
+  .p8-payment-option:hover{border-color:var(--p-gold)}
+  .p8-payment-option input{accent-color:var(--p-gold);width:17px;height:17px}
+  .p8-payment-option i{color:var(--p-gold)}
+  .p8-payment small{color:var(--p-muted);line-height:1.8}
+  .p8-order-items{display:grid;gap:0;max-height:300px;overflow:auto;margin:18px 0}
+  .p8-order-item{
+    display:grid;grid-template-columns:1fr auto;gap:14px;padding:13px 0;border-bottom:1px solid var(--p-line);
+  }
+  .p8-order-item:last-child{border-bottom:0}
+  .p8-order-item span{font-size:12px;line-height:1.8}
+  .p8-order-item small{display:block;color:var(--p-muted);margin-top:3px}
+  .p8-order-item strong{color:var(--p-gold);font-size:13px;white-space:nowrap}
+  .p8-checkout-totals{display:grid;gap:11px;padding:17px 0;border-top:1px solid var(--p-line);border-bottom:1px solid var(--p-line)}
+  .p8-checkout-totals>div{display:flex;justify-content:space-between;gap:14px;color:var(--p-muted);font-size:12px}
+  .p8-checkout-totals b{color:var(--p-text)}
+  .p8-checkout-total{
+    display:flex;align-items:flex-end;justify-content:space-between;gap:16px;padding:20px 0 18px;
+  }
+  .p8-checkout-total span{font-weight:800}
+  .p8-checkout-total strong{color:var(--p-gold);font-size:24px}
+  .p8-checkout-total em{display:block;color:var(--p-muted);font-size:9px;font-style:normal;text-align:left;margin-top:2px}
+  .p8-checkout-submit{width:100%;border:0;cursor:pointer;font:inherit;font-weight:900}
+  .p8-checkout-back{margin-top:9px}
+  html[data-perfume-theme="night"] .p8-checkout-card,
+  html[data-perfume-theme="night"] .p8-checkout-summary{
+    background:linear-gradient(145deg,#17110d,#21160f)!important;
+  }
+  html[data-perfume-theme="night"] .p8-field input,
+  html[data-perfume-theme="night"] .p8-field textarea,
+  html[data-perfume-theme="night"] .p8-payment{
+    background:#0f0b09!important;
+  }
+  html[data-perfume-theme="day"] .p8-checkout-card,
+  html[data-perfume-theme="day"] .p8-checkout-summary{
+    background:linear-gradient(145deg,#fffaf4,#f6eadb)!important;
+  }
+  html[data-perfume-theme="day"] .p8-field input,
+  html[data-perfume-theme="day"] .p8-field textarea,
+  html[data-perfume-theme="day"] .p8-payment{background:#fffdf9!important}
+  .p8-field.has-error input,
+  .p8-field.has-error textarea,
+  .p8-field.has-error .p8-payment{border-color:#d45f61!important;box-shadow:0 0 0 3px rgba(212,95,97,.08)}
+  .p8-field-error{display:flex;align-items:center;gap:6px;color:#d77778;font-size:10px;line-height:1.8;margin-top:-2px}
+  .p8-field-error i{font-size:9px}
+  .p8-form-note{display:flex;align-items:flex-start;gap:9px;padding:12px 14px;border:1px solid var(--p-line);background:rgba(188,137,68,.06);color:var(--p-muted);font-size:10px;line-height:1.9}
+  .p8-form-note i{color:var(--p-gold);margin-top:4px}
+  @media(max-width:900px){
+    .p8-checkout-layout{grid-template-columns:1fr}
+    .p8-checkout-summary{position:static}
+  }
+  @media(max-width:640px){
+    .p8-checkout-card,.p8-checkout-summary{padding:20px}
+    .p8-checkout-grid{grid-template-columns:1fr}
+    .p8-field.full{grid-column:auto}
+    .p8-checkout-total strong{font-size:20px}
+  }
+</style>
+{% endblock %}
 
 {% block content %}
-<div class="max-w-4xl mx-auto">
-    <h1 class="text-3xl font-bold gradient-text mb-8">💰 تسویه حساب</h1>
-    
-    <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
-        <!-- فرم اطلاعات -->
-        <div class="lg:col-span-2">
-            <div class="bg-white/80 backdrop-blur-lg rounded-2xl p-6 shadow-lg">
-                <h3 class="font-bold text-xl mb-4">اطلاعات تحویل سفارش</h3>
-                
-                <form method="POST" id="checkout-form">
-                    {% csrf_token %}
-                    
-                    <div class="space-y-4">
-                        <div>
-                            <label class="block text-sm font-bold text-gray-700 mb-1">آدرس تحویل *</label>
-                            <textarea name="address" rows="3" 
-                                      class="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:border-pink-500 focus:ring-4 focus:ring-pink-100 transition-all outline-none"
-                                      placeholder="آدرس کامل خود را وارد کنید" required>{{ user.address|default:'' }}</textarea>
-                        </div>
-                        
-                        <div>
-                            <label class="block text-sm font-bold text-gray-700 mb-1">کد پستی *</label>
-                            <input type="text" name="postal_code" 
-                                   class="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:border-pink-500 focus:ring-4 focus:ring-pink-100 transition-all outline-none"
-                                   placeholder="کد پستی ۱۰ رقمی" required>
-                        </div>
-                        
-                        <div>
-                            <label class="block text-sm font-bold text-gray-700 mb-1">شماره تماس *</label>
-                            <input type="tel" name="phone" value="{{ user.phone|default:'' }}"
-                                   class="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:border-pink-500 focus:ring-4 focus:ring-pink-100 transition-all outline-none"
-                                   placeholder="شماره تلفن" required>
-                        </div>
-                        
-                        <div>
-                            <label class="block text-sm font-bold text-gray-700 mb-1">روش پرداخت</label>
-                            <div class="space-y-2">
-                                <label class="flex items-center gap-3 p-3 border rounded-xl cursor-pointer hover:bg-pink-50 transition-all">
-                                    <input type="radio" name="payment_method" value="cash" checked>
-                                    <i class="fas fa-money-bill text-green-500"></i>
-                                    <span>پرداخت در محل</span>
-                                </label>
-                                <p class="text-xs text-gray-500">
-                                    پرداخت آنلاین پس از اتصال درگاه واقعی فعال می‌شود.
-                                </p>
-                            </div>
-                        </div>
-                        
-                        <div>
-                            <label class="block text-sm font-bold text-gray-700 mb-1">توضیحات (اختیاری)</label>
-                            <textarea name="note" rows="2" 
-                                      class="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:border-pink-500 focus:ring-4 focus:ring-pink-100 transition-all outline-none"
-                                      placeholder="توضیحات یا نکات ویژه"></textarea>
-                        </div>
-                    </div>
-                </form>
-            </div>
+<section class="p8-page">
+  <div class="p8-wrap">
+    <header class="p8-page-head">
+      <div>
+        <span class="p8-kicker">SECURE CHECKOUT</span>
+        <h1>تسویه حساب</h1>
+        <p>اطلاعات تحویل را تکمیل کنید و سفارش خود را نهایی کنید.</p>
+      </div>
+      <div class="p8-head-mark"><i class="fa-solid fa-shield-halved"></i></div>
+    </header>
+
+    <div class="p8-checkout-layout">
+      <section class="p8-checkout-card">
+        <div class="p8-checkout-title">
+          <div>
+            <span class="p8-kicker">DELIVERY DETAILS</span>
+            <h2>اطلاعات تحویل سفارش</h2>
+          </div>
+          <i class="fa-solid fa-location-dot"></i>
         </div>
-        
-        <!-- خلاصه سفارش -->
-        <div class="lg:col-span-1">
-            <div class="bg-white/80 backdrop-blur-lg rounded-2xl p-6 shadow-lg sticky top-24">
-                <h3 class="font-bold text-xl mb-4">خلاصه سفارش</h3>
-                
-                <div class="space-y-3 max-h-60 overflow-y-auto mb-4">
-                    {% for item in items %}
-                    <div class="flex justify-between text-sm border-b border-gray-100 pb-2">
-                        <span>{{ item.product.name }} × {{ item.quantity }}</span>
-                        <span class="font-bold">{{ item.final_price|floatformat:0 }}</span>
-                    </div>
-                    {% endfor %}
-                </div>
-                
-                <div class="space-y-2 text-sm border-t border-gray-200 pt-4">
-                    <div class="flex justify-between">
-                        <span class="text-gray-600">جمع کل ({{ total_items }} مورد)</span>
-                        <span class="font-bold">{{ cart.total_price|floatformat:0 }}</span>
-                    </div>
-                    <div class="flex justify-between text-green-500">
-                        <span>تخفیف</span>
-                        <span class="font-bold">-{{ cart.total_discount|floatformat:0 }}</span>
-                    </div>
-                    <div class="flex justify-between text-gray-600">
-                        <span>هزینه ارسال</span>
-                        <span>رایگان</span>
-                    </div>
-                </div>
-                
-                <div class="flex justify-between items-center mt-4 pt-4 border-t border-gray-200">
-                    <span class="text-lg font-bold">مبلغ قابل پرداخت</span>
-                    <span class="text-2xl font-bold gradient-text">{{ final_price|floatformat:0 }}</span>
-                </div>
-                
-                <button type="submit" form="checkout-form" 
-                        class="w-full mt-4 py-3 bg-gradient-to-r from-pink-500 to-purple-600 text-white rounded-xl font-bold text-center hover:shadow-xl transition-all hover:scale-105">
-                    <i class="fas fa-check-circle ml-2"></i> ثبت سفارش
-                </button>
+
+        <form method="post" id="checkout-form" class="p8-checkout-form" novalidate>
+          {% csrf_token %}
+          <div class="p8-form-note"><i class="fa-solid fa-shield-halved"></i><span>اگر یکی از فیلدها اشتباه باشد، بقیه اطلاعاتی که وارد کرده‌اید حفظ می‌شود و فقط همان فیلد مشخص خواهد شد.</span></div>
+          <div class="p8-checkout-grid">
+            <div class="p8-field full{% if checkout_errors.address %} has-error{% endif %}">
+              <label for="checkout-address"><i class="fa-regular fa-map"></i> آدرس تحویل *</label>
+              <textarea id="checkout-address" name="address" placeholder="استان، شهر، خیابان، پلاک و واحد" required>{{ checkout_values.address }}</textarea>
+              {% if checkout_errors.address %}<span class="p8-field-error"><i class="fa-solid fa-circle-exclamation"></i>{{ checkout_errors.address }}</span>{% endif %}
             </div>
+
+            <div class="p8-field{% if checkout_errors.postal_code %} has-error{% endif %}">
+              <label for="checkout-postal"><i class="fa-solid fa-envelopes-bulk"></i> کد پستی *</label>
+              <input id="checkout-postal" type="text" name="postal_code" inputmode="numeric" maxlength="10" value="{{ checkout_values.postal_code }}" placeholder="۱۰ رقم" required>
+              {% if checkout_errors.postal_code %}<span class="p8-field-error"><i class="fa-solid fa-circle-exclamation"></i>{{ checkout_errors.postal_code }}</span>{% endif %}
+            </div>
+
+            <div class="p8-field{% if checkout_errors.phone %} has-error{% endif %}">
+              <label for="checkout-phone"><i class="fa-solid fa-phone"></i> شماره تماس *</label>
+              <input id="checkout-phone" type="tel" name="phone" inputmode="tel" maxlength="11" value="{{ checkout_values.phone }}" placeholder="09xxxxxxxxx" required>
+              {% if checkout_errors.phone %}<span class="p8-field-error"><i class="fa-solid fa-circle-exclamation"></i>{{ checkout_errors.phone }}</span>{% endif %}
+            </div>
+
+            <div class="p8-field full{% if checkout_errors.payment_method %} has-error{% endif %}">
+              <label><i class="fa-regular fa-credit-card"></i> روش پرداخت</label>
+              <div class="p8-payment">
+                <label class="p8-payment-option">
+                  <input type="radio" name="payment_method" value="cash" {% if checkout_values.payment_method == 'cash' or not checkout_values.payment_method %}checked{% endif %}>
+                  <i class="fa-solid fa-money-bill-wave"></i>
+                  <span>پرداخت در محل</span>
+                </label>
+                <small>پرداخت آنلاین بعد از اتصال درگاه واقعی فعال خواهد شد.</small>
+              </div>
+              {% if checkout_errors.payment_method %}<span class="p8-field-error"><i class="fa-solid fa-circle-exclamation"></i>{{ checkout_errors.payment_method }}</span>{% endif %}
+            </div>
+
+            <div class="p8-field full{% if checkout_errors.note %} has-error{% endif %}">
+              <label for="checkout-note"><i class="fa-regular fa-note-sticky"></i> توضیحات سفارش (اختیاری)</label>
+              <textarea id="checkout-note" name="note" rows="3" placeholder="نکته‌ای برای بسته‌بندی یا تحویل دارید؟">{{ checkout_values.note }}</textarea>
+              {% if checkout_errors.note %}<span class="p8-field-error"><i class="fa-solid fa-circle-exclamation"></i>{{ checkout_errors.note }}</span>{% endif %}
+            </div>
+          </div>
+        </form>
+      </section>
+
+      <aside class="p8-checkout-summary">
+        <span class="p8-kicker">ORDER SUMMARY</span>
+        <h2>خلاصه سفارش</h2>
+
+        <div class="p8-order-items">
+          {% for item in items %}
+          <div class="p8-order-item">
+            <span>
+              {{ item.item_name|default:item.product.name }} × {{ item.quantity }}
+              {% if item.variant %}<small>{{ item.variant }}</small>{% endif %}
+            </span>
+            <strong>{{ item.final_price|price_format }} تومان</strong>
+          </div>
+          {% endfor %}
         </div>
+
+        <div class="p8-checkout-totals">
+          <div><span>تعداد کالا</span><b>{{ total_items|default:0 }}</b></div>
+          <div><span>جمع محصولات</span><b>{{ cart.total_price|price_format }} تومان</b></div>
+          <div><span>تخفیف</span><b>{{ cart.total_discount|price_format }} تومان</b></div>
+          <div><span>هزینه ارسال</span><b>رایگان</b></div>
+        </div>
+
+        <div class="p8-checkout-total">
+          <span>مبلغ قابل پرداخت</span>
+          <strong>{{ final_price|price_format }}<em>تومان</em></strong>
+        </div>
+
+        <button type="submit" form="checkout-form" class="p8-primary p8-checkout-submit">
+          ثبت سفارش
+          <i class="fa-solid fa-arrow-left"></i>
+        </button>
+        <a class="p8-secondary full p8-checkout-back" href="{% url 'first:cart' %}">بازگشت به سبد خرید</a>
+      </aside>
     </div>
-</div>
+  </div>
+</section>
 {% endblock %}

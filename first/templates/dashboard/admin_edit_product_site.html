@@ -390,25 +390,115 @@
         backdrop-filter: blur(12px);
     }
 
-    [data-theme="dark"] .edit-product {
-        --line: #4a444e;
-        --muted: #b8b0ba;
+    /* The admin shell uses data-perfume-theme="night" (not data-theme="dark"). */
+    html[data-perfume-theme="night"] .edit-product {
+        --line: rgba(215,173,99,.22);
+        --muted: #b8aa98;
+        color: var(--pa-text);
     }
 
-    [data-theme="dark"] .edit-card,
-    [data-theme="dark"] .edit-section,
-    [data-theme="dark"] .variant-row,
-    [data-theme="dark"] .image-card,
-    [data-theme="dark"] .status-option,
-    [data-theme="dark"] .secondary-btn,
-    [data-theme="dark"] .save-bar {
-        background: #32323b;
+    html[data-perfume-theme="night"] .edit-card {
+        background:
+            radial-gradient(circle at 90% 0%, rgba(215,173,99,.08), transparent 26rem),
+            linear-gradient(145deg,#18120e,#100c09);
+        border-color: var(--line);
+        box-shadow: 0 28px 70px -42px rgba(0,0,0,.8);
     }
 
-    [data-theme="dark"] .edit-input,
-    [data-theme="dark"] .edit-select,
-    [data-theme="dark"] .edit-textarea {
-        background: #292930;
+    html[data-perfume-theme="night"] .edit-section {
+        background: linear-gradient(145deg,#1e1712,#17110d);
+        border-color: var(--line);
+    }
+
+    html[data-perfume-theme="night"] .edit-input,
+    html[data-perfume-theme="night"] .edit-select,
+    html[data-perfume-theme="night"] .edit-textarea,
+    html[data-perfume-theme="night"] .variant-field input,
+    html[data-perfume-theme="night"] .variant-field select {
+        color: var(--pa-text);
+        background: #231a14;
+        border-color: var(--line);
+        caret-color: var(--pa-gold-3);
+    }
+
+    html[data-perfume-theme="night"] .edit-input::placeholder,
+    html[data-perfume-theme="night"] .edit-textarea::placeholder,
+    html[data-perfume-theme="night"] .variant-field input::placeholder {
+        color: #887a68;
+    }
+
+    html[data-perfume-theme="night"] .edit-select option,
+    html[data-perfume-theme="night"] .variant-field select option {
+        color: var(--pa-text);
+        background: #1b140f;
+    }
+
+    html[data-perfume-theme="night"] .variant-row,
+    html[data-perfume-theme="night"] .image-card,
+    html[data-perfume-theme="night"] .status-option,
+    html[data-perfume-theme="night"] .secondary-btn,
+    html[data-perfume-theme="night"] .new-preview,
+    html[data-perfume-theme="night"] .color-panel {
+        color: var(--pa-text);
+        background: #201812;
+        border-color: var(--line);
+    }
+
+    html[data-perfume-theme="night"] .save-bar {
+        color: var(--pa-text);
+        background: rgba(20,15,11,.94);
+        border-color: var(--line);
+        box-shadow: 0 18px 45px rgba(0,0,0,.34);
+    }
+
+    html[data-perfume-theme="night"] .image-card img,
+    html[data-perfume-theme="night"] .new-preview img {
+        background: #17110d;
+    }
+
+    html[data-perfume-theme="night"] .upload-box {
+        color: var(--pa-text);
+        background: rgba(215,173,99,.045);
+        border-color: rgba(215,173,99,.30);
+    }
+
+    html[data-perfume-theme="night"] .upload-box:hover {
+        background: rgba(215,173,99,.08);
+        border-color: var(--pa-gold);
+    }
+
+    html[data-perfume-theme="night"] .field-label,
+    html[data-perfume-theme="night"] .section-title,
+    html[data-perfume-theme="night"] .variant-field label {
+        color: var(--pa-heading);
+    }
+
+    html[data-perfume-theme="night"] .field-help,
+    html[data-perfume-theme="night"] .image-card-info,
+    html[data-perfume-theme="night"] .new-preview span {
+        color: var(--pa-muted);
+    }
+
+    html[data-perfume-theme="night"] .section-title i,
+    html[data-perfume-theme="night"] .upload-box i {
+        color: var(--pa-gold);
+    }
+
+    html[data-perfume-theme="night"] .edit-input:focus,
+    html[data-perfume-theme="night"] .edit-select:focus,
+    html[data-perfume-theme="night"] .edit-textarea:focus,
+    html[data-perfume-theme="night"] .variant-field input:focus,
+    html[data-perfume-theme="night"] .variant-field select:focus {
+        border-color: var(--pa-gold);
+        box-shadow: 0 0 0 3px rgba(215,173,99,.10);
+    }
+
+    html[data-perfume-theme="night"] .switch span {
+        background: #3a2c21;
+    }
+
+    html[data-perfume-theme="night"] .switch input:checked + span {
+        background: var(--pa-gold-2);
     }
 
     @media (max-width:900px) {
@@ -606,8 +696,8 @@
                 </div>
 
                 <div>
-                    <label class="field-label">
-                        موجودی محصول ساده
+                    <label class="field-label" id="stockLabel">
+                        موجودی محصول
                     </label>
 
                     <input id="stock"
@@ -618,8 +708,8 @@
                            step="1"
                            value="{{ product.stock }}">
 
-                    <p class="field-help">
-                        برای محصول دارای تنوع، موجودی هر مدل جداست.
+                    <p class="field-help" id="stockHelp">
+                        برای محصول ساده، موجودی اصلی را از همین‌جا ویرایش کن.
                     </p>
                 </div>
             </div>
@@ -1129,8 +1219,62 @@
     const variantsSection = document.getElementById('variantsSection');
     const variantRows = document.getElementById('variantRows');
     const variantTemplate = document.getElementById('variantTemplate');
+    const stockInput = document.getElementById('stock');
+    const stockLabel = document.getElementById('stockLabel');
+    const stockHelp = document.getElementById('stockHelp');
 
     let variantSerial = 0;
+
+    function getDefaultVariantRow() {
+        const checked = variantRows.querySelector(
+            '[name="variant_default"]:checked'
+        );
+
+        return checked?.closest('.variant-row') ||
+            variantRows.querySelector('.variant-row');
+    }
+
+    function syncTopStockFromDefault() {
+        if (!variantsToggle.checked) return;
+
+        const row = getDefaultVariantRow();
+        const variantStock = row?.querySelector(
+            '[name="variant_stocks"]'
+        );
+
+        if (variantStock) {
+            stockInput.value = variantStock.value || '0';
+        }
+    }
+
+    function syncDefaultStockFromTop() {
+        if (!variantsToggle.checked) return;
+
+        const row = getDefaultVariantRow();
+        const variantStock = row?.querySelector(
+            '[name="variant_stocks"]'
+        );
+
+        if (variantStock) {
+            variantStock.value = stockInput.value || '0';
+        }
+    }
+
+    function refreshStockEditor(syncValue = true) {
+        if (variantsToggle.checked) {
+            stockLabel.textContent = 'موجودی تنوع پیش‌فرض';
+            stockHelp.textContent =
+                'این عدد مستقیماً موجودی تنوع پیش‌فرض را تغییر می‌دهد؛ موجودی بقیه تنوع‌ها را پایین همین صفحه ویرایش کن.';
+
+            if (syncValue) {
+                syncTopStockFromDefault();
+            }
+        } else {
+            stockLabel.textContent = 'موجودی محصول';
+            stockHelp.textContent =
+                'برای محصول ساده، موجودی اصلی را از همین‌جا ویرایش کن.';
+        }
+    }
 
     function bindVariantRow(row) {
         const select = row.querySelector('.variant-color-select');
@@ -1138,6 +1282,12 @@
         const imageInput = row.querySelector('.variant-image');
         const imageName = row.querySelector('.variant-image-name');
         const removeButton = row.querySelector('.remove-variant');
+        const defaultRadio = row.querySelector(
+            '[name="variant_default"]'
+        );
+        const variantStock = row.querySelector(
+            '[name="variant_stocks"]'
+        );
 
         function updateColorPreview() {
             const option = select.options[select.selectedIndex];
@@ -1159,6 +1309,21 @@
                 imageInput.files[0]?.name || '';
         });
 
+        defaultRadio?.addEventListener('change', () => {
+            if (defaultRadio.checked) {
+                syncTopStockFromDefault();
+            }
+        });
+
+        variantStock?.addEventListener('input', () => {
+            if (
+                variantsToggle.checked &&
+                getDefaultVariantRow() === row
+            ) {
+                stockInput.value = variantStock.value || '0';
+            }
+        });
+
         removeButton.addEventListener('click', () => {
             row.remove();
 
@@ -1172,6 +1337,8 @@
                     '[name="variant_default"]'
                 ).checked = true;
             }
+
+            syncTopStockFromDefault();
         });
     }
 
@@ -1197,7 +1364,17 @@
                 row.querySelector(
                     '[name="variant_default"]'
                 ).checked = true;
+
+                const firstVariantStock = row.querySelector(
+                    '[name="variant_stocks"]'
+                );
+
+                if (firstVariantStock) {
+                    firstVariantStock.value = stockInput.value || '0';
+                }
             }
+
+            refreshStockEditor();
         });
 
     function updateVariantsStatus() {
@@ -1206,8 +1383,13 @@
             !variantsToggle.checked
         );
 
-        const stockInput = document.getElementById('stock');
-        stockInput.disabled = variantsToggle.checked;
+        /*
+         * Keep the stock field editable. For variant products it is an
+         * alias for the default variant stock, so the user never sees a
+         * disabled/dead inventory control.
+         */
+        stockInput.disabled = false;
+        stockInput.readOnly = false;
 
         if (
             variantsToggle.checked &&
@@ -1215,12 +1397,18 @@
         ) {
             document.getElementById('addVariant').click();
         }
+
+        refreshStockEditor();
     }
 
     variantsToggle.addEventListener(
         'change',
         updateVariantsStatus
     );
+
+    stockInput.addEventListener('input', () => {
+        syncDefaultStockFromTop();
+    });
 
     updateVariantsStatus();
 
@@ -1406,6 +1594,10 @@
         });
 
     form.addEventListener('submit', event => {
+        /* Ensure the convenient top inventory field is persisted into the
+           canonical default-variant stock before Django receives the form. */
+        syncDefaultStockFromTop();
+
         const price = Number(
             document.getElementById('price').value
         );

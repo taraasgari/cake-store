@@ -1,111 +1,160 @@
 {% extends 'perfume_base.html' %}
-{% load custom_filters %}
+{% load static custom_filters %}
 {% block title %}{{ settings.site_title|default:"VÉLORA — رایحه‌ای فراتر از زمان" }}{% endblock %}
+{% block extra_css %}
+{{ block.super }}
+<style>
+/* Built-in hero: this belongs to the theme, never to SliderImage. */
+.home-lux-default-media{position:absolute;inset:0;display:block;overflow:hidden}
+.home-lux-default-media>img{width:100%;height:100%;display:block;object-fit:cover}
+/* The artwork already contains the visual button. This semantic link sits exactly
+   over it, making that painted control a real keyboard/clickable storefront link. */
+.home-lux-default-cta{position:absolute;z-index:8;left:16.4%;top:55.1%;width:23%;height:11.2%;display:flex;align-items:center;justify-content:center;border-radius:999px;color:transparent!important;background:transparent!important;text-decoration:none!important;cursor:pointer;outline:none}
+.home-lux-default-cta:focus-visible{box-shadow:0 0 0 3px #090706,0 0 0 5px #e3c286}
+@media(max-width:760px){.home-lux-default-cta{left:8%;top:55%;width:36%;height:12%}}
+
+/* Slider core: custom slides must occupy the exact same frame.
+   Earlier only the active class changed, but there was no visibility CSS, so the
+   browser had nothing to visually switch. Keep the transition local and explicit. */
+.home-lux-slider{position:relative;overflow:hidden;background:#0a0705}
+.home-lux-slider-shell{position:relative;width:100%;height:100%;min-height:clamp(430px,calc(100vh - 280px),780px);overflow:hidden}
+.home-lux-slide{position:absolute;inset:0;z-index:0;opacity:0;visibility:hidden;pointer-events:none;transition:opacity .38s ease,visibility .38s ease}
+.home-lux-slide.is-active{z-index:2;opacity:1;visibility:visible;pointer-events:auto}
+.home-lux-managed-media,.home-lux-managed-media>img{position:absolute;inset:0;width:100%;height:100%;display:block}
+.home-lux-managed-media{overflow:hidden}
+.home-lux-managed-media>img{object-fit:contain;background:#080604}
+.home-lux-managed-shade{position:absolute;inset:0;z-index:3;pointer-events:none;background:linear-gradient(90deg,rgba(7,5,4,.58),rgba(7,5,4,.05) 58%,rgba(7,5,4,.18))}
+.home-lux-slide-copy--managed{position:absolute;z-index:4;inset:auto auto 12% 7%;max-width:min(620px,48vw)}
+
+/* Customer slider navigation: centered arrows, visible only when there is more than one custom slide. */
+.home-lux-slider-nav{position:absolute;inset:0;z-index:20;pointer-events:none}
+.home-lux-slider-arrow{position:absolute;top:50%;transform:translateY(-50%);width:54px;height:74px;border:1px solid rgba(226,188,118,.55);background:rgba(8,6,5,.58);backdrop-filter:blur(8px);color:#f0c97d;font:300 48px/1 Georgia,serif;display:grid;place-items:center;cursor:pointer;pointer-events:auto;transition:background .2s,border-color .2s,transform .2s;box-shadow:0 12px 34px rgba(0,0,0,.28)}
+.home-lux-slider-arrow:hover,.home-lux-slider-arrow:focus-visible{background:rgba(32,20,12,.86);border-color:#e2bc76;outline:none;transform:translateY(-50%) scale(1.04)}
+.home-lux-slider-arrow--prev{left:22px}.home-lux-slider-arrow--next{right:22px}
+@media(max-width:760px){.home-lux-slider-arrow{width:42px;height:58px;font-size:36px}.home-lux-slider-arrow--prev{left:10px}.home-lux-slider-arrow--next{right:10px}}
+
+/* Rich category artwork. These are pure CSS so no missing icon-font can leave an empty square. */
+.category-card-x .cat-visual{position:relative;isolation:isolate}
+.category-card-x .cat-art{position:relative;display:block;color:#d9aa5b;filter:drop-shadow(0 12px 22px rgba(0,0,0,.28))}
+.category-card-x .cat-visual--1 .cat-art{width:78px;height:58px;border:1px solid currentColor;border-radius:5px;background:linear-gradient(145deg,rgba(217,170,91,.08),rgba(217,170,91,.01))}
+.category-card-x .cat-visual--1 .cat-art:before{content:"";position:absolute;left:50%;top:-1px;width:12px;height:60px;transform:translateX(-50%);border-left:1px solid currentColor;border-right:1px solid currentColor}
+.category-card-x .cat-visual--1 .cat-art:after{content:"";position:absolute;left:50%;top:-22px;width:34px;height:26px;transform:translateX(-50%);border:1px solid currentColor;border-radius:50% 50% 12px 12px;box-shadow:-18px 5px 0 -8px rgba(217,170,91,.7),18px 5px 0 -8px rgba(217,170,91,.7)}
+.category-card-x .cat-visual--2 .cat-art{width:18px;height:76px;border:1px solid currentColor;border-radius:9px 9px 4px 4px;background:linear-gradient(to top,rgba(217,170,91,.22) 0 42%,transparent 42%);box-shadow:-31px 10px 0 -1px #15100c,-31px 10px 0 0 currentColor,31px 10px 0 -1px #15100c,31px 10px 0 0 currentColor}
+.category-card-x .cat-visual--2 .cat-art:before{content:"";position:absolute;left:4px;top:-10px;width:8px;height:10px;border:1px solid currentColor;border-bottom:0}
+.category-card-x .cat-visual--3 .cat-art{width:82px;height:82px;border:1px solid rgba(217,170,91,.5);border-radius:50%}
+.category-card-x .cat-visual--3 .cat-art:before{content:"";position:absolute;inset:22px;border:1px solid currentColor;border-radius:50% 8px 50% 8px;transform:rotate(45deg);box-shadow:0 -24px 0 -13px currentColor,0 24px 0 -13px currentColor,24px 0 0 -13px currentColor,-24px 0 0 -13px currentColor}
+.category-card-x .cat-visual--3 .cat-art:after{content:"";position:absolute;left:50%;top:50%;width:8px;height:8px;background:currentColor;border-radius:50%;transform:translate(-50%,-50%)}
+.category-card-x .cat-visual--4 .cat-art{width:64px;height:64px;border:1px solid currentColor;transform:rotate(45deg);background:linear-gradient(135deg,rgba(217,170,91,.12),transparent 60%)}
+.category-card-x .cat-visual--4 .cat-art:before{content:"";position:absolute;inset:12px;border:1px solid rgba(217,170,91,.62)}
+.category-card-x .cat-visual--4 .cat-art:after{content:"";position:absolute;left:50%;top:50%;width:10px;height:10px;background:currentColor;border-radius:50%;transform:translate(-50%,-50%)}
+.category-card-x .cat-visual--5 .cat-art{width:96px;height:70px}
+.category-card-x .cat-visual--5 .cat-art:before,.category-card-x .cat-visual--5 .cat-art:after{content:"";position:absolute;top:7px;width:54px;height:54px;border:1px solid currentColor;border-radius:50%;background:rgba(217,170,91,.025)}
+.category-card-x .cat-visual--5 .cat-art:before{left:5px}.category-card-x .cat-visual--5 .cat-art:after{right:5px}
+.category-card-x .cat-visual--6 .cat-art{width:80px;height:80px;border:1px solid rgba(217,170,91,.55);border-radius:50%}
+.category-card-x .cat-visual--6 .cat-art:before{content:"";position:absolute;left:50%;top:14px;width:1px;height:52px;background:currentColor;box-shadow:-16px 8px 0 rgba(217,170,91,.65),16px 8px 0 rgba(217,170,91,.65);transform:translateX(-50%) rotate(22deg)}
+
+/* Replace the old empty editorial placeholders with deliberate perfume-themed illustrations. */
+.panel-bottle{width:108px!important;height:184px!important;border:1px solid #c89a58!important;border-radius:18px 18px 8px 8px!important;background:linear-gradient(90deg,#110b08 0%,#5b3218 42%,#1a0e08 70%,#0b0806 100%)!important;box-shadow:0 26px 50px rgba(0,0,0,.32),inset 0 0 35px rgba(217,170,91,.08)!important}
+.panel-bottle:before{content:"";position:absolute;left:50%;top:-33px;width:48px;height:34px;transform:translateX(-50%);border:1px solid #c89a58;border-bottom:0;border-radius:8px 8px 2px 2px;background:linear-gradient(90deg,#16100b,#7c5a31,#16100b)}
+.panel-bottle:after{content:"V";position:absolute;left:18px;right:18px;top:72px;height:45px;border:1px solid rgba(216,179,109,.6);display:grid;place-items:center;color:#d9aa5b;font:20px Georgia,serif;letter-spacing:.18em}
+.panel-rings{width:230px!important;height:230px!important;border:1px solid rgba(217,178,115,.28)!important;border-radius:50%!important;background:radial-gradient(circle,rgba(217,170,91,.09) 0 5%,transparent 6% 100%)!important}
+.panel-rings:before,.panel-rings:after{content:"";position:absolute;left:50%;top:50%;border:1px solid rgba(217,178,115,.52);border-radius:50%;transform:translate(-50%,-50%) rotate(24deg)}
+.panel-rings:before{width:155px;height:72px}.panel-rings:after{width:72px;height:155px;transform:translate(-50%,-50%) rotate(-32deg)}
+.panel-icons .panel-rings{box-shadow:inset 0 0 60px rgba(217,170,91,.025)}
+.gift-box-x{width:132px!important;height:112px!important;border:1px solid #d2a560!important;background:linear-gradient(145deg,#0c0907,#2d1a0f)!important;box-shadow:0 24px 40px rgba(0,0,0,.28)!important}
+.gift-box-x:before{content:"";position:absolute;left:50%;top:-10px;width:18px;height:122px;transform:translateX(-50%);border-left:1px solid #d2a560;border-right:1px solid #d2a560;background:rgba(210,165,96,.04)}
+.gift-box-x:after{content:"";position:absolute;left:-8px;right:-8px;top:-14px;height:24px;border:1px solid #d2a560;background:#17100b;box-shadow:56px -23px 0 -7px #17100b,56px -23px 0 -6px #d2a560}
+
+/* Quick commerce hub replacing the old category carousel. */
+.home-commerce-hub{padding:clamp(54px,7vw,110px) clamp(22px,4vw,74px);border-top:1px solid rgba(216,169,91,.18);border-bottom:1px solid rgba(216,169,91,.18);background:linear-gradient(180deg,#0a0705,#100a07)}
+.home-commerce-head{display:flex;align-items:end;justify-content:space-between;gap:24px;margin-bottom:34px}
+.home-commerce-head .eyebrow-x{color:#c9964f;letter-spacing:.22em}.home-commerce-head h2{margin:.4rem 0 0;font-size:clamp(36px,4vw,68px);line-height:1.05;color:#f6efe6}.home-commerce-head>a{color:#d9aa5b;text-decoration:none;border-bottom:1px solid rgba(217,170,91,.35);padding-bottom:6px}
+.home-commerce-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));border:1px solid rgba(217,170,91,.24)}
+.home-commerce-card{position:relative;min-height:260px;padding:28px;overflow:hidden;text-decoration:none;color:#f5eee5;border-inline-end:1px solid rgba(217,170,91,.18);background:linear-gradient(145deg,rgba(217,170,91,.025),rgba(255,255,255,.008));transition:background .25s,transform .25s}
+.home-commerce-card:last-child{border-inline-end:0}.home-commerce-card:hover{background:linear-gradient(145deg,rgba(217,170,91,.11),rgba(255,255,255,.015));transform:translateY(-3px)}
+.home-commerce-card>small{display:block;color:#c99448;letter-spacing:.18em;font-size:11px}.home-commerce-card>h3{margin:70px 0 12px;font-size:clamp(27px,2.4vw,42px);line-height:1.1}.home-commerce-card>p{margin:0;color:#ad9c8d;line-height:1.9;font-size:14px;max-width:25ch}.home-commerce-card>b{position:absolute;left:28px;bottom:24px;color:#d9aa5b;font-weight:600}
+.home-commerce-art{position:absolute;left:26px;top:28px;width:72px;height:72px;border:1px solid rgba(217,170,91,.45);border-radius:50%}
+.home-commerce-art:before,.home-commerce-art:after{content:"";position:absolute;inset:50% auto auto 50%;transform:translate(-50%,-50%);border:1px solid #d9aa5b}
+.home-commerce-card--sale .home-commerce-art:before{width:36px;height:1px;transform:translate(-50%,-50%) rotate(-45deg);background:#d9aa5b}.home-commerce-card--sale .home-commerce-art:after{width:8px;height:8px;border-radius:50%;box-shadow:24px -24px 0 -1px #0e0906,24px -24px 0 0 #d9aa5b;transform:translate(-20px,12px)}
+.home-commerce-card--best .home-commerce-art:before{width:30px;height:44px;border-radius:15px 15px 8px 8px;background:linear-gradient(#432714,#140d08)}.home-commerce-card--best .home-commerce-art:after{width:18px;height:9px;top:15px;background:#1a100a}
+.home-commerce-card--new .home-commerce-art:before{width:34px;height:34px;transform:translate(-50%,-50%) rotate(45deg)}.home-commerce-card--new .home-commerce-art:after{width:8px;height:8px;border-radius:50%;background:#d9aa5b}
+.home-commerce-card--all .home-commerce-art:before{width:42px;height:26px;border-radius:50%}.home-commerce-card--all .home-commerce-art:after{width:26px;height:42px;border-radius:50%}
+@media(max-width:1000px){.home-commerce-grid{grid-template-columns:repeat(2,1fr)}.home-commerce-card:nth-child(2){border-inline-end:0}.home-commerce-card:nth-child(-n+2){border-bottom:1px solid rgba(217,170,91,.18)}}
+@media(max-width:620px){.home-lux-slider-shell{min-height:52vw}.home-commerce-grid{grid-template-columns:1fr}.home-commerce-card{border-inline-end:0;border-bottom:1px solid rgba(217,170,91,.18)}.home-commerce-card:last-child{border-bottom:0}.home-commerce-head{align-items:flex-start;flex-direction:column}}
+
+/* Day mode keeps the editorial warmth instead of turning this section stark white. */
+html[data-perfume-theme="day"] .home-commerce-hub{background:linear-gradient(180deg,#d7c0a7,#c9ad8f);border-color:rgba(111,72,36,.22)}
+html[data-perfume-theme="day"] .home-commerce-head h2{color:#241a13}
+html[data-perfume-theme="day"] .home-commerce-head .eyebrow-x,html[data-perfume-theme="day"] .home-commerce-head>a{color:#875823}
+html[data-perfume-theme="day"] .home-commerce-grid{border-color:rgba(108,69,31,.26);box-shadow:0 24px 60px rgba(88,55,27,.10)}
+html[data-perfume-theme="day"] .home-commerce-card{color:#241a13;border-color:rgba(108,69,31,.20);background:linear-gradient(145deg,rgba(255,248,239,.48),rgba(149,101,58,.07))}
+html[data-perfume-theme="day"] .home-commerce-card:hover{background:linear-gradient(145deg,rgba(255,250,243,.72),rgba(149,101,58,.12))}
+html[data-perfume-theme="day"] .home-commerce-card>small,html[data-perfume-theme="day"] .home-commerce-card>b{color:#7f531f}
+html[data-perfume-theme="day"] .home-commerce-card>p{color:#5f5144}
+html[data-perfume-theme="day"] .home-commerce-art{border-color:rgba(126,83,31,.46)}
+html[data-perfume-theme="day"] .home-commerce-art:before,html[data-perfume-theme="day"] .home-commerce-art:after{border-color:#8b5c25}
+html[data-perfume-theme="day"] .home-commerce-card--sale .home-commerce-art:before{background:#8b5c25}
+html[data-perfume-theme="day"] .home-commerce-card--sale .home-commerce-art:after{box-shadow:24px -24px 0 -1px #d0b699,24px -24px 0 0 #8b5c25}
+html[data-perfume-theme="day"] .home-commerce-card--best .home-commerce-art:before{background:linear-gradient(#b98a55,#6f4727)}
+html[data-perfume-theme="day"] .home-commerce-card--best .home-commerce-art:after{background:#8a5b2f}
+html[data-perfume-theme="day"] .home-commerce-card--new .home-commerce-art:after{background:#8b5c25}
+
+</style>
+{% endblock %}
 {% block content %}
 
-<section class="home-lux-slider" data-home-slider data-bsg-edit="home-section" data-bsg-name="بخش 1 صفحه اصلی" data-bsg-kind="box">
+<section class="home-lux-slider home-lux-slider--managed" data-home-slider data-bsg-edit="home-section" data-bsg-name="بخش 1 صفحه اصلی" data-bsg-kind="box">
   <div class="home-lux-slider-shell">
 
     {% if sliders %}{% for slider in sliders %}
-    <article class="home-lux-slide {% if forloop.first %}is-active{% endif %}" data-home-slide="{{ forloop.counter0 }}">
-      <div class="home-lux-slide-bg slide-bg-one"></div>
-      <div class="home-lux-slide-copy">
+    <article class="home-lux-slide home-lux-slide--managed {% if forloop.first %}is-active{% endif %}" data-home-slide="{{ forloop.counter0 }}">
+      <a class="home-lux-managed-media" {% if slider.safe_link %}href="{{ slider.safe_link }}"{% endif %} aria-label="{{ slider.title|default:'اسلاید فروشگاه' }}">
+        <img src="{{ slider.image.url }}" alt="{{ slider.title|default:'' }}" {% if not forloop.first %}loading="lazy"{% endif %}>
+      </a>
+      {% if slider.title or slider.subtitle or slider.button_text %}
+      <div class="home-lux-managed-shade"></div>
+      <div class="home-lux-slide-copy home-lux-slide-copy--managed">
         {% if slider.title %}<h1>{{ slider.title }}</h1>{% endif %}
         {% if slider.subtitle %}<p>{{ slider.subtitle }}</p>{% endif %}
-        {% if slider.button_text and slider.safe_link %}<div class="home-lux-slide-actions"><a class="lux-primary-btn" href="{{ slider.safe_link }}">{{ slider.button_text }}</a></div>{% endif %}
+        {% if slider.button_text and slider.safe_link %}<div class="home-lux-slide-actions"><a class="slider-primary" href="{{ slider.safe_link }}">{{ slider.button_text }}</a></div>{% endif %}
       </div>
-      <div class="home-lux-slide-stage"><a {% if slider.safe_link %}href="{{ slider.safe_link }}"{% endif %}><img src="{{ slider.image.url }}" alt="{{ slider.title|default:'' }}" {% if not forloop.first %}loading="lazy"{% endif %}></a></div>
+      {% endif %}
     </article>
     {% endfor %}{% else %}
-    <article class="home-lux-slide is-active" data-home-slide="0">
-      <div class="home-lux-slide-bg slide-bg-one"></div>
-      <div class="home-lux-slide-copy">
-        <span class="phase-kicker">THE SIGNATURE EDIT</span>
-        <h1 data-bsg-edit="home-hero-title" data-bsg-name="عنوان اصلی" data-bsg-kind="text">رایحه‌ای برای<br><em>حضورهای ماندگار</em></h1>
-        <p>عطرهایی با شخصیت مشخص؛ از رایحه‌های روشن روزانه تا نت‌های عمیق و گرم برای شب.</p>
-        <div class="home-lux-slide-actions">
-          <a class="slider-primary" href="{% url 'first:product_list' %}">کشف کالکشن <i class="fa-solid fa-arrow-left"></i></a>
-          <a class="slider-secondary" href="#home-shop-products">مشاهده محصولات</a>
-        </div>
+    {# Built-in storefront slide. It is a static theme asset, not a database slider. #}
+    <article class="home-lux-slide home-lux-slide--managed is-active home-lux-slide--theme-default" data-home-slide="0">
+      <div class="home-lux-default-media" aria-hidden="true">
+        <img src="{% static 'images/perfume-default-slider.png' %}" alt="">
       </div>
-      <div class="home-lux-slide-stage">
-        {% firstof featured_products.0 best_sellers.0 new_products.0 as slide_product_one %}
-        {% if slide_product_one and slide_product_one.main_image %}
-        <a href="{% url 'first:product_detail' slide_product_one.slug %}">
-          <img src="{{ slide_product_one.main_image.url }}" alt="{{ slide_product_one.name }}" data-bsg-edit="home-image-1" data-bsg-name="تصویر 1" data-bsg-kind="image">
-        </a>
-        {% else %}
-        <div class="slider-css-bottle slider-bottle-gold">
-          <div class="slider-bottle-cap"></div><span>VÉLORA</span><small>ÉCLAT</small>
-        </div>
-        {% endif %}
-      </div>
+      <a class="home-lux-default-cta" href="{% url 'first:product_list' %}" aria-label="مشاهده محصولات">مشاهده محصولات</a>
     </article>
-
-    <article class="home-lux-slide" data-home-slide="1">
-      <div class="home-lux-slide-bg slide-bg-two"></div>
-      <div class="home-lux-slide-copy">
-        <span class="phase-kicker">DAYLIGHT COLLECTION</span>
-        <h1>روشن، نرم و<br><em>بی‌زحمت لوکس</em></h1>
-        <p>انتخابی برای روز؛ تمیز، ظریف و حرفه‌ای بدون اینکه بیش‌ازحد سنگین باشد.</p>
-        <div class="home-lux-slide-actions">
-          <a class="slider-primary" href="{% url 'first:product_list' %}?sort=-created_at">تازه‌رسیده‌ها <i class="fa-solid fa-arrow-left"></i></a>
-          <a class="slider-secondary" href="{% url 'first:best_sellers' %}">پرفروش‌ها</a>
-        </div>
-      </div>
-      <div class="home-lux-slide-stage">
-        {% firstof new_products.0 featured_products.1 best_sellers.1 as slide_product_two %}
-        {% if slide_product_two and slide_product_two.main_image %}
-        <a href="{% url 'first:product_detail' slide_product_two.slug %}">
-          <img src="{{ slide_product_two.main_image.url }}" alt="{{ slide_product_two.name }}" data-bsg-edit="home-image-2" data-bsg-name="تصویر 2" data-bsg-kind="image">
-        </a>
-        {% else %}
-        <div class="slider-css-bottle slider-bottle-cream">
-          <div class="slider-bottle-cap"></div><span>LUNÉA</span><small>SOLEIL</small>
-        </div>
-        {% endif %}
-      </div>
-    </article>
-
-    <article class="home-lux-slide" data-home-slide="2">
-      <div class="home-lux-slide-bg slide-bg-three"></div>
-      <div class="home-lux-slide-copy">
-        <span class="phase-kicker">NIGHT COLLECTION</span>
-        <h1>تیره، گرم و<br><em>ساخته‌شده برای شب</em></h1>
-        <p>کهربا، چوب و ادویه؛ برای وقتی که رایحه باید بیشتر از یک جزئیات باشد.</p>
-        <div class="home-lux-slide-actions">
-          <a class="slider-primary" href="{% url 'first:best_sellers' %}">انتخاب شب <i class="fa-solid fa-arrow-left"></i></a>
-          <a class="slider-secondary" href="{% url 'first:discounts' %}">پیشنهاد ویژه</a>
-        </div>
-      </div>
-      <div class="home-lux-slide-stage">
-        {% firstof best_sellers.0 featured_products.2 new_products.1 as slide_product_three %}
-        {% if slide_product_three and slide_product_three.main_image %}
-        <a href="{% url 'first:product_detail' slide_product_three.slug %}">
-          <img src="{{ slide_product_three.main_image.url }}" alt="{{ slide_product_three.name }}" data-bsg-edit="home-image-3" data-bsg-name="تصویر 3" data-bsg-kind="image">
-        </a>
-        {% else %}
-        <div class="slider-css-bottle slider-bottle-noir">
-          <div class="slider-bottle-cap"></div><span>NOIR</span><small>ATELIER</small>
-        </div>
-        {% endif %}
-      </div>
-    </article>
-
     {% endif %}
-    <div class="home-lux-slider-ui">
-      <div class="home-lux-slider-count"><strong data-slider-current>01</strong><span>/ <span data-slider-total>{% if sliders %}{{ sliders|length|stringformat:"02d" }}{% else %}03{% endif %}</span></span></div>
-      <div class="home-lux-slider-dots">
-        {% if sliders %}{% for slider in sliders %}<button class="{% if forloop.first %}is-active{% endif %}" type="button" data-home-slider-dot="{{ forloop.counter0 }}" aria-label="اسلاید {{ forloop.counter }}"></button>{% endfor %}
-        {% else %}{% for n in '012' %}<button class="{% if forloop.first %}is-active{% endif %}" type="button" data-home-slider-dot="{{ n }}" aria-label="اسلاید {{ forloop.counter }}"></button>{% endfor %}{% endif %}
+    {# Keep customer-uploaded artwork clean: no theme labels over the image. #}
+    {% if sliders %}
+      {% if sliders|length > 1 %}
+      <div class="home-lux-slider-nav" aria-label="کنترل اسلایدها">
+        <button class="home-lux-slider-arrow home-lux-slider-arrow--prev" type="button" data-home-slider-prev aria-label="اسلاید قبلی"><span aria-hidden="true">‹</span></button>
+        <button class="home-lux-slider-arrow home-lux-slider-arrow--next" type="button" data-home-slider-next aria-label="اسلاید بعدی"><span aria-hidden="true">›</span></button>
       </div>
-    </div>
+      <div class="home-lux-slider-ui">
+        <div class="home-lux-slider-count"><strong data-slider-current>01</strong><span>/ <span data-slider-total>{{ sliders|length|stringformat:"02d" }}</span></span></div>
+        <div class="home-lux-slider-dots">
+          {% for slider in sliders %}<button class="{% if forloop.first %}is-active{% endif %}" type="button" data-home-slider-dot="{{ forloop.counter0 }}" aria-label="اسلاید {{ forloop.counter }}"></button>{% endfor %}
+        </div>
+      </div>
+      {% endif %}
+    {% else %}
+      <div class="home-lux-slider-ui">
+        <div class="home-lux-slider-count"><strong data-slider-current>01</strong><span>/ <span data-slider-total>01</span></span></div>
+        <div class="home-lux-slider-dots"><button class="is-active" type="button" data-home-slider-dot="0" aria-label="اسلاید 1"></button></div>
+      </div>
 
-    <div class="home-lux-slider-trust">
-      <div><i class="fa-solid fa-shield-halved"></i><span><b>تضمین اصالت</b><small>خرید مطمئن</small></span></div>
-      <div><i class="fa-solid fa-truck-fast"></i><span><b>ارسال حرفه‌ای</b><small>بسته‌بندی ایمن</small></span></div>
-      <div><i class="fa-regular fa-gem"></i><span><b>انتخاب لوکس</b><small>کالکشن منتخب</small></span></div>
-    </div>
+      <div class="home-lux-slider-trust">
+        <div><i class="fa-solid fa-shield-halved"></i><span><b>تضمین اصالت</b><small>خرید مطمئن</small></span></div>
+        <div><i class="fa-solid fa-truck-fast"></i><span><b>ارسال حرفه‌ای</b><small>بسته‌بندی ایمن</small></span></div>
+        <div><i class="fa-regular fa-gem"></i><span><b>انتخاب لوکس</b><small>کالکشن منتخب</small></span></div>
+      </div>
+    {% endif %}
 
   </div>
 </section>
@@ -128,7 +177,7 @@
 
   <div class="hero-object">
     <div class="orbit oa"></div><div class="orbit ob"></div><div class="hero-glow"></div>
-    {% if hero_product %}
+    {% if hero_product and hero_product.slug %}
       <a href="{% url 'first:product_detail' hero_product.slug %}" class="hero-product">
         {% if hero_product.main_image %}<img src="{{ hero_product.main_image.url }}" alt="{{ hero_product.name }}" data-bsg-edit="home-image-5" data-bsg-name="تصویر 5" data-bsg-kind="image">{% else %}<div class="css-bottle"><b>VÉLORA</b><small>EXTRAIT DE PARFUM</small></div>{% endif %}
       </a>
@@ -161,68 +210,21 @@
   <div class="home-product-grid">
     {% for product in best_sellers|slice:":4" %}
     <article class="home-product reveal">
-      <a class="home-product-media" href="{% url 'first:product_detail' product.slug %}">
+      <a class="home-product-media" href="{% if product.slug %}{% url 'first:product_detail' product.slug %}{% else %}#{% endif %}">
         <span class="seq">0{{ forloop.counter }}</span>
         {% if product.is_best_seller %}<small class="badge-x">ICON</small>{% endif %}
         {% if product.main_image %}<img src="{{ product.main_image.url }}" alt="{{ product.name }}" loading="lazy" data-bsg-edit="home-image-6" data-bsg-name="تصویر 6" data-bsg-kind="image">{% else %}<div class="mini-bottle">V</div>{% endif %}
       </a>
       <div class="home-product-copy">
-        <div><small>{{ product.brand.name|default:"VÉLORA" }}</small><a href="{% url 'first:product_detail' product.slug %}">{{ product.name }}</a></div>
+        <div><small>{{ product.brand.name|default:"VÉLORA" }}</small><a href="{% if product.slug %}{% url 'first:product_detail' product.slug %}{% else %}#{% endif %}">{{ product.name }}</a></div>
         <div><strong>{{ product.final_price|price_format }}</strong><span>تومان</span></div>
       </div>
     </article>
     {% empty %}
-      {% for product in featured_products|slice:":4" %}
-      <article class="home-product reveal">
-        <a class="home-product-media" href="{% url 'first:product_detail' product.slug %}"><span class="seq">0{{ forloop.counter }}</span>{% if product.main_image %}<img src="{{ product.main_image.url }}" alt="{{ product.name }}" data-bsg-edit="home-image-7" data-bsg-name="تصویر 7" data-bsg-kind="image">{% else %}<div class="mini-bottle">V</div>{% endif %}</a>
-        <div class="home-product-copy"><div><small>{{ product.brand.name|default:"VÉLORA" }}</small><a href="{% url 'first:product_detail' product.slug %}">{{ product.name }}</a></div><div><strong>{{ product.final_price|price_format }}</strong><span>تومان</span></div></div>
-      </article>
-      {% endfor %}
+      <div class="home-shop-empty">هنوز محصولی به‌عنوان پرفروش مشخص نشده است.</div>
     {% endfor %}
   </div>
 </section>
-
-<section class="scent-finder" id="finder" data-bsg-edit="home-finder" data-bsg-name="راهنمای رایحه" data-bsg-kind="box">
-  <div class="finder-art reveal"><div class="face-art"></div><span>FIND<br>YOUR<br>SIGNATURE</span><small>02 / SCENT PROFILE</small></div>
-  <div class="finder-copy reveal">
-    <span class="eyebrow-x">PERFUME FINDER</span><h2 data-bsg-edit="home-heading-2" data-bsg-name="عنوان بخش 2" data-bsg-kind="text">عطر مناسب تو،<br>از حس شروع می‌شود.</h2><p>به‌جای گشتن بین صدها محصول، از خانواده رایحه‌ای که دوست داری شروع کن.</p>
-    <div class="finder-links">
-      <a href="{% url 'first:search_products' %}?q=خنک"><span>01</span><b>FRESH</b><small>مرکباتی / تمیز / روزانه</small><i>↗</i></a>
-      <a href="{% url 'first:search_products' %}?q=چوبی"><span>02</span><b>WOODY</b><small>چوبی / خشک / عمیق</small><i>↗</i></a>
-      <a href="{% url 'first:search_products' %}?q=گلی"><span>03</span><b>FLORAL</b><small>گلی / نرم / روشن</small><i>↗</i></a>
-      <a href="{% url 'first:search_products' %}?q=گرم"><span>04</span><b>AMBER</b><small>گرم / شبانه / ماندگار</small><i>↗</i></a>
-    </div>
-  </div>
-</section>
-
-<section class="editorial-grid-x" data-bsg-edit="home-section-3" data-bsg-name="بخش 6 صفحه اصلی" data-bsg-kind="box">
-  <a class="panel-x panel-new reveal" href="{% url 'first:product_list' %}?sort=-created_at"><span>03 / NEW ARRIVALS</span><h3>تازه وارد<br>آرشیو</h3><p>رایحه‌هایی که همین حالا وارد کالکشن شده‌اند.</p><b>DISCOVER ↗</b><div class="panel-bottle"></div></a>
-  <a class="panel-x panel-icons reveal" href="{% url 'first:best_sellers' %}"><span>04 / ICONS</span><h3>محبوب‌ترین<br>انتخاب‌ها</h3><b>VIEW ICONS ↗</b><div class="panel-rings"></div></a>
-  <a class="panel-x panel-gift reveal" href="{% url 'first:product_list' %}"><span>05 / GIFTING</span><h3>هنر<br>هدیه دادن</h3><p>انتخابی ماندگار برای یک لحظه خاص.</p><b>SELECT A GIFT ↗</b><div class="gift-box-x"></div></a>
-</section>
-
-{% if categories %}
-<section class="category-home" data-bsg-edit="home-categories" data-bsg-name="دسته‌بندی‌های صفحه اصلی" data-bsg-kind="box">
-  <div class="section-head-x reveal"><div><span class="eyebrow-x">SHOP BY MOOD</span><h2 data-bsg-edit="home-heading-3" data-bsg-name="عنوان بخش 3" data-bsg-kind="text">از حس انتخاب کن.</h2></div><a href="{% url 'first:product_list' %}">همه دسته‌ها ←</a></div>
-  <div class="category-grid-x">
-    {% for category in categories|slice:":6" %}{% if category.slug %}
-    <a class="category-card-x reveal" href="{% url 'first:category_products' category.slug %}">
-      <span>0{{ forloop.counter }}</span>
-      <div>{% if category.image %}<img src="{{ category.image.url }}" alt="{{ category.name }}" data-bsg-edit="home-image-8" data-bsg-name="تصویر 8" data-bsg-kind="image">{% else %}<i class="fa-solid fa-spray-can-sparkles"></i>{% endif %}</div>
-      <b>{{ category.name }}</b><small>DISCOVER</small>
-    </a>
-    {% endif %}{% endfor %}
-  </div>
-</section>
-{% endif %}
-
-<section class="craft-home reveal" data-bsg-edit="home-section-4" data-bsg-name="بخش 8 صفحه اصلی" data-bsg-kind="box">
-  <div><span class="eyebrow-x">THE ART OF PERFUMERY</span><h2 data-bsg-edit="home-heading-4" data-bsg-name="عنوان بخش 4" data-bsg-kind="text">یک عطر خوب<br>فقط خوشبو نیست.</h2><p>شروع، قلب و پایه هر رایحه باید مثل یک داستان کنار هم قرار بگیرند؛ چیزی که حس می‌شود و در حافظه می‌ماند.</p><a class="outline-btn-x" href="{% url 'first:customer_service' 'shopping-guide' %}">راهنمای انتخاب عطر ←</a></div>
-  <aside><i class="craft-ring cr1"></i><i class="craft-ring cr2"></i><i class="petal pet1"></i><i class="petal pet2"></i><i class="petal pet3"></i><span>NATURE<br>TO MEMORY</span></aside>
-</section>
-
-{% if brands %}<section class="brand-rail-x" data-bsg-edit="home-brands" data-bsg-name="برندها" data-bsg-kind="box"><span>CURATED HOUSES</span><div>{% for brand in brands %}{% if brand.slug %}<a href="{% url 'first:brand_products' brand.slug %}">{{ brand.name }}</a>{% endif %}{% endfor %}</div></section>{% endif %}
-<section class="quote-home" data-bsg-edit="home-section-5" data-bsg-name="بخش 10 صفحه اصلی" data-bsg-kind="box"><span>06</span><blockquote>“Perfume is the most intense form of memory.”</blockquote><small>JEAN-PAUL GUERLAIN</small></section>
 
 <!-- PHASE02_HOME_PRODUCTS -->
 <section class="home-shop-section" id="home-shop-products" data-bsg-edit="home-section-6" data-bsg-name="بخش 11 صفحه اصلی" data-bsg-kind="box">
@@ -238,7 +240,7 @@
   <div class="home-shop-grid">
     {% for product in latest_products %}
     <article class="home-shop-card reveal">
-      <a class="home-shop-media" href="{% url 'first:product_detail' product.slug %}">
+      <a class="home-shop-media" href="{% if product.slug %}{% url 'first:product_detail' product.slug %}{% else %}#{% endif %}">
         <div class="home-shop-badges">
           {% if product.is_new %}<span>NEW</span>{% endif %}
           {% if product.is_best_seller %}<span>ICON</span>{% endif %}
@@ -247,11 +249,11 @@
       </a>
       <div class="home-shop-body">
         <small>{{ product.brand.name|default:'VÉLORA' }}</small>
-        <h3><a href="{% url 'first:product_detail' product.slug %}">{{ product.name }}</a></h3>
+        <h3><a href="{% if product.slug %}{% url 'first:product_detail' product.slug %}{% else %}#{% endif %}">{{ product.name }}</a></h3>
         <div class="home-shop-bottom">
           <div class="home-shop-price"><strong>{{ product.final_price|price_format }}</strong><span> تومان</span>{% if product.discount_percent %}<del>{{ product.price|price_format }}</del>{% endif %}</div>
           {% if product.has_variants %}
-          <a class="home-shop-action" href="{% url 'first:product_detail' product.slug %}"><i class="fa-solid fa-arrow-left"></i></a>
+          <a class="home-shop-action" href="{% if product.slug %}{% url 'first:product_detail' product.slug %}{% else %}#{% endif %}"><i class="fa-solid fa-arrow-left"></i></a>
           {% else %}
           <form method="post" action="{% url 'first:add_to_cart' product.id %}">{% csrf_token %}<button class="home-shop-action" type="submit"><i class="fa-solid fa-bag-shopping"></i></button></form>
           {% endif %}
@@ -261,8 +263,8 @@
     {% empty %}
       {% for product in featured_products|slice:":8" %}
       <article class="home-shop-card reveal">
-        <a class="home-shop-media" href="{% url 'first:product_detail' product.slug %}">{% if product.main_image %}<img src="{{ product.main_image.url }}" alt="{{ product.name }}" loading="lazy">{% else %}<div class="mini-css-bottle">V</div>{% endif %}</a>
-        <div class="home-shop-body"><small>{{ product.brand.name|default:'VÉLORA' }}</small><h3><a href="{% url 'first:product_detail' product.slug %}">{{ product.name }}</a></h3><div class="home-shop-bottom"><div class="home-shop-price"><strong>{{ product.final_price|price_format }}</strong><span> تومان</span></div><a class="home-shop-action" href="{% url 'first:product_detail' product.slug %}"><i class="fa-solid fa-arrow-left"></i></a></div></div>
+        <a class="home-shop-media" href="{% if product.slug %}{% url 'first:product_detail' product.slug %}{% else %}#{% endif %}">{% if product.main_image %}<img src="{{ product.main_image.url }}" alt="{{ product.name }}" loading="lazy">{% else %}<div class="mini-css-bottle">V</div>{% endif %}</a>
+        <div class="home-shop-body"><small>{{ product.brand.name|default:'VÉLORA' }}</small><h3><a href="{% if product.slug %}{% url 'first:product_detail' product.slug %}{% else %}#{% endif %}">{{ product.name }}</a></h3><div class="home-shop-bottom"><div class="home-shop-price"><strong>{{ product.final_price|price_format }}</strong><span> تومان</span></div><a class="home-shop-action" href="{% if product.slug %}{% url 'first:product_detail' product.slug %}{% else %}#{% endif %}"><i class="fa-solid fa-arrow-left"></i></a></div></div>
       </article>
       {% empty %}<div class="home-shop-empty">هنوز محصولی برای نمایش وجود ندارد.</div>{% endfor %}
     {% endfor %}
@@ -270,6 +272,43 @@
 
   <div class="home-shop-more"><a href="{% url 'first:product_list' %}">ورود به فروشگاه <i class="fa-solid fa-arrow-left"></i></a></div>
 </section>
+
+
+<section class="editorial-grid-x" data-bsg-edit="home-section-3" data-bsg-name="بخش 6 صفحه اصلی" data-bsg-kind="box">
+  <a class="panel-x panel-new reveal" href="{% url 'first:product_list' %}?sort=-created_at"><span>03 / NEW ARRIVALS</span><h3>تازه وارد<br>آرشیو</h3><p>رایحه‌هایی که همین حالا وارد کالکشن شده‌اند.</p><b>DISCOVER ↗</b><div class="panel-bottle"></div></a>
+  <a class="panel-x panel-icons reveal" href="{% url 'first:best_sellers' %}"><span>04 / ICONS</span><h3>محبوب‌ترین<br>انتخاب‌ها</h3><b>VIEW ICONS ↗</b><div class="panel-rings"></div></a>
+  <a class="panel-x panel-gift reveal" href="{% url 'first:product_list' %}"><span>05 / GIFTING</span><h3>هنر<br>هدیه دادن</h3><p>انتخابی ماندگار برای یک لحظه خاص.</p><b>SELECT A GIFT ↗</b><div class="gift-box-x"></div></a>
+</section>
+
+<section class="home-commerce-hub" data-bsg-edit="home-commerce-hub" data-bsg-name="دسترسی سریع فروشگاه" data-bsg-kind="box">
+  <div class="home-commerce-head reveal">
+    <div><span class="eyebrow-x">SHOP HIGHLIGHTS</span><h2 data-bsg-edit="home-heading-3" data-bsg-name="عنوان دسترسی سریع" data-bsg-kind="text">پیشنهادهای فروشگاه</h2></div>
+    <a href="{% url 'first:product_list' %}">همه عطرها ←</a>
+  </div>
+  <div class="home-commerce-grid">
+    <a class="home-commerce-card home-commerce-card--sale reveal" href="{% url 'first:discounts' %}">
+      <span class="home-commerce-art" aria-hidden="true"></span><small>PRIVATE OFFERS</small><h3>تخفیف‌های ویژه</h3><p>پیشنهادهای محدود و قیمت‌های ویژه روی عطرهای منتخب.</p><b>مشاهده تخفیف‌ها ←</b>
+    </a>
+    <a class="home-commerce-card home-commerce-card--best reveal" href="{% url 'first:best_sellers' %}">
+      <span class="home-commerce-art" aria-hidden="true"></span><small>BEST SELLERS</small><h3>پرفروش‌ترین‌ها</h3><p>عطرهایی که بیشترین انتخاب مشتریان فروشگاه بوده‌اند.</p><b>مشاهده پرفروش‌ها ←</b>
+    </a>
+    <a class="home-commerce-card home-commerce-card--new reveal" href="{% url 'first:product_list' %}?sort=-created_at">
+      <span class="home-commerce-art" aria-hidden="true"></span><small>NEW ARRIVALS</small><h3>جدیدترین عطرها</h3><p>تازه‌ترین محصولاتی که به آرشیو فروشگاه اضافه شده‌اند.</p><b>مشاهده جدیدترین‌ها ←</b>
+    </a>
+    <a class="home-commerce-card home-commerce-card--all reveal" href="{% url 'first:product_list' %}">
+      <span class="home-commerce-art" aria-hidden="true"></span><small>THE ARCHIVE</small><h3>همه عطرها</h3><p>ورود به آرشیو کامل و استفاده از فیلترهای برند، دسته و قیمت.</p><b>ورود به آرشیو ←</b>
+    </a>
+  </div>
+</section>
+
+<section class="craft-home reveal" data-bsg-edit="home-section-4" data-bsg-name="بخش 8 صفحه اصلی" data-bsg-kind="box">
+  <div><span class="eyebrow-x">THE ART OF PERFUMERY</span><h2 data-bsg-edit="home-heading-4" data-bsg-name="عنوان بخش 4" data-bsg-kind="text">یک عطر خوب<br>فقط خوشبو نیست.</h2><p>شروع، قلب و پایه هر رایحه باید مثل یک داستان کنار هم قرار بگیرند؛ چیزی که حس می‌شود و در حافظه می‌ماند.</p><a class="outline-btn-x" href="{% url 'first:customer_service' 'shopping-guide' %}">راهنمای انتخاب عطر ←</a></div>
+  <aside><i class="craft-ring cr1"></i><i class="craft-ring cr2"></i><i class="petal pet1"></i><i class="petal pet2"></i><i class="petal pet3"></i><span>NATURE<br>TO MEMORY</span></aside>
+</section>
+
+{% if brands %}<section class="brand-rail-x" data-bsg-edit="home-brands" data-bsg-name="برندها" data-bsg-kind="box"><span>CURATED HOUSES</span><div>{% for brand in brands %}{% if brand.slug %}<a href="{% url 'first:brand_products' brand.slug %}">{{ brand.name }}</a>{% endif %}{% endfor %}</div></section>{% endif %}
+<section class="quote-home" data-bsg-edit="home-section-5" data-bsg-name="بخش 10 صفحه اصلی" data-bsg-kind="box"><span>06</span><blockquote>“Perfume is the most intense form of memory.”</blockquote><small>JEAN-PAUL GUERLAIN</small></section>
+
 
 
 {% endblock %}

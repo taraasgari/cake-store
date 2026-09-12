@@ -1,30 +1,77 @@
 {% extends 'perfume_base.html' %}
-{% block title %}درخواست مرجوعی{% endblock %}
+{% load custom_filters %}
+{% block title %}درخواست مرجوعی سفارش #{{ order.order_number }}{% endblock %}
 {% block content %}
-<div class="max-w-3xl mx-auto px-4 py-10">
-  <div class="bg-white rounded-3xl shadow p-7">
-    <h1 class="text-2xl font-bold mb-2">مرجوعی سفارش #{{ order.order_number }}</h1>
-    <p class="text-gray-500 mb-6">کالاهای بازشده یا مصرف‌شده ممکن است طبق قوانین فروشگاه قابل مرجوعی نباشند؛ موارد معیوب، آسیب‌دیده یا اشتباه ارسال‌شده توسط پشتیبانی بررسی می‌شوند.</p>
-    <p class="text-xs text-gray-500 mb-4">تعداد قابل مرجوعی در سمت سرور با مرجوعی‌های قبلی کنترل می‌شود.</p>
-    <form method="post" class="space-y-4">
+<style>
+  .cr-page{max-width:1180px;margin:0 auto;padding:54px 28px 90px;direction:rtl;color:#f7efe5}
+  .cr-head{display:flex;align-items:flex-end;justify-content:space-between;gap:24px;margin-bottom:28px}
+  .cr-kicker{display:block;color:#c89a4b;letter-spacing:.2em;font:700 11px/1.4 sans-serif;margin-bottom:10px}
+  .cr-head h1{margin:0;font-size:clamp(28px,3vw,46px);line-height:1.15;color:#fff7ee}.cr-head p{margin:10px 0 0;color:#b8a99a;max-width:760px;line-height:2}
+  .cr-back{display:inline-flex;align-items:center;gap:9px;border:1px solid #4a3824;color:#f1d2a0;text-decoration:none;padding:12px 16px;border-radius:10px;background:#15100c;white-space:nowrap}
+  .cr-grid{display:grid;grid-template-columns:minmax(0,1fr) 330px;gap:24px;align-items:start}
+  .cr-card{background:linear-gradient(180deg,#17110d,#120e0b);border:1px solid #392b1d;border-radius:18px;padding:24px;box-shadow:0 22px 70px rgba(0,0,0,.18)}
+  .cr-card h2{margin:0 0 6px;font-size:19px;color:#fff}.cr-card .muted{color:#9f9184;font-size:13px;line-height:1.9;margin:0 0 22px}
+  .cr-field{display:grid;gap:8px;margin-bottom:18px}.cr-field label{font-weight:800;font-size:13px;color:#e7d7c3}
+  .cr-card select,.cr-card textarea,.cr-card input[type=number]{width:100%;box-sizing:border-box;background:#0f0c09!important;color:#f9f1e8!important;border:1px solid #4a3824!important;border-radius:10px!important;padding:12px 14px!important;outline:none!important;font:inherit}.cr-card textarea{min-height:130px;resize:vertical}.cr-card select:focus,.cr-card textarea:focus,.cr-card input:focus{border-color:#c89a4b!important;box-shadow:0 0 0 3px rgba(200,154,75,.10)}
+  .cr-errors,.errorlist{list-style:none;margin:0 0 16px;padding:12px 14px;border:1px solid rgba(219,93,93,.36);background:rgba(142,36,36,.12);border-radius:10px;color:#ffb7b7;font-size:13px}
+  .cr-items{display:grid;gap:12px}.cr-item{border:1px solid #35291d;background:#100d0a;border-radius:14px;padding:16px;display:grid;grid-template-columns:minmax(0,1fr) 150px;gap:16px;align-items:center}.cr-item-main{display:flex;align-items:center;gap:12px}.cr-item-main input[type=checkbox]{appearance:none;width:20px;height:20px;border:1px solid #80613a;border-radius:6px;background:#0c0907;display:grid;place-items:center;cursor:pointer}.cr-item-main input[type=checkbox]:checked{background:#c89a4b;border-color:#c89a4b}.cr-item-main input[type=checkbox]:checked:after{content:'✓';color:#17110d;font-weight:900;font-size:14px}.cr-item-name{font-weight:900;color:#f7efe5}.cr-item small{display:block;color:#8f8174;margin-top:5px}.cr-qty label{display:block;color:#9f9184;font-size:11px;margin-bottom:6px}
+  .cr-submit{width:100%;border:0;border-radius:11px;background:#c89a4b;color:#17110d;font-weight:950;font-size:15px;padding:14px 18px;cursor:pointer;margin-top:22px;transition:.18s}.cr-submit:hover{background:#ddb66f;transform:translateY(-1px)}
+  .cr-summary{position:sticky;top:120px}.cr-summary-line{display:flex;justify-content:space-between;gap:16px;padding:13px 0;border-bottom:1px solid #2d2319;color:#aa9b8d}.cr-summary-line b{color:#f7efe5}.cr-note{margin-top:18px;padding:14px;border:1px solid #3c2d1e;border-radius:12px;background:#130f0b;color:#b7a898;font-size:12px;line-height:2}.cr-note i{color:#c89a4b;margin-left:7px}
+  @media(max-width:850px){.cr-grid{grid-template-columns:1fr}.cr-summary{position:static;order:-1}.cr-head{align-items:flex-start;flex-direction:column}.cr-item{grid-template-columns:1fr}.cr-page{padding:34px 16px 70px}}
+</style>
+<section class="cr-page">
+  <header class="cr-head">
+    <div>
+      <span class="cr-kicker">RETURN REQUEST</span>
+      <h1>مرجوعی سفارش #{{ order.order_number }}</h1>
+      <p>کالای موردنظر، تعداد و دلیل مرجوعی را مشخص کنید. درخواست شما برای بررسی به پشتیبانی ارسال می‌شود.</p>
+    </div>
+    <a class="cr-back" href="{% url 'first:order_detail' order.order_number %}"><i class="fa-solid fa-arrow-right"></i> بازگشت به سفارش</a>
+  </header>
+
+  <div class="cr-grid">
+    <form method="post" class="cr-card" novalidate>
       {% csrf_token %}
-      {{ form.non_field_errors }}
-      {{ form.reason.label_tag }} {{ form.reason }}
-      {{ form.description.label_tag }} {{ form.description }}
-      <div class="space-y-3 mt-5">
+      {% if form.non_field_errors %}<div class="cr-errors">{{ form.non_field_errors }}</div>{% endif %}
+      <h2>اطلاعات درخواست</h2>
+      <p class="muted">ابتدا دلیل را انتخاب کنید و در صورت نیاز توضیح بیشتری بنویسید.</p>
+
+      <div class="cr-field">
+        <label for="{{ form.reason.id_for_label }}">دلیل مرجوعی</label>
+        {{ form.reason }}
+        {{ form.reason.errors }}
+      </div>
+      <div class="cr-field">
+        <label for="{{ form.description.id_for_label }}">توضیحات شما</label>
+        {{ form.description }}
+        {{ form.description.errors }}
+      </div>
+
+      <h2 style="margin-top:30px">انتخاب اقلام</h2>
+      <p class="muted">حداقل یک کالا را انتخاب کنید. تعداد نهایی دوباره در سمت سرور کنترل می‌شود.</p>
+      <div class="cr-items">
         {% for item in order.items.all %}
-          <div class="border rounded-2xl p-4">
-            <label class="flex items-center gap-3">
-              <input type="checkbox" name="item_{{ item.pk }}">
-              <span class="font-bold">{{ item.product_name }}</span>
-            </label>
-            <label class="block text-sm mt-3">تعداد (حداکثر {{ item.quantity }})</label>
-            <input class="rounded-xl border p-2 mt-1" type="number" min="1" max="{{ item.quantity }}" value="1" name="qty_{{ item.pk }}">
-          </div>
+        <article class="cr-item">
+          <label class="cr-item-main">
+            <input type="checkbox" name="item_{{ item.pk }}">
+            <span><span class="cr-item-name">{{ item.product_name }}</span><small>تعداد خریداری‌شده: {{ item.quantity }}</small></span>
+          </label>
+          <div class="cr-qty"><label>تعداد مرجوعی</label><input type="number" min="1" max="{{ item.quantity }}" value="1" name="qty_{{ item.pk }}"></div>
+        </article>
         {% endfor %}
       </div>
-      <button class="w-full bg-pink-600 text-white py-3 rounded-xl font-bold">ثبت درخواست مرجوعی</button>
+
+      <button class="cr-submit" type="submit"><i class="fa-solid fa-rotate-left"></i> ثبت درخواست مرجوعی</button>
     </form>
+
+    <aside class="cr-card cr-summary">
+      <h2>خلاصه سفارش</h2>
+      <div class="cr-summary-line"><span>شماره سفارش</span><b>#{{ order.order_number }}</b></div>
+      <div class="cr-summary-line"><span>وضعیت</span><b>{{ order.get_status_display }}</b></div>
+      <div class="cr-summary-line"><span>مبلغ سفارش</span><b>{{ order.total|price_format }} تومان</b></div>
+      <div class="cr-summary-line"><span>تعداد ردیف</span><b>{{ order.items.count }}</b></div>
+      <div class="cr-note"><i class="fa-solid fa-circle-info"></i> کالاهای مصرف‌شده یا بازشده ممکن است مطابق قوانین فروشگاه قابل مرجوعی نباشند. کالاهای معیوب، آسیب‌دیده یا اشتباه ارسال‌شده توسط پشتیبانی بررسی می‌شوند.</div>
+    </aside>
   </div>
-</div>
+</section>
 {% endblock %}

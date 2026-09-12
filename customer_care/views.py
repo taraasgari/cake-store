@@ -224,6 +224,12 @@ def _restore_stock_for_action(action):
 
 
 def order_tracking(request):
+    # Authenticated customers should first see their order history and
+    # explicitly choose which order they want to track/manage. This avoids
+    # surprising redirects to the newest order when several orders exist.
+    if request.user.is_authenticated and request.method == 'GET':
+        return redirect('first:user_orders')
+
     from time import time
 
     translation = str.maketrans(

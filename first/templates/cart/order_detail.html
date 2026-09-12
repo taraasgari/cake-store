@@ -2,176 +2,88 @@
 
 {% block title %}سفارش #{{ order.order_number }}{% endblock %}
 
+{% block extra_css %}
+<style>
+.od-page{max-width:1180px;margin:0 auto;padding:38px 24px 70px}.od-back{display:inline-flex;align-items:center;gap:8px;color:#c9954d;text-decoration:none;font-size:12px;margin-bottom:18px}.od-head{display:flex;align-items:flex-end;justify-content:space-between;gap:20px;flex-wrap:wrap;margin-bottom:22px}.od-head span{display:block;color:#9d8d7f;font-size:11px;letter-spacing:.16em}.od-head h1{font-size:34px;margin:5px 0 0;color:#f6eadc}.od-badge{border:1px solid rgba(201,149,77,.32);background:rgba(201,149,77,.08);color:#ddb66f;padding:10px 14px;font-weight:800}.od-badge.cancelled,.od-badge.refunded{color:#dc8a85;border-color:rgba(185,74,72,.35);background:rgba(185,74,72,.08)}.od-layout{display:grid;grid-template-columns:minmax(0,1fr) 330px;gap:18px}.od-stack{display:grid;gap:16px}.od-card{background:linear-gradient(145deg,#17110d,#100c09);border:1px solid #3b2b21;padding:20px}.od-card h2{margin:0 0 15px;font-size:17px;color:#f6eadc}.od-meta{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}.od-meta>div{border:1px solid #32241c;background:#120d0a;padding:14px}.od-meta span{display:block;color:#857668;font-size:10px;margin-bottom:5px}.od-meta strong{color:#f1e4d4;font-size:13px}.od-meta strong.gold{color:#d4a45b}.od-steps{display:grid;grid-template-columns:repeat(5,1fr);gap:8px;margin-top:18px}.od-step{text-align:center}.od-step-bar{height:4px;background:#2d211a}.od-step.active .od-step-bar{background:#c9954d}.od-step small{display:block;margin-top:7px;color:#6f6258;font-size:9px}.od-step.active small{color:#d7b273}.od-items{width:100%;border-collapse:collapse}.od-items th,.od-items td{padding:12px 8px;border-bottom:1px solid #2c2019;text-align:right;font-size:12px}.od-items th{color:#c9954d;font-size:10px}.od-items td{color:#e8dacb}.od-items td:last-child,.od-items th:last-child{text-align:left}.od-address{display:grid;grid-template-columns:1fr 1fr;gap:12px}.od-address div{border:1px solid #30231b;background:#120d0a;padding:14px}.od-address span{display:block;color:#7f7164;font-size:10px;margin-bottom:5px}.od-address strong,.od-address p{margin:0;color:#e6d7c7;font-size:12px;line-height:1.9}.od-actions{display:grid;gap:14px}.od-side-card{background:#15100c;border:1px solid #3b2b21;padding:18px}.od-side-card h3{margin:0 0 7px;color:#f4e7d7;font-size:15px}.od-side-card p{color:#8e7f71;font-size:11px;line-height:1.8}.od-side-card select,.od-side-card textarea{width:100%;box-sizing:border-box;background:#0d0907;border:1px solid #4a3528;color:#f0e2d2;padding:11px;font:inherit;margin-top:9px;outline:none}.od-side-card textarea{resize:vertical}.od-btn{width:100%;display:flex;align-items:center;justify-content:center;gap:8px;min-height:43px;border:1px solid #c9954d;background:#c9954d;color:#130d09;text-decoration:none;font-weight:900;cursor:pointer;margin-top:10px}.od-btn.outline{background:transparent;color:#ddb873}.od-btn.danger{background:#6e2827;border-color:#8d3a38;color:#f8e7e5}.od-note{padding:11px;border:1px solid rgba(201,149,77,.24);background:rgba(201,149,77,.06);color:#d8b16c;font-size:11px;line-height:1.9}.od-requests{display:grid;gap:9px}.od-request{display:flex;justify-content:space-between;gap:14px;align-items:center;border:1px solid #30231b;background:#120d0a;padding:12px;text-decoration:none}.od-request strong{color:#e9dac9;font-size:12px}.od-request span{color:#c9954d;font-size:11px}@media(max-width:900px){.od-layout{grid-template-columns:1fr}.od-meta{grid-template-columns:1fr 1fr}}@media(max-width:580px){.od-page{padding:25px 14px 50px}.od-head h1{font-size:27px}.od-meta,.od-address{grid-template-columns:1fr}.od-items{min-width:560px}.od-table-wrap{overflow-x:auto}}
+</style>
+{% endblock %}
+
 {% block content %}
-<div class="max-w-5xl mx-auto px-4 py-8">
-    <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-7">
-        <div>
-            <a href="{% url 'first:user_orders' %}"
-               class="text-pink-500 text-sm font-bold">
-                <i class="fas fa-arrow-right ml-1"></i>
-                سفارش‌های من
-            </a>
-            <h1 class="text-3xl font-bold gradient-text mt-2">
-                سفارش <span dir="ltr">#{{ order.order_number }}</span>
-            </h1>
+<section class="od-page">
+  <a class="od-back" href="{% url 'first:user_orders' %}"><i class="fa-solid fa-arrow-right"></i> سفارش‌های من</a>
+  <header class="od-head">
+    <div><span>ORDER STATUS</span><h1>سفارش <b dir="ltr">#{{ order.order_number }}</b></h1></div>
+    <div class="od-badge {{ order.status }}">{{ order.get_status_display }}</div>
+  </header>
+
+  <div class="od-layout">
+    <div class="od-stack">
+      <section class="od-card">
+        <h2>وضعیت سفارش</h2>
+        <div class="od-meta">
+          <div><span>تاریخ ثبت</span><strong>{{ order.created_at|date:"Y/m/d H:i" }}</strong></div>
+          <div><span>روش پرداخت</span><strong>{{ order.get_payment_method_display }}</strong></div>
+          <div><span>مبلغ نهایی</span><strong class="gold">{{ order.total|floatformat:0 }} تومان</strong></div>
         </div>
+        {% if status_index >= 0 %}
+        <div class="od-steps">
+          <div class="od-step {% if status_index >= 0 %}active{% endif %}"><div class="od-step-bar"></div><small>ثبت</small></div>
+          <div class="od-step {% if status_index >= 1 %}active{% endif %}"><div class="od-step-bar"></div><small>پرداخت</small></div>
+          <div class="od-step {% if status_index >= 2 %}active{% endif %}"><div class="od-step-bar"></div><small>پردازش</small></div>
+          <div class="od-step {% if status_index >= 3 %}active{% endif %}"><div class="od-step-bar"></div><small>ارسال</small></div>
+          <div class="od-step {% if status_index >= 4 %}active{% endif %}"><div class="od-step-bar"></div><small>تحویل</small></div>
+        </div>
+        {% else %}<div class="od-note" style="margin-top:15px">این سفارش در وضعیت «{{ order.get_status_display }}» قرار دارد.</div>{% endif %}
+      </section>
 
+      <section class="od-card">
+        <h2>آیتم‌های سفارش</h2>
+        <div class="od-table-wrap"><table class="od-items"><thead><tr><th>محصول</th><th>تعداد</th><th>قیمت واحد</th><th>جمع</th></tr></thead><tbody>
+          {% for item in order.items.all %}<tr><td>{{ item.product_name }}</td><td>{{ item.quantity }}</td><td>{{ item.price|floatformat:0 }}</td><td>{{ item.total|floatformat:0 }} تومان</td></tr>{% endfor %}
+        </tbody></table></div>
+      </section>
 
+      <section class="od-card">
+        <h2>اطلاعات تحویل</h2>
+        <div class="od-address">
+          <div><span>آدرس</span><p>{{ order.address }}</p></div>
+          <div><span>تماس</span><strong>{{ order.phone }}</strong><br><span style="margin-top:8px">کد پستی</span><strong>{{ order.postal_code }}</strong></div>
+        </div>
+      </section>
+
+      <section class="od-card">
+        <h2>درخواست‌های این سفارش</h2>
+        <div class="od-requests">
+          {% for action in order.action_requests.all %}
+          <a class="od-request" href="{% url 'customer_care:order_action_detail' action.pk %}"><strong>{{ action.get_kind_display }} · {{ action.created_at|date:"Y/m/d H:i" }}</strong><span>{{ action.get_status_display }}</span></a>
+          {% empty %}<div class="od-note">هنوز درخواست لغو یا مرجوعی برای این سفارش ثبت نشده است.</div>{% endfor %}
+        </div>
+      </section>
     </div>
 
-    <div class="grid lg:grid-cols-[1fr_340px] gap-6">
-        <div class="space-y-6">
-            <div class="bg-white/80 backdrop-blur-lg rounded-2xl p-6 shadow-lg">
-                <div class="grid sm:grid-cols-3 gap-4">
-                    <div class="bg-gray-50 rounded-xl p-4">
-                        <p class="text-gray-400 text-sm">وضعیت</p>
-                        <p class="font-black mt-1">{{ order.get_status_display }}</p>
-                    </div>
-                    <div class="bg-gray-50 rounded-xl p-4">
-                        <p class="text-gray-400 text-sm">تاریخ ثبت</p>
-                        <p class="font-black mt-1">{{ order.created_at|date:"Y/m/d H:i" }}</p>
-                    </div>
-                    <div class="bg-gray-50 rounded-xl p-4">
-                        <p class="text-gray-400 text-sm">مبلغ سفارش</p>
-                        <p class="font-black text-pink-500 mt-1">
-                            {{ order.total|floatformat:0 }} تومان
-                        </p>
-                    </div>
-                </div>
+    <aside class="od-actions">
+      {% if order.status == 'pending' or order.status == 'paid' or order.status == 'processing' %}
+      <section class="od-side-card">
+        <h3>لغو سفارش</h3><p>تا قبل از ارسال می‌توانید درخواست لغو ثبت کنید.</p>
+        {% if open_cancel_request %}<div class="od-note">درخواست لغو ثبت شده: <b>{{ open_cancel_request.get_status_display }}</b></div>
+        {% else %}<form method="post" action="{% url 'customer_care:cancel_order_request' order.order_number %}">{% csrf_token %}<select name="reason"><option value="changed_mind">انصراف از خرید</option><option value="wrong_item">اشتباه در سفارش</option><option value="other">سایر</option></select><textarea name="description" rows="3" placeholder="توضیح اختیاری"></textarea><button class="od-btn danger" type="submit">ثبت درخواست لغو</button></form>{% endif %}
+      </section>
+      {% endif %}
 
-                <div class="border-t border-gray-200 pt-5 mt-5">
-                    <h3 class="font-bold mb-3">آیتم‌های سفارش</h3>
+      <section class="od-side-card">
+        <h3>مرجوعی کالا</h3>
+        {% if order.status == 'delivered' %}
+          <p>سفارش تحویل شده و می‌توانید کالاهای موردنظر برای مرجوعی را انتخاب کنید.</p>
+          {% if open_return_request %}<div class="od-note">درخواست مرجوعی ثبت شده: <b>{{ open_return_request.get_status_display }}</b></div>{% else %}<a class="od-btn" href="{% url 'customer_care:return_order_request' order.order_number %}"><i class="fa-solid fa-rotate-left"></i> ثبت درخواست مرجوعی</a>{% endif %}
+        {% elif order.status == 'cancelled' or order.status == 'refunded' %}
+          <div class="od-note">برای سفارش {{ order.get_status_display }} درخواست مرجوعی جدید قابل ثبت نیست.</div>
+        {% else %}
+          <p>دکمه مرجوعی بعد از ثبت وضعیت «تحویل داده شده» فعال می‌شود.</p><button class="od-btn outline" type="button" disabled style="opacity:.45;cursor:not-allowed">مرجوعی پس از تحویل</button>
+        {% endif %}
+      </section>
 
-                    {% for item in order.items.all %}
-                    <div class="flex justify-between items-center gap-4 py-3 border-b border-gray-100">
-                        <div>
-                            <p class="font-bold">{{ item.product_name }}</p>
-                            <p class="text-sm text-gray-500">
-                                تعداد: {{ item.quantity }}
-                            </p>
-                        </div>
-                        <span class="font-bold">
-                            {{ item.total|floatformat:0 }} تومان
-                        </span>
-                    </div>
-                    {% endfor %}
-                </div>
-
-                <div class="mt-6">
-                    <h3 class="font-bold mb-2">آدرس تحویل</h3>
-                    <p class="text-gray-600">{{ order.address }}</p>
-                    <p class="text-gray-500 text-sm mt-1">
-                        کد پستی: {{ order.postal_code }}
-                    </p>
-                    <p class="text-gray-500 text-sm">
-                        تلفن: {{ order.phone }}
-                    </p>
-                </div>
-            </div>
-
-            <div class="bg-white/80 backdrop-blur-lg rounded-2xl p-6 shadow-lg">
-                <h2 class="text-xl font-black mb-4">درخواست‌های این سفارش</h2>
-
-                {% for action in order.action_requests.all %}
-                <a href="{% url 'customer_care:order_action_detail' action.pk %}"
-                   class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 p-4 rounded-xl bg-gray-50 mb-3 hover:bg-pink-50 transition">
-                    <div>
-                        <p class="font-bold">{{ action.get_kind_display }}</p>
-                        <p class="text-xs text-gray-400 mt-1">
-                            {{ action.created_at|date:"Y/m/d H:i" }}
-                        </p>
-                    </div>
-                    <span class="px-3 py-1 rounded-full bg-white text-pink-600 text-sm font-bold">
-                        {{ action.get_status_display }}
-                    </span>
-                </a>
-                {% empty %}
-                <p class="text-gray-400 text-sm">
-                    برای این سفارش هنوز درخواست لغو یا مرجوعی ثبت نشده است.
-                </p>
-                {% endfor %}
-            </div>
-        </div>
-
-        <aside class="space-y-5">
-            {% if order.status == 'pending' or order.status == 'paid' or order.status == 'processing' %}
-            <div class="bg-white rounded-2xl shadow-lg p-5 border border-red-100">
-                <div class="flex items-center gap-3 mb-3">
-                    <div class="w-11 h-11 rounded-xl bg-red-50 text-red-500 grid place-items-center">
-                        <i class="fas fa-ban"></i>
-                    </div>
-                    <div>
-                        <h3 class="font-black">لغو سفارش</h3>
-                        <p class="text-xs text-gray-400">قبل از ارسال</p>
-                    </div>
-                </div>
-
-                {% if open_cancel_request %}
-                <div class="bg-yellow-50 text-yellow-700 rounded-xl p-3 text-sm">
-                    درخواست لغو شما ثبت شده و وضعیت آن:
-                    <b>{{ open_cancel_request.get_status_display }}</b>
-                </div>
-                {% else %}
-                <form method="post"
-                      action="{% url 'customer_care:cancel_order_request' order.order_number %}"
-                      class="space-y-3">
-                    {% csrf_token %}
-                    <select name="reason"
-                            class="w-full border-2 border-gray-200 rounded-xl p-3">
-                        <option value="changed_mind">انصراف از خرید</option>
-                        <option value="wrong_item">اشتباه در سفارش</option>
-                        <option value="other">سایر</option>
-                    </select>
-                    <textarea name="description"
-                              rows="3"
-                              placeholder="توضیح اختیاری"
-                              class="w-full border-2 border-gray-200 rounded-xl p-3"></textarea>
-                    <button type="submit"
-                            class="w-full py-3 rounded-xl bg-red-500 text-white font-bold">
-                        ثبت درخواست لغو
-                    </button>
-                </form>
-                {% endif %}
-            </div>
-            {% endif %}
-
-            {% if order.status == 'delivered' %}
-            <div class="bg-white rounded-2xl shadow-lg p-5 border border-orange-100">
-                <div class="flex items-center gap-3 mb-3">
-                    <div class="w-11 h-11 rounded-xl bg-orange-50 text-orange-500 grid place-items-center">
-                        <i class="fas fa-undo-alt"></i>
-                    </div>
-                    <div>
-                        <h3 class="font-black">مرجوعی کالا</h3>
-                        <p class="text-xs text-gray-400">برای همین سفارش</p>
-                    </div>
-                </div>
-
-                {% if open_return_request %}
-                <div class="bg-yellow-50 text-yellow-700 rounded-xl p-3 text-sm">
-                    درخواست مرجوعی شما ثبت شده و وضعیت آن:
-                    <b>{{ open_return_request.get_status_display }}</b>
-                </div>
-                {% else %}
-                <a href="{% url 'customer_care:return_order_request' order.order_number %}"
-                   class="block text-center w-full py-3 rounded-xl bg-orange-500 text-white font-bold">
-                    انتخاب کالاهای مرجوعی
-                </a>
-                {% endif %}
-            </div>
-            {% endif %}
-
-            <div class="bg-white rounded-2xl shadow-lg p-5">
-                <h3 class="font-black mb-2">نیاز به کمک دارید؟</h3>
-                <p class="text-sm text-gray-500 mb-4">
-                    تیکت مستقیماً به همین سفارش متصل می‌شود.
-                </p>
-                <a href="{% url 'customer_care:support_create' %}?order={{ order.pk }}"
-                   class="block text-center py-3 rounded-xl border-2 border-pink-500 text-pink-500 font-bold hover:bg-pink-500 hover:text-white transition">
-                    پیام به پشتیبانی
-                </a>
-            </div>
-        </aside>
-    </div>
-</div>
+      <section class="od-side-card"><h3>پشتیبانی سفارش</h3><p>پیام شما مستقیماً به همین سفارش متصل می‌شود.</p><a class="od-btn outline" href="{% url 'customer_care:support_create' %}?order={{ order.pk }}"><i class="fa-solid fa-headset"></i> پیام به پشتیبانی</a></section>
+    </aside>
+  </div>
+</section>
 {% endblock %}

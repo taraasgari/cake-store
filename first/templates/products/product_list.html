@@ -1,7 +1,7 @@
 {% extends 'perfume_base.html' %}{% load custom_filters %}
 {% block title %}کالکشن عطرها | {{ settings.site_name|default:'فروشگاه عطر' }}{% endblock %}
 {% block content %}
-<section class="p4-page-hero"><div class="p4-wrap p4-page-hero-grid"><div><span class="p4-kicker">THE PERFUME ARCHIVE</span><h1>کالکشن<br><em>عطرها</em></h1><p>رایحه‌های موجود را بر اساس دسته‌بندی، برند، قیمت و سبک انتخاب کنید.</p></div><div class="p4-stat"><span>AVAILABLE</span><strong>{{ page_obj.paginator.count|default:total_products|default:'0' }}</strong><small>محصول در آرشیو</small></div></div></section>
+<section class="p4-page-hero"><div class="p4-wrap p4-page-hero-grid"><div><span class="p4-kicker">THE PERFUME ARCHIVE</span><h1>کالکشن<br><em>عطرها</em></h1><p>رایحه‌های موجود را بر اساس دسته‌بندی، برند، قیمت و سبک انتخاب کنید.</p></div><div class="p4-stat"><span>CURATED SELECTION</span><strong><span class="p4-native-mark p4-mark-bottle" aria-hidden="true"></span></strong><small>انتخابی از رایحه‌های ماندگار</small></div></div></section>
 
 <section class="p4-wrap p4-shop-layout">
   <aside class="p4-filter" data-p4-filter>
@@ -12,7 +12,7 @@
   </aside>
 
   <div class="p4-products-area">
-    <div class="p4-toolbar"><div><button class="p4-filter-open" type="button" data-p4-filter-open><i class="fa-solid fa-sliders"></i> فیلتر</button><span>{{ page_obj.paginator.count|default:total_products|default:'0' }} محصول</span></div><label>مرتب‌سازی<select data-p4-sort><option value="-created_at" {% if current_sort == '-created_at' %}selected{% endif %}>جدیدترین</option><option value="-sales_count" {% if current_sort == '-sales_count' %}selected{% endif %}>پرفروش‌ترین</option><option value="-rating" {% if current_sort == '-rating' %}selected{% endif %}>بالاترین امتیاز</option><option value="price" {% if current_sort == 'price' %}selected{% endif %}>قیمت کم به زیاد</option><option value="-price" {% if current_sort == '-price' %}selected{% endif %}>قیمت زیاد به کم</option></select></label></div>
+    <div class="p4-toolbar"><div><button class="p4-filter-open" type="button" data-p4-filter-open><i class="fa-solid fa-sliders"></i> فیلتر</button></div><label>مرتب‌سازی<select data-p4-sort><option value="-created_at" {% if current_sort == '-created_at' %}selected{% endif %}>جدیدترین</option><option value="-sales_count" {% if current_sort == '-sales_count' %}selected{% endif %}>پرفروش‌ترین</option><option value="-rating" {% if current_sort == '-rating' %}selected{% endif %}>بالاترین امتیاز</option><option value="price" {% if current_sort == 'price' %}selected{% endif %}>قیمت کم به زیاد</option><option value="-price" {% if current_sort == '-price' %}selected{% endif %}>قیمت زیاد به کم</option></select></label></div>
     <div class="p4-grid">{% for product in page_obj %}{% include 'includes/p4_product_card.html' %}{% empty %}<div class="p4-empty"><div class="p4-empty-icon"><i class="fa-solid fa-spray-can-sparkles"></i></div><span>NO PRODUCTS FOUND</span><h2>هنوز محصولی در این بخش نیست.</h2><p>فیلترها را تغییر دهید یا همه عطرها را مشاهده کنید.</p><a href="{% url 'first:product_list' %}">پاک کردن فیلترها</a></div>{% endfor %}</div>
   </div>
 </section>

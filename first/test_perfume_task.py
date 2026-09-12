@@ -110,6 +110,23 @@ class PerfumeTaskTests(TestCase):
             self.assertEqual(response.status_code, 400)
             self.assertFalse(SliderImage.objects.exists())
 
+
+    def test_superuser_can_use_visual_editor_runtime(self):
+        superuser = User.objects.create_superuser(
+            username='visual-superuser',
+            email='visual-superuser@example.com',
+            password='test-pass-12345',
+            phone='09121110009',
+        )
+        # create_superuser leaves the custom role at its model default
+        # ("user").  It must still receive the same visual-editor access
+        # that owner_required grants everywhere else.
+        self.assertEqual(superuser.role, 'user')
+        self.client.force_login(superuser)
+        response = self.client.get(reverse('first:home'))
+        self.assertTrue(response.context['visual_customizer']['canEdit'])
+        self.assertEqual(self.client.get(reverse('first:customizer')).status_code, 200)
+
     def test_admin_menu_and_granted_routes(self):
         user = User.objects.create_user(username='limited', email='limited@example.com', phone='09121110001', role='admin')
         permission, _ = AdminPermission.objects.get_or_create(name='products_view', defaults={'label': 'Products'})

@@ -1,13 +1,30 @@
-.pa-catalog-actions{display:flex;gap:6px;margin-top:8px;align-items:center;flex-wrap:wrap}
-.pa-catalog-actions button,.pa-tag-choice{border:1px solid #B89B65;border-radius:8px;background:transparent;color:inherit;padding:8px 12px;cursor:pointer}
-.pa-catalog-actions button:disabled{opacity:.35;cursor:default}
-.pa-catalog-actions button:hover:not(:disabled),.pa-tag-choice:has(input:checked){background:#B89B65;color:#171717}
-.pa-tag-list{display:flex;gap:8px;flex-wrap:wrap;margin:10px 0}
-.pa-tag-choice{display:inline-flex;align-items:center;gap:6px}
-.pa-tag-choice input{width:auto!important}
-.pa-catalog-dialog{width:min(92vw,520px);max-height:90vh;overflow:auto;border:1px solid #B89B65;border-radius:18px;padding:26px;background:#1D1A17;color:#FAF7F2}
-.pa-catalog-dialog::backdrop{background:rgba(0,0,0,.65)}
+.pa-catalog-shell{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:8px;align-items:stretch;margin-top:6px}
+.pa-catalog-shell>select:not([hidden]){min-width:0;width:100%}
+.pa-catalog-actions{display:flex;gap:6px;align-items:stretch;flex-wrap:nowrap}
+.pa-catalog-icon{width:44px;min-width:44px;height:44px;border-radius:10px;border:1px solid rgba(184,155,101,.55);display:inline-grid;place-items:center;cursor:pointer;transition:.18s ease;font-size:15px;box-shadow:none}
+.pa-catalog-icon i{pointer-events:none}
+.pa-catalog-icon:disabled{opacity:.28;cursor:not-allowed;filter:saturate(.25)}
+.pa-catalog-add{background:#b89b65;color:#17130f;border-color:#c9ad77}
+.pa-catalog-add:hover:not(:disabled){background:#d2b579;transform:translateY(-1px)}
+.pa-catalog-edit{background:rgba(184,155,101,.08);color:#d8bd88}
+.pa-catalog-edit:hover:not(:disabled){background:rgba(184,155,101,.18);border-color:#b89b65}
+.pa-catalog-delete{background:rgba(179,59,67,.09);color:#e77f86;border-color:rgba(211,87,95,.38)}
+.pa-catalog-delete:hover:not(:disabled){background:rgba(179,59,67,.2);border-color:#d3575f}
+.pa-catalog-shell-tags{grid-template-columns:1fr auto}
+.pa-catalog-shell-tags .pa-tag-list{grid-column:1/-1}
+.pa-catalog-picker{min-width:0;width:100%;height:44px;border:1px solid rgba(184,155,101,.45)!important;border-radius:10px!important;background:rgba(255,255,255,.035)!important;color:inherit!important;padding:0 12px!important}
+.pa-tag-list{display:flex;gap:8px;flex-wrap:wrap;margin:8px 0 0}
+.pa-tag-choice{border:1px solid rgba(184,155,101,.42);border-radius:999px;background:rgba(184,155,101,.055);color:inherit;padding:7px 11px;cursor:pointer;display:inline-flex;align-items:center;gap:7px;font-size:12px}
+.pa-tag-choice:has(input:checked){background:#b89b65;color:#17130f;border-color:#b89b65}
+.pa-tag-choice input{width:auto!important;margin:0}
+.pa-catalog-dialog{width:min(92vw,520px);max-height:90vh;overflow:auto;border:1px solid rgba(184,155,101,.55);border-radius:18px;padding:26px;background:#17120e;color:#faf7f2;box-shadow:0 24px 90px rgba(0,0,0,.55)}
+.pa-catalog-dialog::backdrop{background:rgba(3,2,1,.72);backdrop-filter:blur(2px)}
 .pa-catalog-dialog .pa-field{display:flex;flex-direction:column;gap:8px;margin:14px 0}
-.pa-catalog-dialog input,.pa-catalog-dialog select{background:#FAF7F2;color:#171717;border:1px solid #B89B65;border-radius:8px;padding:10px;width:100%}
-.pa-catalog-dialog [role=alert]{color:#efacb9}
-[data-perfume-theme=day] .pa-catalog-dialog{background:#FAF7F2;color:#171717}
+.pa-catalog-dialog input,.pa-catalog-dialog select{background:#211a15!important;color:#f7eee2!important;border:1px solid rgba(184,155,101,.45)!important;border-radius:10px!important;padding:11px 12px!important;width:100%}
+.pa-catalog-dialog [role=alert]{color:#f0939b;min-height:18px}
+.pa-catalog-dialog #pa-catalog-delete-message{padding:14px;border:1px solid rgba(211,87,95,.28);border-radius:12px;background:rgba(179,59,67,.08);color:#f0c0c3}
+.sr-only{position:absolute!important;width:1px!important;height:1px!important;padding:0!important;margin:-1px!important;overflow:hidden!important;clip:rect(0,0,0,0)!important;white-space:nowrap!important;border:0!important}
+[data-perfume-theme=day] .pa-catalog-dialog{background:#faf7f2;color:#171717}
+[data-perfume-theme=day] .pa-catalog-dialog input,[data-perfume-theme=day] .pa-catalog-dialog select{background:#fff!important;color:#171717!important}
+[data-perfume-theme=day] .pa-catalog-picker{background:#fff!important;color:#171717!important}
+@media(max-width:680px){.pa-catalog-shell{grid-template-columns:1fr}.pa-catalog-actions{justify-content:flex-start}.pa-catalog-shell-tags{grid-template-columns:1fr}.pa-catalog-shell-tags .pa-tag-list{grid-column:auto}}

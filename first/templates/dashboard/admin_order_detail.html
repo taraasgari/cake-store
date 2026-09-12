@@ -1,0 +1,95 @@
+{% extends 'dashboard/perfume_admin_base.html' %}
+{% load custom_filters %}
+
+{% block admin_title %}فاکتور سفارش #{{ order.order_number }}{% endblock %}
+
+{% block admin_content %}
+<style>
+  .invoice-wrap{max-width:1180px;margin:0 auto;display:grid;gap:18px}
+  .invoice-head{display:flex;align-items:flex-start;justify-content:space-between;gap:18px;flex-wrap:wrap}
+  .invoice-head h1{margin:4px 0 0;font-size:30px}.invoice-head p{margin:7px 0 0;color:var(--pa-muted,#9d8d7f)}
+  .invoice-actions{display:flex;gap:8px;flex-wrap:wrap}.invoice-actions a,.invoice-actions button{display:inline-flex;align-items:center;gap:7px;min-height:42px;padding:9px 14px;border:1px solid var(--pa-line,#433126);background:var(--pa-card,#17110d);color:var(--pa-text,#f6eadc);text-decoration:none;cursor:pointer;font:inherit}.invoice-actions button{background:#c9954d;color:#160f0a;border-color:#c9954d;font-weight:900}
+  .invoice-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px}.invoice-card{border:1px solid var(--pa-line,#433126);background:var(--pa-card,#17110d);padding:20px}.invoice-card h2{font-size:16px;margin:0 0 16px;color:var(--pa-text,#f6eadc)}
+  .invoice-meta{display:grid;gap:10px}.invoice-meta div{display:flex;justify-content:space-between;gap:18px;padding-bottom:9px;border-bottom:1px solid rgba(201,149,77,.12);font-size:12px}.invoice-meta div:last-child{border-bottom:0}.invoice-meta span{color:var(--pa-muted,#9d8d7f)}.invoice-meta strong{color:var(--pa-text,#f6eadc);text-align:left}
+  .invoice-table{width:100%;border-collapse:collapse}.invoice-table th,.invoice-table td{padding:12px 10px;border-bottom:1px solid rgba(201,149,77,.13);text-align:right;font-size:12px}.invoice-table th{color:#c9954d;font-size:11px}.invoice-table td{color:var(--pa-text,#f6eadc)}
+  .invoice-totals{margin-right:auto;width:min(100%,420px);display:grid;gap:10px}.invoice-totals div{display:flex;justify-content:space-between;gap:15px;font-size:12px}.invoice-totals .total{padding-top:12px;border-top:1px solid rgba(201,149,77,.22);font-size:16px}.invoice-totals .total strong{color:#c9954d;font-size:20px}
+  .invoice-note{white-space:pre-wrap;line-height:2;color:var(--pa-muted,#9d8d7f);font-size:12px}.invoice-status{display:inline-flex;padding:5px 9px;border:1px solid rgba(201,149,77,.3);color:#d8b16c;background:rgba(201,149,77,.08)}
+  @media(max-width:800px){.invoice-grid{grid-template-columns:1fr}.invoice-head h1{font-size:24px}}
+  @media print{.pa-sidebar,.pa-topbar,.invoice-actions{display:none!important}.pa-shell,.pa-main,.pa-content{display:block!important;margin:0!important;padding:0!important;background:#fff!important}.invoice-wrap{max-width:none;color:#111}.invoice-card{background:#fff!important;border:1px solid #ddd!important}.invoice-card *{color:#111!important}.invoice-table th,.invoice-table td{color:#111!important;border-color:#ddd!important}.invoice-head p,.invoice-meta span,.invoice-note{color:#555!important}}
+</style>
+
+<div class="invoice-wrap">
+  <header class="invoice-head">
+    <div>
+      <span class="pa-eyebrow">CUSTOMER ORDER / INVOICE</span>
+      <h1>فاکتور سفارش #{{ order.order_number }}</h1>
+      <p>تمام اطلاعات مشتری، آدرس تحویل، اقلام سفارش و وضعیت پرداخت در همین صفحه است.</p>
+    </div>
+    <div class="invoice-actions">
+      <a href="{% url 'first:admin_orders' %}"><i class="fa-solid fa-arrow-right"></i> سفارش‌ها</a>
+      <button type="button" onclick="window.print()"><i class="fa-solid fa-print"></i> چاپ فاکتور</button>
+    </div>
+  </header>
+
+  <div class="invoice-grid">
+    <section class="invoice-card">
+      <h2><i class="fa-solid fa-user ml-2"></i> اطلاعات مشتری</h2>
+      <div class="invoice-meta">
+        <div><span>نام کاربری</span><strong>{{ order.user.username }}</strong></div>
+        <div><span>ایمیل</span><strong dir="ltr">{{ order.user.email|default:'—' }}</strong></div>
+        <div><span>شماره تماس سفارش</span><strong dir="ltr">{{ order.phone }}</strong></div>
+        <div><span>عضویت از</span><strong>{{ order.user.created_at|date:'Y/m/d H:i' }}</strong></div>
+      </div>
+    </section>
+
+    <section class="invoice-card">
+      <h2><i class="fa-solid fa-location-dot ml-2"></i> اطلاعات تحویل</h2>
+      <div class="invoice-meta">
+        <div><span>آدرس</span><strong>{{ order.address }}</strong></div>
+        <div><span>کد پستی</span><strong dir="ltr">{{ order.postal_code }}</strong></div>
+        <div><span>روش پرداخت</span><strong>{{ order.get_payment_method_display }}</strong></div>
+        <div><span>وضعیت</span><strong><span class="invoice-status">{{ order.get_status_display }}</span></strong></div>
+      </div>
+    </section>
+  </div>
+
+  <section class="invoice-card">
+    <h2><i class="fa-solid fa-bag-shopping ml-2"></i> اقلام سفارش</h2>
+    <div style="overflow-x:auto">
+      <table class="invoice-table">
+        <thead><tr><th>محصول</th><th>تنوع</th><th>تعداد</th><th>قیمت واحد</th><th>جمع</th></tr></thead>
+        <tbody>
+          {% for item in order.items.all %}
+          <tr>
+            <td>{{ item.product_name }}</td>
+            <td>{% if item.variant_info %}{{ item.variant_info }}{% elif item.variant %}{{ item.variant }}{% else %}—{% endif %}</td>
+            <td>{{ item.quantity }}</td>
+            <td>{{ item.price|price_format }} تومان</td>
+            <td><strong>{{ item.total|price_format }} تومان</strong></td>
+          </tr>
+          {% empty %}
+          <tr><td colspan="5">آیتمی برای این سفارش ثبت نشده است.</td></tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <div class="invoice-grid">
+    <section class="invoice-card">
+      <h2><i class="fa-regular fa-note-sticky ml-2"></i> توضیحات مشتری</h2>
+      <div class="invoice-note">{{ order.note|default:'توضیحی ثبت نشده است.' }}</div>
+    </section>
+
+    <section class="invoice-card">
+      <h2><i class="fa-solid fa-receipt ml-2"></i> جمع فاکتور</h2>
+      <div class="invoice-totals">
+        <div><span>جمع محصولات</span><strong>{{ order.subtotal|price_format }} تومان</strong></div>
+        <div><span>تخفیف</span><strong>{{ order.discount|price_format }} تومان</strong></div>
+        <div><span>هزینه ارسال</span><strong>{{ order.shipping_cost|price_format }} تومان</strong></div>
+        <div class="total"><span>مبلغ نهایی</span><strong>{{ order.total|price_format }} تومان</strong></div>
+      </div>
+    </section>
+  </div>
+</div>
+{% endblock %}

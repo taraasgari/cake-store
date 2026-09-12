@@ -46,6 +46,8 @@
     let currentBreakpoint = getBreakpoint();
     let dragState = null;
     let resizeState = null;
+    let editorMode = 'select';
+    let suppressClickUntil = 0;
 
     const STYLE_KEYS = [
         'color',
@@ -174,7 +176,47 @@
                 .trim();
         }
 
-        return directText(element);
+        const direct = directText(element);
+        if (direct) return direct;
+
+        // Many storefront headings/buttons contain nested spans or icons.
+        // Fall back to their rendered text so the visual editor can still
+        // expose and edit them instead of treating them as non-text boxes.
+        return (
+            element.innerText ||
+            element.textContent ||
+            ''
+        )
+            .replace(/\s+/g, ' ')
+            .trim();
+    }
+
+    function firstEditableTextNode(element) {
+        const walker = document.createTreeWalker(
+            element,
+            NodeFilter.SHOW_TEXT,
+            {
+                acceptNode(node) {
+                    if (!node.nodeValue || !node.nodeValue.trim()) {
+                        return NodeFilter.FILTER_SKIP;
+                    }
+
+                    const parent = node.parentElement;
+                    if (
+                        parent &&
+                        parent.closest(
+                            'script,style,noscript,template'
+                        )
+                    ) {
+                        return NodeFilter.FILTER_SKIP;
+                    }
+
+                    return NodeFilter.FILTER_ACCEPT;
+                }
+            }
+        );
+
+        return walker.nextNode();
     }
 
     function replaceEditableText(
@@ -197,16 +239,22 @@
                 node.nodeValue.trim()
         );
 
-        if (!nodes.length) return;
+        if (nodes.length) {
+            nodes[0].nodeValue =
+                ` ${value} `;
 
-        nodes[0].nodeValue =
-            ` ${value} `;
+            nodes
+                .slice(1)
+                .forEach((node) => {
+                    node.nodeValue = '';
+                });
+            return;
+        }
 
-        nodes
-            .slice(1)
-            .forEach((node) => {
-                node.nodeValue = '';
-            });
+        const nested = firstEditableTextNode(element);
+        if (nested) {
+            nested.nodeValue = ` ${value} `;
+        }
     }
 
     function backgroundSource(element) {
@@ -329,6 +377,15 @@
                             ? 'تصویر صفحه'
                             : 'بخش صفحه'
                     );
+
+                element.dataset.bsgKind =
+                    hasImage
+                        ? 'image'
+                        : (
+                            isLayout && !text
+                                ? 'box'
+                                : 'text'
+                        );
             });
     }
 
@@ -595,16 +652,12 @@
         element.className =
             'bsg-custom-element';
 
-        element.style.position =
-            'absolute';
-
-        element.style.top = '0';
-        element.style.left = '0';
-        element.style.right = 'auto';
-        element.style.margin = '0';
-
-        element.style.boxSizing =
-            'border-box';
+        element.style.setProperty('position', 'absolute', 'important');
+        element.style.setProperty('top', '0', 'important');
+        element.style.setProperty('left', '0', 'important');
+        element.style.setProperty('right', 'auto', 'important');
+        element.style.setProperty('margin', '0', 'important');
+        element.style.setProperty('box-sizing', 'border-box', 'important');
 
         if (
             rule.kind === 'image'
@@ -771,20 +824,26 @@
                         element.src =
                             rule.src;
                     } else {
-                        element.style.backgroundImage =
-                            `url("${rule.src.replace(
-                                /"/g,
-                                ''
-                            )}")`;
-
-                        element.style.backgroundSize =
-                            'cover';
-
-                        element.style.backgroundPosition =
-                            'center';
-
-                        element.style.backgroundRepeat =
-                            'no-repeat';
+                        element.style.setProperty(
+                            'background-image',
+                            `url("${rule.src.replace(/"/g, '')}")`,
+                            'important'
+                        );
+                        element.style.setProperty(
+                            'background-size',
+                            'cover',
+                            'important'
+                        );
+                        element.style.setProperty(
+                            'background-position',
+                            'center',
+                            'important'
+                        );
+                        element.style.setProperty(
+                            'background-repeat',
+                            'no-repeat',
+                            'important'
+                        );
                     }
                 }
 
@@ -804,10 +863,20 @@
                             rule.styles[key] !==
                                 undefined
                         ) {
-                            element.style[key] =
-                                rule.styles[
-                                    key
-                                ];
+                            const cssName = key.replace(
+                                /[A-Z]/g,
+                                (letter) => '-' + letter.toLowerCase()
+                            );
+
+                            // Storefront theme CSS intentionally contains
+                            // several !important declarations. Visual edits
+                            // must win over those rules or the inspector looks
+                            // broken even though a rule was saved correctly.
+                            element.style.setProperty(
+                                cssName,
+                                String(rule.styles[key]),
+                                'important'
+                            );
                         }
                     }
                 );
@@ -822,13 +891,17 @@
                         );
 
                     if (customImage) {
-                        customImage.style.objectFit =
-                            rule.styles
-                                ?.objectFit ||
-                            'cover';
+                        customImage.style.setProperty(
+                            'object-fit',
+                            rule.styles?.objectFit || 'cover',
+                            'important'
+                        );
 
-                        customImage.style.borderRadius =
-                            'inherit';
+                        customImage.style.setProperty(
+                            'border-radius',
+                            'inherit',
+                            'important'
+                        );
                     }
                 }
 
@@ -837,23 +910,22 @@
                         rule
                     );
 
-                element.style.translate =
-                    `${Number(
-                        position.x
-                    ) || 0}px ` +
-                    `${Number(
-                        position.y
-                    ) || 0}px`;
+                element.style.setProperty(
+                    'translate',
+                    `${Number(position.x) || 0}px ${Number(position.y) || 0}px`,
+                    'important'
+                );
 
                 if (
                     Number(
                         position.width
                     ) > 0
                 ) {
-                    element.style.width =
-                        `${Number(
-                            position.width
-                        )}px`;
+                    element.style.setProperty(
+                        'width',
+                        `${Number(position.width)}px`,
+                        'important'
+                    );
                 } else if (
                     rule.created &&
                     rule.kind !==
@@ -868,10 +940,11 @@
                         position.height
                     ) > 0
                 ) {
-                    element.style.height =
-                        `${Number(
-                            position.height
-                        )}px`;
+                    element.style.setProperty(
+                        'height',
+                        `${Number(position.height)}px`,
+                        'important'
+                    );
                 } else if (
                     rule.created &&
                     rule.kind !==
@@ -891,12 +964,11 @@
                             'relative';
                     }
 
-                    element.style.zIndex =
-                        String(
-                            Number(
-                                position.zIndex
-                            )
-                        );
+                    element.style.setProperty(
+                        'z-index',
+                        String(Number(position.zIndex)),
+                        'important'
+                    );
                 }
 
                 element.hidden =
@@ -914,35 +986,54 @@
             document.documentElement;
 
         const variables = {
-            primary:
+            primary: [
                 '--primary-color',
-
-            secondary:
+                '--site-primary',
+                '--lux-gold',
+                '--p-gold'
+            ],
+            secondary: [
                 '--secondary-color',
-
-            accent:
+                '--site-secondary',
+                '--lux-brown',
+                '--p-gold-deep'
+            ],
+            accent: [
                 '--accent-color',
-
-            bg:
+                '--site-accent',
+                '--lux-gold-light',
+                '--p-gold-pale'
+            ],
+            bg: [
                 '--bg-color',
-
-            text:
-                '--text-color'
+                '--lux-canvas',
+                '--p-bg'
+            ],
+            text: [
+                '--text-color',
+                '--lux-text',
+                '--p-text'
+            ]
         };
 
-        Object.keys(
-            variables
-        ).forEach((key) => {
-            if (theme[key]) {
+        Object.keys(variables).forEach((key) => {
+            if (!theme[key]) return;
+
+            variables[key].forEach((name) => {
                 root.style.setProperty(
-                    variables[key],
-                    theme[key]
+                    name,
+                    theme[key],
+                    'important'
                 );
-            }
+            });
         });
     }
 
     function applyAll() {
+        // Re-scan on every full apply so content injected after initial page
+        // load (slider content, dynamic cards, etc.) also becomes editable.
+        autoTagElements();
+
         document
             .querySelectorAll(
                 '[data-bsg-created="1"]'
@@ -1019,6 +1110,7 @@
                     ? 'image'
                     : (
                         saved.kind ||
+                        element.dataset.bsgKind ||
                         (
                             text
                                 ? 'text'
@@ -1142,6 +1234,8 @@
     }
 
     function editorClick(event) {
+        if (editorMode === 'off') return;
+
         const target =
             event.target.closest(
                 '[data-bsg-edit]'
@@ -1149,15 +1243,25 @@
 
         if (!target) return;
 
+        // While editing, storefront links/buttons must never navigate away
+        // from the iframe.  In Move mode a completed drag is followed by a
+        // synthetic click in Chromium; suppress it as well.
         event.preventDefault();
         event.stopPropagation();
 
-        select(target);
+        if (Date.now() < suppressClickUntil) {
+            return;
+        }
+
+        if (editorMode === 'select') {
+            select(target);
+        }
     }
 
     function pointerDown(event) {
         if (
-            event.button !== 0
+            event.button !== 0 ||
+            editorMode === 'off'
         ) {
             return;
         }
@@ -1231,12 +1335,28 @@
             return;
         }
 
+        // Dragging is intentionally available in both Select and Move.
+        // In Select a normal click still selects the element, while a real
+        // pointer movement turns into a drag. This matches the older visual
+        // editor workflow and prevents the common "nothing moves" feeling.
+        if (!['select', 'move'].includes(editorMode)) {
+            return;
+        }
+
         const target =
             event.target.closest(
                 '[data-bsg-edit]'
             );
 
         if (!target) return;
+
+        if (
+            event.target.closest(
+                'input,textarea,select,option,[contenteditable="true"]'
+            )
+        ) {
+            return;
+        }
 
         select(target);
 
@@ -1380,17 +1500,17 @@
                     }
                 );
 
-            resizeState
-                .target
-                .style
-                .width =
-                    `${width}px`;
+            resizeState.target.style.setProperty(
+                'width',
+                `${width}px`,
+                'important'
+            );
 
-            resizeState
-                .target
-                .style
-                .height =
-                    `${height}px`;
+            resizeState.target.style.setProperty(
+                'height',
+                `${height}px`,
+                'important'
+            );
 
             return;
         }
@@ -1466,12 +1586,11 @@
                 currentBreakpoint
             ];
 
-        dragState
-            .target
-            .style
-            .translate =
-                `${position.x}px ` +
-                `${position.y}px`;
+        dragState.target.style.setProperty(
+            'translate',
+            `${position.x}px ${position.y}px`,
+            'important'
+        );
 
         dragState
             .target
@@ -1536,18 +1655,41 @@
             select(
                 dragState.target
             );
+
+            suppressClickUntil =
+                Date.now() + 350;
         }
 
         dragState = null;
     }
 
+    function applyEditorMode(mode) {
+        editorMode =
+            ['off', 'select', 'move'].includes(mode)
+                ? mode
+                : 'select';
+
+        document.documentElement.classList.toggle(
+            'bsg-edit-mode',
+            editorMode !== 'off'
+        );
+        document.documentElement.classList.toggle(
+            'bsg-move-mode',
+            editorMode === 'move'
+        );
+        document.documentElement.classList.toggle(
+            'bsg-select-mode',
+            editorMode === 'select'
+        );
+
+        if (editorMode === 'off' && selectedElement) {
+            selectedElement.classList.remove('bsg-selected');
+            selectedElement = null;
+        }
+    }
+
     function enableEditor() {
-        document
-            .documentElement
-            .classList
-            .add(
-                'bsg-edit-mode'
-            );
+        applyEditorMode(editorMode);
 
         document.addEventListener(
             'click',
@@ -1595,6 +1737,109 @@
         });
     }
 
+    // Same-origin direct bridge used by the studio as a reliable
+    // fallback to postMessage. The iframe is sandboxed with allow-same-origin,
+    // so the parent can call these methods safely when both pages belong to
+    // this storefront.
+    window.BSGCustomizer = {
+        status() {
+            return {
+                canEdit,
+                editRequested,
+                editMode,
+                editorMode,
+                breakpoint: currentBreakpoint,
+                ready: true
+            };
+        },
+        setEditorMode(mode) {
+            applyEditorMode(mode);
+        },
+        setRules(nextRules) {
+            rules = Array.isArray(nextRules) ? nextRules : [];
+            applyAll();
+        },
+        setTheme(nextTheme) {
+            theme = nextTheme && typeof nextTheme === 'object'
+                ? nextTheme
+                : {};
+            applyTheme();
+        },
+        setBreakpoint(nextBreakpoint) {
+            currentBreakpoint = [
+                'desktop',
+                'tablet',
+                'mobile'
+            ].includes(nextBreakpoint)
+                ? nextBreakpoint
+                : getBreakpoint();
+            applyAll();
+        },
+        applyRule(rule) {
+            if (!rule) return;
+            upsertRule(rule);
+            applyAll();
+            const element = document.querySelector(
+                `[data-bsg-edit="${safeSelector(rule.id)}"]`
+            );
+            if (element) select(element);
+        },
+        removeRule(id) {
+            rules = rules.filter(
+                (rule) => rule && rule.id !== id
+            );
+            selectedElement = null;
+            applyAll();
+        },
+        createRule(rule) {
+            if (!rule) return;
+            upsertRule(rule);
+            applyAll();
+            const element = document.querySelector(
+                `[data-bsg-edit="${safeSelector(rule.id)}"]`
+            );
+            if (element) {
+                element.scrollIntoView({
+                    behavior: 'smooth',
+                    block: 'center',
+                    inline: 'center'
+                });
+                select(element);
+                post({type: 'bsg-layers-changed'});
+            }
+        },
+        selectId(id) {
+            const element = document.querySelector(
+                `[data-bsg-edit="${safeSelector(id)}"]`
+            );
+            if (element) {
+                element.scrollIntoView({
+                    behavior: 'smooth',
+                    block: 'center',
+                    inline: 'center'
+                });
+                select(element);
+            }
+        },
+        requestLayers() {
+            const layerList = Array.from(
+                document.querySelectorAll('[data-bsg-edit]')
+            ).map((element) => ({
+                id: element.dataset.bsgEdit,
+                name:
+                    element.dataset.bsgName ||
+                    element.dataset.bsgEdit,
+                tag: element.tagName.toLowerCase()
+            }));
+            post({type: 'bsg-layers', layers: layerList});
+            return layerList;
+        },
+        refresh() {
+            autoTagElements();
+            applyAll();
+        }
+    };
+
     window.addEventListener(
         'message',
         (event) => {
@@ -1612,6 +1857,13 @@
                 event.data || {};
 
             if (
+                data.type ===
+                'bsg-set-editor-mode'
+            ) {
+                applyEditorMode(data.mode);
+            }
+
+            else if (
                 data.type ===
                 'bsg-set-rules'
             ) {
@@ -1832,12 +2084,12 @@
             background:
                 linear-gradient(
                     135deg,
-                    #ec407a,
-                    #7c3aed
+                    #c9954d,
+                    #7a4a2b
                 );
             box-shadow:
                 0 5px 16px
-                rgba(124, 58, 237, .42);
+                rgba(122, 74, 43, .42);
             cursor: nwse-resize !important;
             pointer-events: auto;
             touch-action: none;
@@ -1854,11 +2106,21 @@
             cursor: pointer !important;
         }
 
+        .bsg-move-mode
+        [data-bsg-edit] {
+            cursor: grab !important;
+        }
+
+        .bsg-move-mode
+        [data-bsg-edit]:active {
+            cursor: grabbing !important;
+        }
+
         .bsg-edit-mode
         [data-bsg-edit]:hover {
             outline:
                 2px dashed
-                #ec407a !important;
+                #c9954d !important;
             outline-offset: 3px;
         }
 
@@ -1866,7 +2128,7 @@
         [data-bsg-edit].bsg-selected {
             outline:
                 3px solid
-                #7c3aed !important;
+                #7a4a2b !important;
             outline-offset: 4px;
             box-shadow:
                 0 0 0 6px
@@ -1895,7 +2157,7 @@
             padding: 6px 9px;
             border-radius: 8px;
             color: #fff;
-            background: #7c3aed;
+            background: #7a4a2b;
             box-shadow:
                 0 8px 25px
                 rgba(
@@ -1922,7 +2184,7 @@
         .bsg-edit-mode
         [data-bsg-edit].bsg-resizing {
             outline-color:
-                #ec407a !important;
+                #c9954d !important;
         }
 
         .bsg-edit-mode a,

@@ -1,15 +1,17 @@
-{% extends 'perfume_base.html' %}
-{% block title %}مدیریت لغو و مرجوعی{% endblock %}
-{% block content %}
-<div class="max-w-6xl mx-auto px-4 py-10">
-  <div class="flex justify-between mb-6"><h1 class="text-2xl font-bold">لغو و مرجوعی سفارش‌ها</h1><a class="text-pink-600" href="{% url 'first:admin_dashboard' %}">بازگشت به مدیریت</a></div>
-  <div class="space-y-3">
-    {% for action in actions %}
-      <a href="{% url 'customer_care:admin_order_action_detail' action.pk %}" class="block bg-white rounded-2xl shadow p-5">
-        <div class="flex justify-between"><b>{{ action.get_kind_display }} · #{{ action.order.order_number }}</b><span>{{ action.get_status_display }}</span></div>
-        <div class="text-sm text-gray-500 mt-2">{{ action.user.phone }} · {{ action.refund_amount }} تومان</div>
-      </a>
-    {% empty %}<div class="bg-white p-8 rounded-2xl text-center">درخواستی وجود ندارد.</div>{% endfor %}
-  </div>
+{% extends 'dashboard/perfume_admin_base.html' %}{% load static %}
+{% block admin_title %}لغو و مرجوعی{% endblock %}
+{% block extra_css %}<link rel="stylesheet" href="{% static 'css/perfume-admin-care.css' %}">{% endblock %}
+{% block admin_content %}
+<section class="pa-page-hero care-hero">
+  <div><span class="pa-eyebrow">RETURNS & CANCELLATIONS</span><h1>لغو و مرجوعی سفارش‌ها</h1><p>درخواست‌های لغو، مرجوعی، دریافت کالا و بازگشت وجه را مرحله‌به‌مرحله مدیریت کنید.</p></div>
+  <div class="care-hero-actions"><a class="care-link-btn" href="{% url 'first:admin_dashboard' %}"><i class="fa-solid fa-arrow-right"></i> داشبورد مدیریت</a></div>
+</section>
+<div class="care-list">
+  {% for action in actions %}
+  <a href="{% url 'customer_care:admin_order_action_detail' action.pk %}" class="care-card">
+    <div class="care-card-main"><div class="care-card-title"><strong>{{ action.get_kind_display }}</strong><span class="care-ref">ORDER #{{ action.order.order_number }}</span></div><div class="care-meta"><span><i class="fa-regular fa-user"></i>{{ action.user.get_full_name|default:action.user.username }}</span>{% if action.user.phone %}<span dir="ltr"><i class="fa-solid fa-phone"></i>{{ action.user.phone }}</span>{% endif %}<span><i class="fa-solid fa-circle-info"></i>{{ action.get_reason_display }}</span><span><i class="fa-regular fa-clock"></i>{{ action.updated_at|date:'Y/m/d H:i' }}</span></div></div>
+    <div class="care-card-side"><span class="care-status care-status-{{ action.status }}">{{ action.get_status_display }}</span><span class="care-arrow"><i class="fa-solid fa-arrow-left"></i></span></div>
+  </a>
+  {% empty %}<div class="care-empty"><i class="fa-solid fa-arrow-rotate-left"></i><h2>درخواستی وجود ندارد</h2><p>هیچ درخواست لغو یا مرجوعی در صف بررسی نیست.</p></div>{% endfor %}
 </div>
 {% endblock %}

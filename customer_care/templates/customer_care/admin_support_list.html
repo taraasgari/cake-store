@@ -1,19 +1,40 @@
-{% extends 'perfume_base.html' %}
-{% block title %}مدیریت پشتیبانی{% endblock %}
-{% block content %}
-<div class="max-w-6xl mx-auto px-4 py-10">
-  <div class="flex justify-between mb-6"><h1 class="text-2xl font-bold">مدیریت پشتیبانی</h1><a class="text-pink-600" href="{% url 'first:admin_dashboard' %}">بازگشت به مدیریت</a></div>
-  <div class="flex gap-2 flex-wrap mb-5">
-    <a class="px-3 py-2 bg-white rounded-lg shadow" href="?">همه</a>
-    {% for value,label in statuses %}<a class="px-3 py-2 bg-white rounded-lg shadow" href="?status={{ value }}">{{ label }}</a>{% endfor %}
+{% extends 'dashboard/perfume_admin_base.html' %}{% load static %}
+{% block admin_title %}مدیریت پشتیبانی{% endblock %}
+{% block extra_css %}<link rel="stylesheet" href="{% static 'css/perfume-admin-care.css' %}">{% endblock %}
+{% block admin_content %}
+<section class="pa-page-hero care-hero">
+  <div>
+    <span class="pa-eyebrow">SUPPORT DESK</span>
+    <h1>مدیریت پشتیبانی</h1>
+    <p>تیکت‌های مشتریان، سفارش مرتبط و وضعیت پاسخ‌گویی را از یک نمای واحد مدیریت کنید.</p>
   </div>
-  <div class="space-y-3">
-    {% for ticket in tickets %}
-      <a href="{% url 'customer_care:admin_support_detail' ticket.reference %}" class="block bg-white rounded-2xl shadow p-5">
-        <div class="flex justify-between"><b>{{ ticket.subject }}</b><span>{{ ticket.get_status_display }}</span></div>
-        <div class="text-sm text-gray-500 mt-2">{{ ticket.reference }} · {{ ticket.user.phone }}{% if ticket.order %} · سفارش #{{ ticket.order.order_number }}{% endif %}</div>
-      </a>
-    {% empty %}<div class="bg-white p-8 rounded-2xl text-center">تیکتی وجود ندارد.</div>{% endfor %}
+  <div class="care-hero-actions"><a class="care-link-btn" href="{% url 'first:admin_dashboard' %}"><i class="fa-solid fa-arrow-right"></i> داشبورد مدیریت</a></div>
+</section>
+
+<section class="care-toolbar">
+  <div class="care-filters">
+    <a class="care-filter {% if not request.GET.status %}active{% endif %}" href="?">همه تیکت‌ها</a>
+    {% for value,label in statuses %}<a class="care-filter {% if request.GET.status == value %}active{% endif %}" href="?status={{ value }}"><i class="fa-solid fa-circle"></i>{{ label }}</a>{% endfor %}
   </div>
+  <span class="care-toolbar-note">برای مشاهده گفتگو روی هر تیکت کلیک کنید.</span>
+</section>
+
+<div class="care-list">
+  {% for ticket in tickets %}
+  <a href="{% url 'customer_care:admin_support_detail' ticket.reference %}" class="care-card">
+    <div class="care-card-main">
+      <div class="care-card-title"><strong>{{ ticket.subject }}</strong><span class="care-ref">{{ ticket.reference }}</span></div>
+      <div class="care-meta">
+        <span><i class="fa-regular fa-user"></i>{{ ticket.user.get_full_name|default:ticket.user.username }}</span>
+        {% if ticket.user.phone %}<span dir="ltr"><i class="fa-solid fa-phone"></i>{{ ticket.user.phone }}</span>{% endif %}
+        {% if ticket.order %}<span><i class="fa-solid fa-receipt"></i>سفارش #{{ ticket.order.order_number }}</span>{% endif %}
+        <span><i class="fa-regular fa-clock"></i>{{ ticket.updated_at|date:'Y/m/d H:i' }}</span>
+      </div>
+    </div>
+    <div class="care-card-side"><span class="care-status care-status-{{ ticket.status }}">{{ ticket.get_status_display }}</span><span class="care-arrow"><i class="fa-solid fa-arrow-left"></i></span></div>
+  </a>
+  {% empty %}
+  <div class="care-empty"><i class="fa-regular fa-comments"></i><h2>تیکتی وجود ندارد</h2><p>در حال حاضر هیچ درخواست پشتیبانی برای نمایش وجود ندارد.</p></div>
+  {% endfor %}
 </div>
 {% endblock %}

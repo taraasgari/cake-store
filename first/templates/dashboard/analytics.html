@@ -659,52 +659,142 @@
 
 
     /* ==========================================================
-       حالت تاریک
+       حالت شب - هماهنگ با تم گرم پنل عطر
        ========================================================== */
 
-    [data-theme="dark"] .an-card,
-    [data-theme="dark"] .an-finance-item,
-    [data-theme="dark"] .an-input {
-        color: #f5f1f4;
-        background: #34343c;
-        border-color: #4c4850;
+    html[data-perfume-theme="night"] .an-card {
+        color: #eadfce;
+        background: linear-gradient(145deg, rgba(37, 27, 20, 0.98), rgba(22, 16, 12, 0.98));
+        border-color: rgba(215, 173, 99, 0.18);
+        box-shadow: 0 16px 45px rgba(0, 0, 0, 0.22);
     }
 
-    [data-theme="dark"] .an-page .an-btn-back {
-        color: #f5f1f4 !important;
-        background: #34343c !important;
-        border-color: #514b51 !important;
+    html[data-perfume-theme="night"] .an-finance-item {
+        color: #eadfce;
+        background: #1b1410;
     }
 
-    [data-theme="dark"] .an-title,
-    [data-theme="dark"] .an-kpi-value,
-    [data-theme="dark"] .an-finance-value,
-    [data-theme="dark"] .an-section-title {
-        color: #f6f2f5;
+    html[data-perfume-theme="night"] .an-input {
+        color: #f6ecdd;
+        background: #211812;
+        border-color: rgba(215, 173, 99, 0.24);
     }
 
-    [data-theme="dark"] .an-mini {
-        background: #2d2d35;
+    html[data-perfume-theme="night"] .an-input::placeholder {
+        color: #8f8170;
     }
 
-    [data-theme="dark"] .an-mini b {
-        color: #f5f1f4;
+    html[data-perfume-theme="night"] .an-page .an-btn-back {
+        color: #f1e4d1 !important;
+        background: #241a13 !important;
+        border-color: rgba(215, 173, 99, 0.28) !important;
     }
 
-    [data-theme="dark"] .an-table th {
-        color: #ffdbea;
-        background: #4b3040;
+    html[data-perfume-theme="night"] .an-page .an-btn-back:hover {
+        background: #2d2118 !important;
     }
 
-    [data-theme="dark"] .an-table td {
-        color: #ddd7dc;
-        border-color: #47444b;
+    html[data-perfume-theme="night"] .an-title,
+    html[data-perfume-theme="night"] .an-kpi-value,
+    html[data-perfume-theme="night"] .an-finance-value,
+    html[data-perfume-theme="night"] .an-section-title {
+        color: #fff4e5;
     }
 
-    [data-theme="dark"] .an-table tbody tr:hover {
-        background: #3c3339;
+    html[data-perfume-theme="night"] .an-subtitle,
+    html[data-perfume-theme="night"] .an-field label,
+    html[data-perfume-theme="night"] .an-kpi-label,
+    html[data-perfume-theme="night"] .an-kpi-note,
+    html[data-perfume-theme="night"] .an-finance-label,
+    html[data-perfume-theme="night"] .an-empty {
+        color: #aa9b88;
     }
 
+    html[data-perfume-theme="night"] .an-kpi-icon {
+        background: rgba(215, 173, 99, 0.10);
+    }
+
+    html[data-perfume-theme="night"] .an-period {
+        color: #e8c98e;
+        background: rgba(215, 173, 99, 0.10);
+        border: 1px solid rgba(215, 173, 99, 0.16);
+    }
+
+    html[data-perfume-theme="night"] .an-mini {
+        color: #d9cbb8;
+        background: #201710;
+        border: 1px solid rgba(215, 173, 99, 0.10);
+    }
+
+    html[data-perfume-theme="night"] .an-mini b {
+        color: #fff1dc;
+    }
+
+    html[data-perfume-theme="night"] .an-table-wrap {
+        border-color: rgba(215, 173, 99, 0.18);
+    }
+
+    html[data-perfume-theme="night"] .an-table th {
+        color: #ead09d;
+        background: #2a1e15;
+    }
+
+    html[data-perfume-theme="night"] .an-table td {
+        color: #d7c9b7;
+        border-color: rgba(215, 173, 99, 0.10);
+    }
+
+    html[data-perfume-theme="night"] .an-table tbody tr:hover {
+        background: #241a13;
+    }
+
+    html[data-perfume-theme="night"] .an-rank {
+        color: #e6d5bd;
+        background: #31241a;
+    }
+
+    html[data-perfume-theme="night"] .an-product img {
+        background: #251b14;
+        border: 1px solid rgba(215, 173, 99, 0.13);
+    }
+
+    html[data-perfume-theme="night"] .an-chart-error {
+        color: #dca7a7;
+        background: #251615;
+    }
+
+    html[data-perfume-theme="night"] .an-alert-danger {
+        color: #efb0b5;
+        background: rgba(122, 36, 63, 0.18);
+        border: 1px solid rgba(180, 73, 91, 0.22);
+    }
+
+    html[data-perfume-theme="night"] .an-alert-warning {
+        color: #e6c78a;
+        background: rgba(184, 155, 101, 0.12);
+        border: 1px solid rgba(184, 155, 101, 0.18);
+    }
+
+    html[data-perfume-theme="night"] .an-alert-info {
+        color: #b8c8cc;
+        background: rgba(83, 112, 117, 0.14);
+        border: 1px solid rgba(105, 132, 136, 0.18);
+    }
+
+    html[data-perfume-theme="night"] .status-out {
+        color: #efb0b5;
+        background: rgba(122, 36, 63, 0.22);
+    }
+
+    html[data-perfume-theme="night"] .status-low {
+        color: #e6c78a;
+        background: rgba(184, 155, 101, 0.15);
+    }
+
+    html[data-perfume-theme="night"] .status-stagnant {
+        color: #b7c8cc;
+        background: rgba(83, 112, 117, 0.16);
+    }
 
     /* ==========================================================
        ریسپانسیو
