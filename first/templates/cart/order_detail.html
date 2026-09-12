@@ -26,12 +26,8 @@
           <div><span>مبلغ نهایی</span><strong class="gold">{{ order.total|floatformat:0 }} تومان</strong></div>
         </div>
         {% if status_index >= 0 %}
-        <div class="od-steps">
-          <div class="od-step {% if status_index >= 0 %}active{% endif %}"><div class="od-step-bar"></div><small>ثبت</small></div>
-          <div class="od-step {% if status_index >= 1 %}active{% endif %}"><div class="od-step-bar"></div><small>پرداخت</small></div>
-          <div class="od-step {% if status_index >= 2 %}active{% endif %}"><div class="od-step-bar"></div><small>پردازش</small></div>
-          <div class="od-step {% if status_index >= 3 %}active{% endif %}"><div class="od-step-bar"></div><small>ارسال</small></div>
-          <div class="od-step {% if status_index >= 4 %}active{% endif %}"><div class="od-step-bar"></div><small>تحویل</small></div>
+        <div class="od-steps" style="grid-template-columns:repeat({{ status_steps|length }},1fr)">
+          {% for step in status_steps %}<div class="od-step {% if step.active %}active{% endif %}"><div class="od-step-bar"></div><small>{{ step.label }}</small></div>{% endfor %}
         </div>
         {% else %}<div class="od-note" style="margin-top:15px">این سفارش در وضعیت «{{ order.get_status_display }}» قرار دارد.</div>{% endif %}
       </section>

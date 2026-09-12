@@ -1,138 +1,51 @@
 {% extends 'perfume_base.html' %}
-
-{% block title %}پیگیری سفارش{% endblock %}
-
-
+{% block title %}پیگیری سفارش | {{ settings.site_name|default:'فروشگاه عطر' }}{% endblock %}
+{% block extra_css %}
+<style>
+.ptrack{max-width:1180px;margin:0 auto;padding:54px 24px 78px}.ptrack-grid{display:grid;grid-template-columns:minmax(0,.9fr) minmax(420px,1.1fr);gap:18px}.ptrack-intro,.ptrack-card{border:1px solid var(--p-line,#3b2b21);background:linear-gradient(145deg,var(--p-surface,#17110d),var(--p-surface-2,#100c09));padding:28px}.ptrack-kicker{color:var(--p-gold,#c9954d);font-size:10px;letter-spacing:.18em}.ptrack-intro h1,.ptrack-card h2{margin:10px 0 8px;color:var(--p-text,#f6eadc)}.ptrack-intro h1{font-size:clamp(38px,5vw,64px);line-height:1.05}.ptrack-intro p,.ptrack-card p{color:var(--p-muted,#9d8d7f);line-height:1.9}.ptrack-steps{display:grid;gap:10px;margin-top:24px}.ptrack-steps div{display:flex;gap:14px;align-items:center;padding:12px;border:1px solid rgba(201,149,77,.14);background:rgba(201,149,77,.035)}.ptrack-steps b{color:var(--p-gold,#c9954d);font-size:11px}.ptrack-steps strong{display:block;color:var(--p-text,#f6eadc)}.ptrack-steps small{color:var(--p-muted,#9d8d7f)}.ptrack-form{display:grid;gap:14px;margin-top:22px}.ptrack-field label{display:block;color:var(--p-text,#f6eadc);font-size:11px;margin-bottom:7px}.ptrack-field input{width:100%;box-sizing:border-box;min-height:48px;border:1px solid var(--p-line,#4a3528);background:#0d0907;color:var(--p-text,#f6eadc);padding:11px 13px;outline:none}.ptrack-field input:focus{border-color:var(--p-gold,#c9954d)}.ptrack-error{display:block;margin-top:6px;color:#df8882;font-size:10px}.ptrack-submit{min-height:48px;border:1px solid var(--p-gold,#c9954d);background:var(--p-gold,#c9954d);color:#160f0a;font-weight:900;cursor:pointer}.ptrack-result{margin-top:22px;padding-top:20px;border-top:1px solid var(--p-line,#3b2b21)}.ptrack-order-head{display:flex;justify-content:space-between;align-items:center;gap:14px;flex-wrap:wrap}.ptrack-order-head strong{font-size:20px;color:var(--p-text,#f6eadc)}.ptrack-status{padding:6px 10px;border:1px solid rgba(201,149,77,.3);color:#ddb66f;background:rgba(201,149,77,.07)}.ptrack-meta{display:grid;grid-template-columns:1fr 1fr;gap:9px;margin-top:14px}.ptrack-meta div{border:1px solid var(--p-line,#3b2b21);background:#120d0a;padding:12px}.ptrack-meta span{display:block;color:var(--p-muted,#8c7c6d);font-size:9px;margin-bottom:4px}.ptrack-meta b{color:var(--p-text,#f6eadc);font-size:12px}.ptrack-action{display:flex;justify-content:center;align-items:center;min-height:44px;margin-top:14px;border:1px solid var(--p-line-strong,#725133);color:#e2bd7d;text-decoration:none}.ptrack-empty{margin-top:20px;padding:14px;border:1px solid rgba(185,74,72,.35);background:rgba(185,74,72,.08);color:#dc8a85}.ptrack-note{margin-top:12px;color:var(--p-muted,#8d7e70);font-size:10px}@media(max-width:900px){.ptrack-grid{grid-template-columns:1fr}.ptrack-card{order:-1}}@media(max-width:560px){.ptrack{padding:28px 14px 54px}.ptrack-intro,.ptrack-card{padding:20px}.ptrack-meta{grid-template-columns:1fr}}
+</style>
+{% endblock %}
 {% block content %}
-<section class="p6-tracking-page">
-  <div class="p6-tracking-shell">
-
-    <aside class="p6-tracking-intro">
-      <div class="p6-tracking-eyebrow">ORDER TRACKING</div>
-
-      <div class="p6-tracking-heading">
-        <span>پیگیری سریع و مطمئن</span>
-        <h1>سفارشت<br><em>کجاست؟</em></h1>
-        <p>
-          کد سفارش و شماره تلفنی که هنگام ثبت سفارش وارد کرده‌اید را وارد کنید
-          تا وضعیت فعلی سفارش نمایش داده شود.
-        </p>
-      </div>
-
-      <div class="p6-tracking-steps">
-        <article>
-          <b>01</b>
-          <div><strong>کد سفارش</strong><small>شماره سفارش ثبت‌شده</small></div>
-        </article>
-        <article>
-          <b>02</b>
-          <div><strong>شماره تلفن</strong><small>همان شماره هنگام خرید</small></div>
-        </article>
-        <article>
-          <b>03</b>
-          <div><strong>مشاهده وضعیت</strong><small>پردازش، آماده‌سازی یا ارسال</small></div>
-        </article>
-      </div>
-
-      <div class="p6-tracking-art">
-        <div class="p6-orbit orbit-a"></div>
-        <div class="p6-orbit orbit-b"></div>
-        <div class="p6-track-mark"><i class="fa-solid fa-box"></i></div>
+<section class="ptrack">
+  <div class="ptrack-grid">
+    <aside class="ptrack-intro">
+      <div class="ptrack-kicker">ORDER TRACKING</div>
+      <h1>وضعیت سفارش<br>در یک نگاه</h1>
+      <p>برای حفظ حریم خصوصی، اطلاعات سفارش با همان کد و شماره تلفنی که هنگام خرید ثبت شده بررسی می‌شود.</p>
+      <div class="ptrack-steps">
+        <div><b>01</b><p><strong>کد سفارش</strong><small>شماره ثبت‌شده بعد از خرید</small></p></div>
+        <div><b>02</b><p><strong>شماره تماس</strong><small>همان شماره درج‌شده روی سفارش</small></p></div>
+        <div><b>03</b><p><strong>وضعیت جاری</strong><small>پردازش، ارسال یا تحویل</small></p></div>
       </div>
     </aside>
 
-    <div class="p6-tracking-card">
-      <div class="p6-tracking-card-head">
-        <span>TRACK YOUR ORDER</span>
-        <h2>اطلاعات سفارش</h2>
-        <p>اطلاعات زیر را دقیقاً مطابق زمان ثبت سفارش وارد کنید.</p>
+    <div class="ptrack-card">
+      <div class="ptrack-kicker">TRACK YOUR ORDER</div>
+      <h2>پیگیری سفارش</h2>
+      {% if user.is_authenticated %}<p>کد سفارش خود را وارد کنید. سفارش فقط از حساب فعلی شما جستجو می‌شود.</p>{% else %}<p>کد سفارش و شماره تلفن ثبت‌شده روی همان سفارش را وارد کنید.</p>{% endif %}
+
+      <form method="post" class="ptrack-form" novalidate>{% csrf_token %}
+        <div class="ptrack-field"><label for="track_order_number">کد سفارش</label><input id="track_order_number" name="order_number" value="{{ form.order_number.value|default:'' }}" dir="ltr" inputmode="numeric" autocomplete="off" placeholder="مثلاً 42857508" required>{% if form.order_number.errors %}<small class="ptrack-error">{{ form.order_number.errors.0 }}</small>{% endif %}</div>
+        {% if not user.is_authenticated %}<div class="ptrack-field"><label for="track_phone">شماره تلفن</label><input id="track_phone" name="phone" value="{{ form.phone.value|default:'' }}" dir="ltr" inputmode="tel" autocomplete="tel" placeholder="09123456789" required>{% if form.phone.errors %}<small class="ptrack-error">{{ form.phone.errors.0 }}</small>{% endif %}</div>{% endif %}
+        <button class="ptrack-submit" type="submit">مشاهده وضعیت سفارش</button>
+      </form>
+
+      {% if searched %}
+      <div class="ptrack-result">
+        {% if order %}
+          <div class="ptrack-order-head"><strong dir="ltr">#{{ order.order_number }}</strong><span class="ptrack-status">{{ order.get_status_display }}</span></div>
+          <div class="ptrack-meta">
+            <div><span>تاریخ ثبت</span><b>{{ order.created_at|date:"Y/m/d H:i" }}</b></div>
+            <div><span>مبلغ نهایی</span><b>{{ order.total|floatformat:0 }} تومان</b></div>
+            <div><span>روش پرداخت</span><b>{{ order.get_payment_method_display }}</b></div>
+            <div><span>وضعیت پرداخت</span><b>{% if order.is_paid %}پرداخت شده{% else %}پرداخت نشده{% endif %}</b></div>
+          </div>
+          {% if user.is_authenticated %}<a class="ptrack-action" href="{% url 'first:order_detail' order.order_number %}">مشاهده جزئیات کامل سفارش</a>{% endif %}
+        {% else %}<div class="ptrack-empty">سفارشی با اطلاعات واردشده پیدا نشد.</div>{% endif %}
       </div>
-
-      <div class="p6-track-original">
-<div class="max-w-3xl mx-auto px-4 py-12">
-    <div class="bg-white/90 rounded-3xl shadow-xl p-6 md:p-8">
-        <h1 class="text-2xl font-black mb-2">پیگیری سفارش</h1>
-
-        {% if user.is_authenticated %}
-        <p class="text-gray-500 mb-6">
-            چون وارد حساب خودتان هستید، فقط کد سفارش را وارد کنید.
-        </p>
-
-        <form method="post" class="space-y-4">
-            {% csrf_token %}
-            <div>
-                <label class="block text-sm font-bold mb-2">کد سفارش</label>
-                <input name="order_number"
-                       placeholder="مثلاً 42857508"
-                       inputmode="numeric"
-                       autocomplete="off"
-                       dir="ltr"
-                       class="w-full rounded-xl border-2 border-gray-200 p-3 focus:border-pink-500 outline-none"
-                       required>
-            </div>
-            <button class="w-full bg-pink-600 text-white rounded-xl py-3 font-bold">
-                مشاهده وضعیت سفارش
-            </button>
-        </form>
-        {% else %}
-        <p class="text-gray-500 mb-6">
-            برای حفظ حریم خصوصی، کد سفارش و شماره تلفن ثبت‌شده روی سفارش را وارد کنید.
-        </p>
-
-        <form method="post" class="space-y-4">
-            {% csrf_token %}
-            {{ form.as_p }}
-            <button class="w-full bg-pink-600 text-white rounded-xl py-3 font-bold">
-                مشاهده وضعیت سفارش
-            </button>
-        </form>
-        {% endif %}
-
-        {% if searched %}
-        <div class="mt-8 border-t pt-6">
-            {% if order %}
-            <h2 class="font-black text-xl" dir="ltr">
-                #{{ order.order_number }}
-            </h2>
-
-            <div class="grid md:grid-cols-2 gap-3 mt-4 text-sm">
-                <div class="bg-gray-50 rounded-xl p-4">
-                    <b>وضعیت:</b>
-                    {{ order.get_status_display }}
-                </div>
-                <div class="bg-gray-50 rounded-xl p-4">
-                    <b>تاریخ ثبت:</b>
-                    {{ order.created_at|date:"Y/m/d H:i" }}
-                </div>
-                <div class="bg-gray-50 rounded-xl p-4">
-                    <b>مبلغ:</b>
-                    {{ order.total|floatformat:0 }} تومان
-                </div>
-                <div class="bg-gray-50 rounded-xl p-4">
-                    <b>روش پرداخت:</b>
-                    {{ order.get_payment_method_display }}
-                </div>
-            </div>
-
-            {% if user.is_authenticated %}
-            <a href="{% url 'first:order_detail' order.order_number %}"
-               class="block text-center mt-5 py-3 rounded-xl bg-gray-900 text-white font-bold">
-                مدیریت این سفارش
-            </a>
-            {% endif %}
-            {% else %}
-            <div class="bg-red-50 text-red-700 rounded-xl p-4">
-                سفارشی با اطلاعات واردشده پیدا نشد.
-            </div>
-            {% endif %}
-        </div>
-        {% endif %}
+      {% endif %}
+      <div class="ptrack-note">برای جلوگیری از سوءاستفاده، تعداد تلاش‌های پیگیری در بازه زمانی محدود می‌شود.</div>
     </div>
-</div>
-      </div>
-    </div>
-
   </div>
 </section>
 {% endblock %}
-

@@ -44,3 +44,19 @@ Thumbs.db
 arayeshi_fix_*.py
 arayeshi_v*.py
 node_modules/
+
+# Runtime cache
+.django-cache/
+
+# Legacy generated rebuild artifacts
+.perfume_frontend_*_backup/
+.restore_core_frontend_backup/
+.task-core/
+phase_*.py
+rebuild_perfume_frontend.py
+restore_core_frontend_keep_home.py
+upgrade_perfume_frontend_v2.py
+implement_task*.py
+prepare_task_changes.py
+CODEX_TASK.md
+task-*-tests.log

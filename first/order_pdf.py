@@ -175,7 +175,7 @@ def build_orders_pdf(orders, *, filters=None, selected=False):
         for order in orders:
             summary_rows.append([
                 f'#{order.order_number}',
-                Paragraph(_rtl(order.user.username), small_style),
+                Paragraph(_rtl(order.customer_name or (order.user.username if order.user_id else 'کاربر حذف‌شده')), small_style),
                 Paragraph(_rtl(order.get_status_display()), small_style),
                 Paragraph(_rtl('پرداخت شده' if order.is_paid else 'پرداخت نشده'), small_style),
                 _money(order.total),
@@ -202,9 +202,10 @@ def build_orders_pdf(orders, *, filters=None, selected=False):
         story.extend([summary, Spacer(1, 7 * mm)])
 
         for order in orders:
-            user_name = order.user.get_full_name() or order.user.username
+            user_name = order.customer_name or (order.user.get_full_name() or order.user.username if order.user_id else 'کاربر حذف‌شده')
+            user_email = order.customer_email or (order.user.email if order.user_id else '') or '-'
             customer_text = (
-                f"مشتری: {user_name} | ایمیل: {order.user.email or '-'} | "
+                f"مشتری: {user_name} | ایمیل: {user_email} | "
                 f"تلفن: {order.phone} | کد پستی: {order.postal_code}"
             )
             header = Table([

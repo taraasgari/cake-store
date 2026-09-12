@@ -84,8 +84,8 @@ class SignUpForm(UserCreationForm):
         }
     
     def clean_email(self):
-        email = self.cleaned_data.get('email')
-        if User.objects.filter(email=email).exists():
+        email = (self.cleaned_data.get('email') or '').strip().lower()
+        if User.objects.filter(email__iexact=email).exists():
             raise ValidationError("این ایمیل قبلاً ثبت شده است")
         return email
     
@@ -190,6 +190,26 @@ class ProfileUpdateForm(forms.ModelForm):
             'address': 'آدرس',
             'profile_image': 'تصویر پروفایل',
         }
+
+    def clean_email(self):
+        email = (self.cleaned_data.get('email') or '').strip().lower()
+        query = User.objects.filter(email__iexact=email)
+        if self.instance and self.instance.pk:
+            query = query.exclude(pk=self.instance.pk)
+        if query.exists():
+            raise ValidationError('این ایمیل قبلاً ثبت شده است')
+        return email
+
+    def clean_phone(self):
+        phone = (self.cleaned_data.get('phone') or '').strip()
+        if not re.fullmatch(r'^09\d{9}$', phone):
+            raise ValidationError('شماره تلفن باید با ۰۹ شروع شود و ۱۱ رقم باشد')
+        query = User.objects.filter(phone=phone)
+        if self.instance and self.instance.pk:
+            query = query.exclude(pk=self.instance.pk)
+        if query.exists():
+            raise ValidationError('این شماره تلفن قبلاً ثبت شده است')
+        return phone
 
 
 # ============================================

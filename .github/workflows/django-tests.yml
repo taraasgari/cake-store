@@ -37,6 +37,7 @@ jobs:
         run: |
           python -m pip install --upgrade pip
           pip install -r requirements.txt
+          pip install "pytest>=8,<9"
 
       - name: Check migrations
         run: python manage.py makemigrations --check --dry-run
@@ -46,3 +47,8 @@ jobs:
 
       - name: Run tests
         run: python manage.py test
+
+      - name: Run vendored shop-core tests
+        env:
+          PYTHONPATH: vendor/shop-core/src
+        run: pytest -q vendor/shop-core/tests

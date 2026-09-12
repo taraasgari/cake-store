@@ -69,7 +69,7 @@ class SecurityV3Tests(TestCase):
             reverse('first:login')
             + '?next=https://evil.example/phish',
             {
-                'phone': self.user.phone,
+                'username': self.user.username,
                 'password': self.password,
             },
         )
@@ -87,7 +87,7 @@ class SecurityV3Tests(TestCase):
             last_response = self.client.post(
                 url,
                 {
-                    'phone': self.user.phone,
+                    'username': self.user.username,
                     'password': 'wrong-password',
                 },
             )

@@ -514,7 +514,7 @@
                 <div class="flex justify-between items-center p-2 bg-gray-50 rounded-lg hover:bg-stone-50 transition-all text-sm">
                     <div>
                         <span class="font-bold">#{{ order.order_number }}</span>
-                        <span class="text-gray-500 mr-2">{{ order.user.username }}</span>
+                        <span class="text-gray-500 mr-2">{{ order.customer_name|default:order.user.username|default:'کاربر حذف‌شده' }}</span>
                     </div>
                     <div class="flex items-center gap-3">
                         <span class="font-bold text-amber-700">{{ order.total|floatformat:0 }}</span>

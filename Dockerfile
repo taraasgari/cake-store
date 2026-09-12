@@ -57,8 +57,8 @@ EXPOSE 8000
 HEALTHCHECK \
     --interval=30s \
     --timeout=5s \
-    --start-period=20s \
+    --start-period=25s \
     --retries=3 \
-    CMD python -c "import urllib.request; urllib.request.urlopen('http://127.0.0.1:8000/health/', timeout=3)" || exit 1
+    CMD python -c "import socket; s=socket.create_connection(('127.0.0.1',8000),3); s.close()" || exit 1
 
-CMD ["gunicorn", "base.wsgi:application", "--bind", "0.0.0.0:8000", "--workers", "3", "--timeout", "60", "--access-logfile", "-", "--error-logfile", "-"]
+CMD ["sh", "-c", "python manage.py migrate --noinput && exec gunicorn base.wsgi:application --bind 0.0.0.0:8000 --workers 3 --timeout 60 --access-logfile - --error-logfile -"]

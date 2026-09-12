@@ -27,7 +27,7 @@ class SafeRedirectTests(TestCase):
         response = self.client.post(
             reverse('first:login') + '?next=/profile/',
             {
-                'phone': self.user.phone,
+                'username': self.user.username,
                 'password': 'StrongPass123!',
             },
         )
@@ -40,7 +40,7 @@ class SafeRedirectTests(TestCase):
             reverse('first:login')
             + '?next=https://evil.example/phish',
             {
-                'phone': self.user.phone,
+                'username': self.user.username,
                 'password': 'StrongPass123!',
             },
         )
@@ -56,7 +56,7 @@ class SafeRedirectTests(TestCase):
             reverse('first:login')
             + '?next=//evil.example/phish',
             {
-                'phone': self.user.phone,
+                'username': self.user.username,
                 'password': 'StrongPass123!',
             },
         )

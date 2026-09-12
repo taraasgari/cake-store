@@ -515,6 +515,7 @@ def build_analytics(request):
 
     top_customer_rows = (
         paid_orders
+        .filter(user_id__isnull=False)
         .values(
             'user_id',
             'user__username',
@@ -962,7 +963,7 @@ def build_analytics(request):
     recent_orders = [
         {
             'number': order.order_number,
-            'username': order.user.username,
+            'username': order.customer_name or (order.user.username if order.user_id else 'کاربر حذف‌شده'),
             'total': float(order.total),
             'status': order.get_status_display(),
             'is_paid': order.is_paid,

@@ -4,7 +4,7 @@ from django.contrib.auth import get_user_model
 from .models import (
     User, Category, Brand, ProductType, Tag, Color, Product, 
     ProductVariant, ProductImage, ProductReview, Order, OrderItem, 
-    Wishlist, SiteSettings, SliderImage,
+    Wishlist, SiteSettings, SliderImage, NewsletterSubscriber,
     AdminPermission, AdminRole, AdminUserPermission,
     InventoryBatch, Coupon
 )
@@ -288,13 +288,13 @@ class ProductReviewAdmin(admin.ModelAdmin):
 class OrderAdmin(admin.ModelAdmin):
     list_display = ('order_number', 'user', 'total', 'status', 'is_paid', 'created_at')
     list_filter = ('status', 'is_paid', 'payment_method', 'created_at')
-    search_fields = ('order_number', 'user__username', 'user__email')
+    search_fields = ('order_number', 'customer_name', 'customer_email', 'user__username', 'user__email', 'phone')
     list_editable = ('status',)
-    readonly_fields = ('order_number', 'created_at', 'updated_at')
+    readonly_fields = ('order_number', 'customer_name', 'customer_email', 'created_at', 'updated_at')
     
     fieldsets = (
         ('اطلاعات اصلی', {
-            'fields': ('order_number', 'user', 'status', 'is_paid')
+            'fields': ('order_number', 'user', 'customer_name', 'customer_email', 'status', 'is_paid')
         }),
         ('قیمت‌ها', {
             'fields': ('subtotal', 'discount', 'shipping_cost', 'total')
@@ -376,6 +376,15 @@ class SiteSettingsAdmin(admin.ModelAdmin):
             'classes': ('collapse',)
         }),
     )
+
+
+@admin.register(NewsletterSubscriber)
+class NewsletterSubscriberAdmin(admin.ModelAdmin):
+    list_display = ('email', 'is_active', 'created_at')
+    list_filter = ('is_active', 'created_at')
+    search_fields = ('email',)
+    list_editable = ('is_active',)
+    ordering = ('-created_at',)
 
 
 # ============================================

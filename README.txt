@@ -1,13 +1,13 @@
-Perfume Shop — Phase 05
+Perfume Shop — Final audited build
 
-Extract this folder INSIDE:
-C:\Users\Tara\Desktop\perfume-shop
-
-Run:
+Local run (Windows PowerShell):
 cd C:\Users\Tara\Desktop\perfume-shop
 .\venv\Scripts\Activate.ps1
-python .\perfume_phase05_package\phase_05_perfume_shop_rebuild.py
+pip install -r requirements.txt
+python manage.py migrate
+python manage.py check
+python manage.py test
 python manage.py runserver
 
-The provided luxury perfume image is installed automatically.
-Backend files are checked and are not modified.
+The shared shop_core package is bundled inside vendor/shop-core and is loaded automatically.
+Before the final Git commit, run .\FINAL_CLEANUP.ps1 once to remove old backup/phase files, then run git add -A.

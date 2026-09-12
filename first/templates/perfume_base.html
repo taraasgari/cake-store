@@ -150,7 +150,7 @@ try{const t=localStorage.getItem('velora-theme');document.documentElement.datase
     <div class="p4-footer-brand"><span>A HOUSE OF SCENT</span><h2>{{ settings.site_name|default:'فروشگاه عطر' }}</h2><p>رایحه‌ای که فقط انتخاب نمی‌شود؛ بخشی از هویت شما می‌شود.</p></div>
     <div class="p4-footer-links"><span>DISCOVER</span><a href="{% url 'first:product_list' %}">همه عطرها</a><a href="{% url 'first:best_sellers' %}">پرفروش‌ها</a><a href="{% url 'first:discounts' %}">تخفیف‌ها</a></div>
     <div class="p4-footer-links"><span>SERVICE</span><a href="{% url 'customer_care:support_home' %}">پشتیبانی</a><a href="{% url 'customer_care:order_tracking' %}">پیگیری سفارش</a><a href="{% url 'first:customer_service' 'shipping-returns' %}">ارسال و مرجوعی</a></div>
-    <div class="p4-footer-note"><span>PRIVATE NOTES</span><p>خبر کالکشن‌های تازه و پیشنهادهای محدود.</p><div><input type="email" placeholder="ایمیل شما"><button type="button">←</button></div></div>
+    <div class="p4-footer-note"><span>PRIVATE NOTES</span><p>خبر کالکشن‌های تازه و پیشنهادهای محدود.</p><form method="post" action="{% url 'first:newsletter_subscribe' %}">{% csrf_token %}<input type="hidden" name="next" value="{{ request.get_full_path }}"><div><input type="email" name="email" autocomplete="email" placeholder="ایمیل شما" required><button type="submit" aria-label="عضویت در خبرنامه">←</button></div></form></div>
   </div>
   <div class="p4-wrap p4-footer-bottom"><span>{{ settings.footer_text|default:'© 2026 PERFUME HOUSE' }}</span><span>SCENT / MEMORY / IDENTITY</span></div>
 </footer>

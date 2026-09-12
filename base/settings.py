@@ -1,9 +1,15 @@
 import os
+import sys
 from pathlib import Path
 from django.core.exceptions import ImproperlyConfigured
 
 
 BASE_DIR = Path(__file__).resolve().parent.parent
+
+# Keep this repository deployable on its own: prefer the vendored shared core.
+_VENDOR_CORE_SRC = BASE_DIR / 'vendor' / 'shop-core' / 'src'
+if _VENDOR_CORE_SRC.exists():
+    sys.path.insert(0, str(_VENDOR_CORE_SRC))
 
 
 # بارگذاری متغیرهای فایل .env
@@ -299,6 +305,32 @@ else:
     }
 
 
+
+
+# ==========================================================
+# Cache
+# ==========================================================
+
+# Use a process-shared cache in production so login throttling works
+# consistently across multiple Gunicorn workers.
+if IS_PRODUCTION:
+    CACHES = {
+        'default': {
+            'BACKEND': 'django.core.cache.backends.filebased.FileBasedCache',
+            'LOCATION': str(BASE_DIR / '.django-cache'),
+            'TIMEOUT': 900,
+            'OPTIONS': {'MAX_ENTRIES': 10000},
+        }
+    }
+else:
+    CACHES = {
+        'default': {
+            'BACKEND': 'django.core.cache.backends.locmem.LocMemCache',
+            'LOCATION': 'perfume-shop-development',
+        }
+    }
+
+
 # ==========================================================
 # اعتبارسنجی رمز عبور
 # ==========================================================
@@ -376,6 +408,10 @@ STATICFILES_DIRS = [
 MEDIA_URL = '/media/'
 
 MEDIA_ROOT = BASE_DIR / 'media'
+
+# Public uploaded media can be served by Django for simple Docker deployments.
+# For high-traffic production, disable this and let Nginx/object storage serve /media/.
+SERVE_MEDIA = env_bool('SERVE_MEDIA', True)
 
 
 # ==========================================================
@@ -566,12 +602,14 @@ SECURE_HSTS_PRELOAD = env_bool(
 
 SITE_NAME = os.environ.get(
     'SITE_NAME',
-    'آرایشی شاپ',
+    'فروشگاه عطر',
 )
 
 DEFAULT_AUTO_FIELD = (
     'django.db.models.BigAutoField'
 )
+
+MAX_PDF_ORDERS = int(os.environ.get('MAX_PDF_ORDERS', '500'))
 
 
 # ==========================================================

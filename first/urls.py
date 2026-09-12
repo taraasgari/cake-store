@@ -21,6 +21,7 @@ urlpatterns = [
     path('', views.home, name='home'),
     path('login/', views.login_view, name='login'),
     path('signup/', views.signup_view, name='signup'),
+    path('newsletter/subscribe/', views.newsletter_subscribe, name='newsletter_subscribe'),
     path(
         'customer-service/<slug:page_slug>/',
         views.customer_service_page,

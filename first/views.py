@@ -1,4 +1,5 @@
 import json
+import logging
 import re
 import secrets
 from decimal import Decimal, InvalidOperation
@@ -129,11 +130,13 @@ from .models import (
     ProductVariant,
     SiteSettings,
     SliderImage,
+    NewsletterSubscriber,
     Tag,
     Wishlist,
 )
 
 User = get_user_model()
+logger = logging.getLogger(__name__)
 
 
 def _is_safe_local_redirect(request, candidate):
@@ -409,8 +412,6 @@ def login_view(request):
     import hashlib
 
     if request.user.is_authenticated:
-        if request.user.is_superuser:
-            return redirect('first:owner_panel')
         return redirect('first:home')
 
     if request.method == 'POST':
@@ -469,6 +470,11 @@ def login_view(request):
 
                 messages.success(request, '✨ خوش آمدید!')
 
+                # Owner/superuser should always land on the storefront first.
+                # Other users can still return to a safe requested page.
+                if user.is_superuser:
+                    return redirect('first:home')
+
                 next_page = request.GET.get('next')
                 if (
                     next_page
@@ -480,8 +486,6 @@ def login_view(request):
                 ):
                     return redirect(next_page)
 
-                if user.is_superuser:
-                    return redirect('first:owner_panel')
                 return redirect('first:home')
 
             cache.set(throttle_key, attempts + 1, timeout=900)
@@ -1028,21 +1032,26 @@ def owner_panel(request):
 @owner_required
 def owner_profile_edit(request):
     if request.method == 'POST':
-        user = request.user
-        user.first_name = request.POST.get('first_name', user.first_name)
-        user.last_name = request.POST.get('last_name', user.last_name)
-        user.email = request.POST.get('email', user.email)
-        user.phone = request.POST.get('phone', user.phone)
-        user.address = request.POST.get('address', user.address)
+        form = ProfileUpdateForm(
+            request.POST,
+            request.FILES,
+            instance=request.user,
+        )
+        if form.is_valid():
+            form.save()
+            messages.success(request, '✅ پروفایل شما با موفقیت به‌روزرسانی شد')
+            return redirect('first:owner_panel')
+        for errors in form.errors.values():
+            for error in errors:
+                messages.error(request, f'❌ {error}')
+    else:
+        form = ProfileUpdateForm(instance=request.user)
 
-        if request.FILES.get('profile_image'):
-            user.profile_image = request.FILES['profile_image']
-
-        user.save()
-        messages.success(request, "✅ پروفایل شما با موفقیت به‌روزرسانی شد")
-        return redirect('first:owner_panel')
-
-    return render(request, 'dashboard/owner_profile_edit.html', {'user': request.user})
+    return render(
+        request,
+        'dashboard/owner_profile_edit.html',
+        {'user': request.user, 'form': form},
+    )
 
 @owner_required
 @require_POST
@@ -1410,6 +1419,7 @@ def cart_view(request):
     cart, _ = Cart.objects.get_or_create(
         user=request.user
     )
+    cart.items.filter(product__is_active=False).delete()
     return render(
         request,
         'cart/cart.html',
@@ -1468,6 +1478,11 @@ def add_to_cart(request, product_id):
             messages.error(
                 request,
                 f"موجودی کافی برای {variant} وجود ندارد",
+            )
+        elif exc.code == 'product_unavailable':
+            messages.error(
+                request,
+                "این محصول موقتاً قابل خرید نیست",
             )
         elif exc.code == 'product_stock':
             messages.error(
@@ -1751,6 +1766,10 @@ def checkout(request):
                     f"محصول «{data.get('product_name')}» "
                     "دیگر فعال نیست"
                 ),
+                'product_unavailable': (
+                    f"محصول «{data.get('product_name')}» "
+                    "موقتاً قابل خرید نیست"
+                ),
                 'variant_missing': (
                     f"تنوع انتخاب‌شده برای "
                     f"«{data.get('product_name')}» "
@@ -1815,12 +1834,27 @@ def order_detail(request, order_number):
         user=request.user,
     )
 
-    status_flow = ['pending', 'paid', 'processing', 'shipped', 'delivered']
-    status_index = (
-        status_flow.index(order.status)
-        if order.status in status_flow
-        else -1
-    )
+    if order.payment_method == 'cash':
+        status_flow = [
+            ('pending', 'ثبت'),
+            ('processing', 'پردازش'),
+            ('shipped', 'ارسال'),
+            ('delivered', 'تحویل'),
+        ]
+    else:
+        status_flow = [
+            ('pending', 'ثبت'),
+            ('paid', 'پرداخت'),
+            ('processing', 'پردازش'),
+            ('shipped', 'ارسال'),
+            ('delivered', 'تحویل'),
+        ]
+    status_codes = [code for code, _ in status_flow]
+    status_index = status_codes.index(order.status) if order.status in status_codes else -1
+    status_steps = [
+        {'code': code, 'label': label, 'active': status_index >= index}
+        for index, (code, label) in enumerate(status_flow)
+    ]
 
     return render(
         request,
@@ -1834,6 +1868,7 @@ def order_detail(request, order_number):
                 open_return_request
             ),
             'status_index': status_index,
+            'status_steps': status_steps,
         },
     )
 
@@ -2250,6 +2285,8 @@ def _admin_orders_for_request(request):
     if query:
         orders = orders.filter(
             Q(order_number__icontains=query)
+            | Q(customer_name__icontains=query)
+            | Q(customer_email__icontains=query)
             | Q(user__username__icontains=query)
             | Q(user__email__icontains=query)
             | Q(phone__icontains=query)
@@ -2328,6 +2365,9 @@ def admin_orders_pdf(request):
 
     if selected_ids:
         orders = orders.filter(pk__in=selected_ids)
+
+    max_pdf_orders = max(1, int(getattr(settings, 'MAX_PDF_ORDERS', 500)))
+    orders = orders[:max_pdf_orders]
 
     pdf_bytes = build_orders_pdf(
         orders,
@@ -3435,6 +3475,7 @@ def customizer_save(request):
             status=400,
         )
     except Exception:
+        logger.exception('Customizer save failed')
         return JsonResponse(
             {
                 'success': False,
@@ -3485,6 +3526,7 @@ def customizer_reset(request):
             **result,
         })
     except Exception:
+        logger.exception('Customizer reset failed')
         return JsonResponse(
             {
                 'success': False,
@@ -3520,6 +3562,7 @@ def customizer_upload(request):
     except ValidationError as exc:
         return JsonResponse({'success': False, 'error': ' '.join(exc.messages)}, status=400)
     except Exception:
+        logger.exception('Customizer upload failed')
         return JsonResponse({'success': False, 'error': 'آپلود تصویر انجام نشد.'}, status=500)
 
 @owner_required
@@ -3586,6 +3629,7 @@ def customizer_product_save(request):
             status=400,
         )
     except Exception:
+        logger.exception('Customizer product save failed')
         return JsonResponse(
             {
                 'success': False,
@@ -3620,6 +3664,7 @@ def customizer_load(request):
             **result,
         })
     except Exception:
+        logger.exception('Customizer load failed')
         return JsonResponse(
             {
                 'success': False,
@@ -3628,6 +3673,31 @@ def customizer_load(request):
             status=500,
         )
 
+
+
+@require_POST
+def newsletter_subscribe(request):
+    from django.core.validators import validate_email
+
+    email = (request.POST.get('email') or '').strip().lower()
+    try:
+        validate_email(email)
+    except ValidationError:
+        messages.error(request, 'ایمیل خبرنامه معتبر نیست.')
+    else:
+        subscriber, created = NewsletterSubscriber.objects.get_or_create(
+            email=email,
+            defaults={'is_active': True},
+        )
+        if not created and not subscriber.is_active:
+            subscriber.is_active = True
+            subscriber.save(update_fields=['is_active', 'updated_at'])
+        messages.success(request, 'عضویت شما در خبرنامه ثبت شد.')
+
+    next_url = request.POST.get('next')
+    if _is_safe_local_redirect(request, next_url):
+        return redirect(next_url)
+    return redirect('first:home')
 
 
 # ============================================

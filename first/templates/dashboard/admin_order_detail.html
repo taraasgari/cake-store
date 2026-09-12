@@ -35,10 +35,10 @@
     <section class="invoice-card">
       <h2><i class="fa-solid fa-user ml-2"></i> اطلاعات مشتری</h2>
       <div class="invoice-meta">
-        <div><span>نام کاربری</span><strong>{{ order.user.username }}</strong></div>
-        <div><span>ایمیل</span><strong dir="ltr">{{ order.user.email|default:'—' }}</strong></div>
+        <div><span>مشتری</span><strong>{{ order.customer_name|default:order.user.username|default:"کاربر حذف‌شده" }}</strong></div>
+        <div><span>ایمیل</span><strong dir="ltr">{{ order.customer_email|default:order.user.email|default:'—' }}</strong></div>
         <div><span>شماره تماس سفارش</span><strong dir="ltr">{{ order.phone }}</strong></div>
-        <div><span>عضویت از</span><strong>{{ order.user.created_at|date:'Y/m/d H:i' }}</strong></div>
+        <div><span>عضویت از</span><strong>{% if order.user %}{{ order.user.created_at|date:'Y/m/d H:i' }}{% else %}—{% endif %}</strong></div>
       </div>
     </section>
 

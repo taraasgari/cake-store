@@ -1,40 +1,6 @@
-{% extends 'perfume_base.html' %}
-
-{% block title %}🏷️ {{ brand.name }}{% endblock %}
-
+{% extends 'perfume_base.html' %}{% load custom_filters %}
+{% block title %}{{ brand.name }} | {{ settings.site_name|default:'فروشگاه عطر' }}{% endblock %}
 {% block content %}
-<div class="max-w-7xl mx-auto">
-    <h1 class="text-3xl font-bold gradient-text mb-4">🏷️ {{ brand.name }}</h1>
-    <p class="text-gray-500 mb-8">{{ brand.description|default:"" }}</p>
-    
-    <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-        {% for product in page_obj %}
-        <div class="bg-white/80 backdrop-blur-lg rounded-2xl overflow-hidden shadow-lg hover:shadow-2xl transition-all">
-            <a href="{{ product.get_absolute_url }}">
-                <img src="{{ product.main_image.url }}" alt="{{ product.name }}" 
-                     class="w-full h-56 object-cover hover:scale-105 transition-transform duration-500">
-            </a>
-            <div class="p-4">
-                <a href="{{ product.get_absolute_url }}">
-                    <h3 class="font-bold text-lg hover:text-pink-500 transition-colors">{{ product.name }}</h3>
-                </a>
-                <div class="flex items-center gap-2 mt-2">
-                    <span class="text-xl font-bold text-pink-500">{{ product.final_price|floatformat:0 }}</span>
-                    {% if product.discount_price %}
-                    <span class="text-sm text-gray-400 line-through">{{ product.price|floatformat:0 }}</span>
-                    {% endif %}
-                </div>
-                <form method="post" action="{% url 'first:add_to_cart' product.id %}" class="inline-block">{% csrf_token %}<button type="submit" class="w-full mt-3 py-2 bg-gradient-to-r from-pink-500 to-purple-600 text-white rounded-xl text-center block hover:shadow-lg transition-all hover:scale-105">
-                    <i class="fas fa-shopping-cart ml-2"></i> افزودن به سبد
-                </button></form>
-            </div>
-        </div>
-        {% empty %}
-        <div class="col-span-full text-center py-12">
-            <i class="fas fa-box-open text-6xl text-gray-300 mb-4"></i>
-            <p class="text-gray-500">هیچ محصولی از این برند یافت نشد</p>
-        </div>
-        {% endfor %}
-    </div>
-</div>
+<section class="p4-page-hero"><div class="p4-wrap p4-page-hero-grid"><div><span class="p4-kicker">PERFUME HOUSE</span><h1>{{ brand.name }}</h1><p>{{ brand.description|default:'عطرهای منتخب این برند را مرور کنید.' }}</p></div><div class="p4-stat"><span>CURATED BRAND</span><strong>{{ page_obj.paginator.count|default:0 }}</strong><small>محصول فعال</small></div></div></section>
+<section class="p4-wrap home-shop-section" style="padding-top:48px"><div class="p4-toolbar"><a href="{% url 'first:product_list' %}" class="p4-filter-open" style="text-decoration:none"><i class="fa-solid fa-arrow-right"></i> همه عطرها</a></div><div class="p4-grid">{% for product in page_obj %}{% include 'includes/p4_product_card.html' %}{% empty %}<div class="p4-empty"><div class="p4-empty-icon"><i class="fa-solid fa-box-open"></i></div><span>NO PRODUCTS</span><h2>محصولی از این برند وجود ندارد.</h2><p>برند دیگری را انتخاب کنید یا به آرشیو کامل برگردید.</p><a href="{% url 'first:product_list' %}">مشاهده همه عطرها</a></div>{% endfor %}</div>{% if page_obj.paginator.num_pages > 1 %}<div class="home-shop-more" style="gap:8px;flex-wrap:wrap">{% if page_obj.has_previous %}<a href="?page={{ page_obj.previous_page_number }}">قبلی</a>{% endif %}<span style="padding:10px 14px;border:1px solid var(--p-line);color:var(--p-muted)">صفحه {{ page_obj.number }} از {{ page_obj.paginator.num_pages }}</span>{% if page_obj.has_next %}<a href="?page={{ page_obj.next_page_number }}">بعدی</a>{% endif %}</div>{% endif %}</section>
 {% endblock %}

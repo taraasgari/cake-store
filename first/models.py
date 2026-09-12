@@ -1,5 +1,7 @@
 from django.db import models
 from django.contrib.auth.models import AbstractUser
+from django.core.validators import RegexValidator
+from django.db.models.functions import Lower
 from django.utils import timezone
 
 # ============================================
@@ -15,7 +17,17 @@ class User(AbstractUser):
 
     role = models.CharField(max_length=10, choices=USER_ROLES, default='user', verbose_name="نقش کاربری")
     email = models.EmailField(unique=True, verbose_name="ایمیل")
-    phone = models.CharField(max_length=11, unique=True, verbose_name="شماره تلفن")
+    phone = models.CharField(
+        max_length=11,
+        unique=True,
+        validators=[
+            RegexValidator(
+                regex=r'^09\d{9}$',
+                message='شماره تلفن باید با ۰۹ شروع شود و ۱۱ رقم باشد.',
+            )
+        ],
+        verbose_name="شماره تلفن",
+    )
     address = models.TextField(blank=True, null=True, verbose_name="آدرس")
     profile_image = models.ImageField(upload_to='profiles/', blank=True, null=True, verbose_name="تصویر پروفایل")
     is_active = models.BooleanField(default=True, verbose_name="فعال")
@@ -60,6 +72,13 @@ class User(AbstractUser):
         verbose_name="نقش‌های ادمین"
     )
 
+    def save(self, *args, **kwargs):
+        if self.email:
+            self.email = self.email.strip().lower()
+        if self.phone:
+            self.phone = self.phone.strip()
+        super().save(*args, **kwargs)
+
     def __str__(self):
         return f"{self.username} - {self.get_role_display()}"
 
@@ -75,6 +94,12 @@ class User(AbstractUser):
         verbose_name = "کاربر"
         verbose_name_plural = "کاربران"
         ordering = ['-created_at']
+        constraints = [
+            models.UniqueConstraint(
+                Lower('email'),
+                name='first_user_email_ci_unique',
+            ),
+        ]
 
 
 # ============================================
@@ -259,24 +284,29 @@ class Product(models.Model):
     def get_absolute_url(self):
         return f"/product/{self.slug}/"
 
+    def _display_variant(self):
+        if not self.has_variants:
+            return None
+        available = self.variants.filter(is_active=True, stock__gt=0)
+        return (
+            available.filter(is_default=True).first()
+            or available.order_by('price', 'id').first()
+        )
+
     @property
     def final_price(self):
-        if self.has_variants:
-            variant = self.variants.filter(is_default=True, is_active=True).first()
-            if not variant:
-                variant = self.variants.filter(is_active=True, stock__gt=0).first()
-            if variant:
-                return variant.final_price
+        variant = self._display_variant()
+        if variant is not None:
+            return variant.final_price
         if self.discount_price and self.discount_price < self.price:
             return self.discount_price
         return self.price
 
     @property
     def discount_percent(self):
-        if self.has_variants:
-            default = self.variants.filter(is_default=True, is_active=True).first()
-            if default and default.discount_percent > 0:
-                return default.discount_percent
+        variant = self._display_variant()
+        if variant is not None:
+            return variant.discount_percent
         if self.discount_price and self.discount_price < self.price:
             return int(((self.price - self.discount_price) / self.price) * 100)
         return 0
@@ -289,9 +319,11 @@ class Product(models.Model):
 
     @property
     def is_in_stock(self):
+        if not self.is_available:
+            return False
         if self.has_variants:
             return self.variants.filter(is_active=True, stock__gt=0).exists()
-        return self.stock > 0 and self.is_available
+        return self.stock > 0
 
     @property
     def available_variants(self):
@@ -708,7 +740,13 @@ class Order(models.Model):
         ('cash', 'پرداخت در محل'),
     ]
 
-    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='orders')
+    user = models.ForeignKey(
+        User,
+        on_delete=models.SET_NULL,
+        related_name='orders',
+        null=True,
+        blank=True,
+    )
     order_number = models.CharField(max_length=20, unique=True)
 
     subtotal = models.DecimalField(max_digits=12, decimal_places=0)
@@ -716,6 +754,8 @@ class Order(models.Model):
     shipping_cost = models.DecimalField(max_digits=12, decimal_places=0, default=0)
     total = models.DecimalField(max_digits=12, decimal_places=0)
 
+    customer_name = models.CharField(max_length=200, blank=True, default='')
+    customer_email = models.EmailField(blank=True, default='')
     address = models.TextField()
     postal_code = models.CharField(max_length=10)
     phone = models.CharField(max_length=11)
@@ -741,7 +781,11 @@ class Order(models.Model):
         ordering = ['-created_at']
 
     def __str__(self):
-        return f"سفارش #{self.order_number} - {self.user.username}"
+        customer = (
+            self.customer_name
+            or (self.user.username if self.user_id else 'کاربر حذف‌شده')
+        )
+        return f"سفارش #{self.order_number} - {customer}"
 
     def save(self, *args, **kwargs):
         if not self.order_number:
@@ -817,26 +861,53 @@ class Wishlist(models.Model):
         return f"{self.user.username} - {self.product.name}"
 
 
+
+
+class NewsletterSubscriber(models.Model):
+    email = models.EmailField(unique=True, verbose_name='ایمیل')
+    is_active = models.BooleanField(default=True, verbose_name='فعال')
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        verbose_name = 'عضو خبرنامه'
+        verbose_name_plural = 'اعضای خبرنامه'
+        ordering = ['-created_at']
+
+    def save(self, *args, **kwargs):
+        if self.email:
+            self.email = self.email.strip().lower()
+        super().save(*args, **kwargs)
+
+    def __str__(self):
+        return self.email
+
+
 class SiteSettings(models.Model):
-    site_name = models.CharField(max_length=100, default='آرایشی شاپ', verbose_name="نام سایت")
-    site_title = models.CharField(max_length=100, default='آرایشی شاپ - لوکس ترین فروشگاه آرایشی', verbose_name="عنوان سایت")
-    site_description = models.TextField(max_length=500, default='مرجع تخصصی لوازم آرایشی با کیفیت و اصالت تضمینی', verbose_name="توضیحات سایت")
+    singleton_key = models.PositiveSmallIntegerField(
+        default=1,
+        unique=True,
+        editable=False,
+    )
+    site_name = models.CharField(max_length=100, default='فروشگاه عطر', verbose_name="نام سایت")
+    site_title = models.CharField(max_length=100, default='فروشگاه عطر - خانه رایحه‌های ماندگار', verbose_name="عنوان سایت")
+    site_description = models.TextField(max_length=500, default='فروشگاه تخصصی عطر با تمرکز بر اصالت، انتخاب دقیق و تجربه لوکس', verbose_name="توضیحات سایت")
 
     logo = models.ImageField(upload_to='settings/', blank=True, null=True)
     favicon = models.ImageField(upload_to='settings/', blank=True, null=True)
     default_product_image = models.ImageField(upload_to='settings/', blank=True, null=True)
     default_avatar = models.ImageField(upload_to='settings/', blank=True, null=True)
 
-    primary_color = models.CharField(max_length=7, default='#ec407a', verbose_name="رنگ اصلی")
-    secondary_color = models.CharField(max_length=7, default='#d81b60', verbose_name="رنگ ثانویه")
-    accent_color = models.CharField(max_length=7, default='#ab47bc', verbose_name="رنگ تاکید")
-    background_color = models.CharField(max_length=7, default='#fdf2f8', verbose_name="رنگ پس‌زمینه")
-    text_color = models.CharField(max_length=7, default='#1a1a2e', verbose_name="رنگ متن")
+    primary_color = models.CharField(max_length=7, default='#C9954D', verbose_name="رنگ اصلی")
+    secondary_color = models.CharField(max_length=7, default='#75471F', verbose_name="رنگ ثانویه")
+    accent_color = models.CharField(max_length=7, default='#E3C286', verbose_name="رنگ تاکید")
+    background_color = models.CharField(max_length=7, default='#090706', verbose_name="رنگ پس‌زمینه")
+    text_color = models.CharField(max_length=7, default='#F7F0E7', verbose_name="رنگ متن")
 
     background_image = models.ImageField(upload_to='settings/bg/', blank=True, null=True)
 
-    footer_text = models.CharField(max_length=200, default='© ۱۴۰۴ آرایشی شاپ - تمامی حقوق محفوظ است', verbose_name="متن فوتر")
-    footer_bg_color = models.CharField(max_length=7, default='#1a0a1a', verbose_name="رنگ پس‌زمینه فوتر")
+    footer_text = models.CharField(max_length=200, default='© ۱۴۰۵ فروشگاه عطر - تمامی حقوق محفوظ است', verbose_name="متن فوتر")
+    footer_bg_color = models.CharField(max_length=7, default='#0B0806', verbose_name="رنگ پس‌زمینه فوتر")
 
     instagram = models.CharField(max_length=200, blank=True, null=True)
     telegram = models.CharField(max_length=200, blank=True, null=True)
@@ -844,7 +915,7 @@ class SiteSettings(models.Model):
     youtube = models.CharField(max_length=200, blank=True, null=True)
 
     phone = models.CharField(max_length=20, default='۰۲۱-۱۲۳۴۵۶۷۸', verbose_name="شماره تماس")
-    email = models.EmailField(default='info@arayeshi.shop', verbose_name="ایمیل")
+    email = models.EmailField(default='info@example.com', verbose_name="ایمیل")
     address = models.TextField(default='تهران، خیابان ولیعصر، پلاک ۱۲۳', verbose_name="آدرس")
     number_format = models.CharField(
         max_length=10,
@@ -871,11 +942,16 @@ class SiteSettings(models.Model):
     def __str__(self):
         return f"تنظیمات سایت - {self.site_name}"
 
+    def save(self, *args, **kwargs):
+        self.singleton_key = 1
+        super().save(*args, **kwargs)
+
     @classmethod
     def get_settings(cls):
-        settings = cls.objects.first()
-        if not settings:
-            settings = cls.objects.create()
+        settings, _ = cls.objects.get_or_create(
+            singleton_key=1,
+            defaults={'site_name': 'فروشگاه عطر'},
+        )
         return settings
 
 
