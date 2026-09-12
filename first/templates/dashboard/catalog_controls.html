@@ -1,0 +1,22 @@
+{% load static custom_filters %}
+<div id="pa-catalog-config" hidden
+ data-can-manage="{{ user|has_permission:'products_edit'|yesno:'true,false' }}"
+ data-category-add="{% url 'first:ajax_add_category' %}" data-category-edit="{% url 'first:ajax_edit_category' 0 %}" data-category-delete="{% url 'first:ajax_delete_category' 0 %}"
+ data-brand-add="{% url 'first:ajax_add_brand' %}" data-brand-edit="{% url 'first:ajax_edit_brand' 0 %}" data-brand-delete="{% url 'first:ajax_delete_brand' 0 %}"
+ data-product_type-add="{% url 'first:ajax_add_product_type' %}" data-product_type-edit="{% url 'first:ajax_edit_product_type' 0 %}" data-product_type-delete="{% url 'first:ajax_delete_product_type' 0 %}"
+ data-tags-add="{% url 'first:ajax_add_tag' %}" data-tags-edit="{% url 'first:ajax_edit_tag' 0 %}" data-tags-delete="{% url 'first:ajax_delete_tag' 0 %}"></div>
+<dialog id="pa-catalog-dialog" class="pa-catalog-dialog">
+ <form class="pa-product-form" id="pa-catalog-form">
+  <h2 id="pa-catalog-title">مدیریت رایحه</h2>
+  <p id="pa-catalog-error" role="alert"></p>
+  <div id="pa-catalog-fields">
+   <label class="pa-field"><span>نام</span><input name="name" required></label>
+   <label class="pa-field"><span>اسلاگ</span><input name="slug" dir="ltr"><small>اختیاری؛ از نام ساخته می‌شود. تغییر نام، اسلاگ قبلی را حفظ می‌کند.</small></label>
+   <label class="pa-field" id="pa-catalog-parent"><span>دسته‌بندی والد</span><select name="parent_id"></select></label>
+  </div>
+  <p id="pa-catalog-delete-message" hidden>این مورد حذف شود؟ موارد استفاده‌شده در محصولات قابل حذف نیستند.</p>
+  <div class="pa-form-actions"><button type="button" class="pa-btn ghost" id="pa-catalog-cancel">انصراف</button><button type="submit" class="pa-btn gold">ذخیره</button></div>
+ </form>
+</dialog>
+<link rel="stylesheet" href="{% static 'css/perfume-catalog.css' %}">
+<script src="{% static 'js/perfume-catalog.js' %}" defer></script>

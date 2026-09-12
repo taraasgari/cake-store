@@ -18,7 +18,8 @@
     function show(i){
       index = (i + slides.length) % slides.length;
       slides.forEach((slide, n) => slide.classList.toggle("is-active", n === index));
-      dots.forEach((dot, n) => dot.classList.toggle("is-active", n === index));
+      dots.forEach((dot, n) => {dot.classList.toggle("is-active", n === index); dot.setAttribute("aria-current", String(n === index));});
+      slides.forEach((slide, n) => {slide.inert = n !== index; slide.setAttribute("aria-hidden", String(n !== index));});
       if(current) current.textContent = String(index + 1).padStart(2, "0");
     }
 
@@ -28,6 +29,7 @@
 
     function start(){
       stop();
+      if(slides.length < 2) return;
       timer = setInterval(() => show(index + 1), 5200);
     }
 

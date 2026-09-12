@@ -1,0 +1,9 @@
+<div class="pa-form-grid">
+  <label class="pa-field"><span>عنوان</span><input name="slider_title" maxlength="200" value="{{ slider.title|default:'' }}"></label>
+  <label class="pa-field"><span>زیرعنوان</span><input name="slider_subtitle" maxlength="300" value="{{ slider.subtitle|default:'' }}"></label>
+  <label class="pa-field"><span>متن دکمه</span><input name="slider_button_text" maxlength="50" value="{{ slider.button_text|default:'' }}"></label>
+  <label class="pa-field"><span>لینک</span><input name="slider_link" maxlength="300" dir="ltr" placeholder="/products/ یا https://example.com" value="{{ slider.link|default:'' }}"></label>
+  <label class="pa-field"><span>ترتیب</span><input name="slider_order" type="number" min="0" value="{{ slider.order|default:0 }}" required></label>
+  <label class="pa-field"><span>تصویر</span><input name="slider_image" type="file" accept="image/*" {% if adding %}required{% endif %}></label>
+  <label><input name="slider_is_active" type="checkbox" {% if adding or slider.is_active %}checked{% endif %}> فعال</label>
+</div>

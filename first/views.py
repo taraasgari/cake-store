@@ -19,6 +19,8 @@ from django.utils.text import slugify
 from django.views.decorators.http import require_POST
 
 from shop_core.catalog.discounts import core_discounts as _core_discounts
+from .slider_forms import SliderForm, safe_slider_link
+from shop_core.catalog.management import update_named_catalog_item
 from shop_core.catalog.detail import core_product_detail as _core_product_detail
 from shop_core.catalog.listing import core_product_list as _core_product_list
 from shop_core.customization.services import (
@@ -345,7 +347,12 @@ _CUSTOMIZER_DEFAULT_THEME = {
 
 def home(request):
     """صفحه اصلی فروشگاه با اسلایدر و مجموعه‌های منتخب محصول."""
-    sliders = SliderImage.objects.filter(is_active=True).order_by('order')
+    sliders = list(SliderImage.objects.filter(is_active=True).order_by('order', 'id'))
+    for slider in sliders:
+        try:
+            slider.safe_link = safe_slider_link(slider.link)
+        except (ValidationError, ValueError):
+            slider.safe_link = ''
     active_products = Product.objects.filter(is_active=True).exclude(slug__isnull=True).exclude(slug='')
 
     featured_products = active_products.filter(is_featured=True).select_related('category', 'brand')[:8]
@@ -368,6 +375,7 @@ def home(request):
 
     context = {
         'sliders': sliders,
+        'latest_products': active_products.select_related('category', 'brand').order_by('-created_at', '-id')[:8],
         'featured_products': featured_products,
         'new_products': new_products,
         'best_sellers': best_sellers,
@@ -1122,114 +1130,48 @@ def owner_change_password(request):
 # ویوهای مدیریت ظاهر سایت
 # ============================================
 
-@owner_required
+@permission_required('site_settings')
 def site_settings(request):
     site = SiteSettings.get_settings()
     sliders = SliderImage.objects.all().order_by('order')
 
+    status = 200
     if request.method == 'POST':
-        _core_apply_site_settings(
-            site,
-            request.POST,
-            request.FILES,
-        )
-
-        slider_action = request.POST.get('slider_action')
-
-        if slider_action == 'add_slider':
-            title = request.POST.get('slider_title', '')
-            image = request.FILES.get('slider_image')
-            order = request.POST.get('slider_order', 0)
-            link = request.POST.get('slider_link', '')
-
-            if not image:
-                messages.error(
-                    request,
-                    "❌ تصویر اسلایدر الزامی است",
-                )
+        action = request.POST.get('slider_action')
+        if action:
+            if action not in ('add_slider', 'edit_slider', 'delete_slider'):
+                messages.error(request, 'عملیات اسلایدر معتبر نیست.')
+                status = 400
             else:
-                SliderImage.objects.create(
-                    title=title if title else None,
-                    image=image,
-                    order=order,
-                    link=link,
-                    is_active=True,
-                )
-                messages.success(
-                    request,
-                    "✅ اسلایدر جدید اضافه شد",
-                )
-
-        elif slider_action == 'edit_slider':
-            slider_id = request.POST.get('slider_id')
-            slider = get_object_or_404(
-                SliderImage,
-                id=slider_id,
-            )
-            slider.title = (
-                request.POST.get(
-                    'slider_title',
-                    '',
-                )
-                or None
-            )
-            slider.order = request.POST.get(
-                'slider_order',
-                slider.order,
-            )
-            slider.link = request.POST.get(
-                'slider_link',
-                slider.link,
-            )
-            slider.is_active = (
-                'slider_is_active'
-                in request.POST
-            )
-            if request.FILES.get(
-                'slider_image'
-            ):
-                slider.image = request.FILES[
-                    'slider_image'
-                ]
-            slider.save()
-            messages.success(
-                request,
-                "✅ اسلایدر ویرایش شد",
-            )
-
-        elif slider_action == 'delete_slider':
-            slider_id = request.POST.get(
-                'slider_id'
-            )
-            slider = get_object_or_404(
-                SliderImage,
-                id=slider_id,
-            )
-            slider.delete()
-            messages.success(
-                request,
-                "✅ اسلایدر حذف شد",
-            )
-
-        messages.success(
-            request,
-            "✅ تنظیمات سایت با موفقیت ذخیره شد",
-        )
-        return redirect(
-            'first:site_settings'
-        )
-
-    return render(
-        request,
-        'dashboard/site_settings.html',
-        {
-            'settings': site,
-            'sliders': sliders,
-        },
-    )
+                slider = None
+                if action != 'add_slider':
+                    slider = get_object_or_404(SliderImage, pk=request.POST.get('slider_id'))
+                if action == 'delete_slider':
+                    slider.delete()
+                    messages.success(request, 'اسلایدر حذف شد.')
+                    return redirect('first:site_settings')
+                data = {field: request.POST.get('slider_' + field, '') for field in SliderForm.Meta.fields}
+                data['order'] = data['order'] or '0'
+                files = {'image': request.FILES['slider_image']} if request.FILES.get('slider_image') else None
+                form = SliderForm(data, files, instance=slider)
+                if form.is_valid():
+                    form.save()
+                    messages.success(request, 'اسلایدر ذخیره شد.')
+                    return redirect('first:site_settings')
+                for field, errors in form.errors.items():
+                    messages.error(request, f'{form.fields[field].label}: {" ".join(errors)}')
+                status = 400
+        else:
+            _core_apply_site_settings(site, request.POST, request.FILES)
+            messages.success(request, 'تنظیمات سایت ذخیره شد.')
+            return redirect('first:site_settings')
+    return render(request, 'dashboard/site_settings.html', {
+        'settings': site, 'sliders': sliders,
+        'slider_form_data': request.POST if status == 400 else None,
+    }, status=status)
 
 
-@owner_required
+@permission_required('site_settings')
 @require_POST
 def reset_site_settings(request):
     site = SiteSettings.get_settings()
@@ -1248,7 +1190,7 @@ def reset_site_settings(request):
 # تنظیمات فرمت اعداد
 # ============================================
 
-@owner_required
+@permission_required('site_settings')
 @require_POST
 def toggle_number_format(request):
     site = _core_toggle_number_format(
@@ -1270,7 +1212,7 @@ def toggle_number_format(request):
     )
 
 
-@owner_required
+@permission_required('site_settings')
 def number_format_settings(request):
     site = SiteSettings.get_settings()
     return render(
@@ -1283,7 +1225,7 @@ def number_format_settings(request):
     )
 
 
-@owner_required
+@permission_required('site_settings')
 @require_POST
 def update_number_format(request):
     try:
@@ -2049,6 +1991,7 @@ def admin_add_product(request):
         request,
         'dashboard/admin_add_product.html',
         context,
+        status=400,
     )
 
 
@@ -2131,7 +2074,7 @@ def _v7_edit_product(
             ),
         )
 
-        if return_to_site:
+        if return_to_site and product.is_active:
             return redirect(
                 'first:product_detail',
                 slug=product.slug,
@@ -2155,6 +2098,7 @@ def _v7_edit_product(
 
     product.refresh_from_db()
     context['product'] = product
+    context['form_data'] = request.POST
 
     return render(
         request,
@@ -2350,7 +2294,7 @@ def manage_admins(request):
 def make_admin(request, user_id):
     user = get_object_or_404(User, id=user_id)
 
-    if user.role == 'owner':
+    if user.role == 'owner' or user.is_superuser:
         messages.error(request, "❌ نمی‌توانید مالک را تغییر دهید")
         return redirect('first:manage_admins')
 
@@ -2365,7 +2309,7 @@ def make_admin(request, user_id):
 def remove_admin(request, user_id):
     user = get_object_or_404(User, id=user_id)
 
-    if user.role == 'owner':
+    if user.role == 'owner' or user.is_superuser:
         messages.error(request, "❌ نمی‌توانید مالک را تغییر دهید")
         return redirect('first:manage_admins')
 
@@ -2380,7 +2324,7 @@ def remove_admin(request, user_id):
 def toggle_user_active(request, user_id):
     user = get_object_or_404(User, id=user_id)
 
-    if user.role == 'owner':
+    if user.role == 'owner' or user.is_superuser:
         messages.error(request, "❌ نمی‌توانید مالک را تغییر دهید")
         return redirect('first:manage_admins')
 
@@ -2717,7 +2661,7 @@ def _effective_product_stock(product):
         if variant.is_active
     )
 
-@owner_required
+@permission_required('warehouse_view')
 def warehouse(request):
     products = list(
         Product.objects
@@ -2785,7 +2729,7 @@ def warehouse(request):
         },
     )
 
-@owner_required
+@permission_required('warehouse_view')
 def warehouse_products(request):
     products = _core_warehouse_products_data(
         Product,
@@ -2810,7 +2754,7 @@ def warehouse_products(request):
     )
 
 
-@owner_required
+@permission_required('warehouse_edit')
 @require_POST
 def update_stock(request, product_id):
     product = get_object_or_404(
@@ -2878,73 +2822,50 @@ def _unique_catalog_slug(model, name, exclude_pk=None):
 
 
 \
+def _ajax_catalog_payload(request):
+    if len(request.body) > 64 * 1024:
+        raise ValidationError('حجم درخواست بیش از حد مجاز است.')
+    data = json.loads(request.body or b'{}')
+    if not isinstance(data, dict):
+        raise ValidationError('داده ارسالی معتبر نیست.')
+    return data
+
+
+def _catalog_response(item, status=200, existing=False):
+    return JsonResponse(dict(success=True, id=item.pk, name=item.name, slug=item.slug,
+                             parent_id=getattr(item, 'parent_id', None), existing=existing), status=status)
+
+
 def _ajax_create_named_item(request, model, label):
     try:
-        if len(request.body) > 64 * 1024:
-            return JsonResponse(
-                {
-                    'success': False,
-                    'error': 'حجم درخواست بیش از حد مجاز است',
-                },
-                status=413,
-            )
-
-        data = json.loads(request.body or b'{}')
-        if not isinstance(data, dict):
-            raise ValueError
-
-        item, error, existing = _core_create_named_catalog_item(
-            model,
-            data.get('name'),
-        )
-
-        if error == 'required':
-            return JsonResponse(
-                {
-                    'success': False,
-                    'error': f'نام {label} الزامی است',
-                },
-                status=400,
-            )
-
-        if error == 'too_long':
-            return JsonResponse(
-                {
-                    'success': False,
-                    'error': f'نام {label} بیش از حد طولانی است',
-                },
-                status=400,
-            )
-
-        return JsonResponse(
-            {
-                'success': True,
-                'id': item.id,
-                'name': item.name,
-                'existing': existing,
-            },
-            status=200 if existing else 201,
-        )
-
-    except (json.JSONDecodeError, TypeError, ValueError):
-        return JsonResponse(
-            {
-                'success': False,
-                'error': 'داده ارسالی معتبر نیست',
-            },
-            status=400,
-        )
-    except Exception:
-        return JsonResponse(
-            {
-                'success': False,
-                'error': f'ثبت {label} انجام نشد',
-            },
-            status=500,
-        )
+        data = _ajax_catalog_payload(request)
+        with transaction.atomic():
+            item, error, existing = _core_create_named_catalog_item(
+                model, data.get('name'), slug=data.get('slug'), parent_id=data.get('parent_id'))
+            if error:
+                raise ValidationError(f'نام {label} الزامی است و باید در محدوده طول مجاز باشد.')
+        return _catalog_response(item, 200 if existing else 201, existing)
+    except ValidationError as exc:
+        return JsonResponse({'success': False, 'error': ' '.join(exc.messages)}, status=400)
+    except (ValueError, TypeError):
+        return JsonResponse({'success': False, 'error': 'داده ارسالی معتبر نیست.'}, status=400)
 
 
-\
+def _ajax_edit_named_item(request, model, item_id):
+    item = get_object_or_404(model, pk=item_id)
+    try:
+        data = _ajax_catalog_payload(request)
+        with transaction.atomic():
+            item = model.objects.select_for_update().get(pk=item_id)
+            update_named_catalog_item(item, name=data.get('name'), slug=data.get('slug'),
+                                      parent_id=data.get('parent_id', getattr(item, 'parent_id', None)))
+        return _catalog_response(item)
+    except ValidationError as exc:
+        return JsonResponse({'success': False, 'error': ' '.join(exc.messages)}, status=400)
+    except (ValueError, TypeError):
+        return JsonResponse({'success': False, 'error': 'داده ارسالی معتبر نیست.'}, status=400)
+
+
 @permission_required('products_edit')
 @require_POST
 def ajax_add_category(request):
@@ -3524,3 +3445,42 @@ def customer_service_page(request, page_slug):
             'page_slug': page_slug,
         },
     )
+
+
+@permission_required('products_edit')
+@require_POST
+def ajax_edit_category(request, item_id):
+    return _ajax_edit_named_item(request, Category, item_id)
+
+
+@permission_required('products_edit')
+@require_POST
+def ajax_edit_brand(request, item_id):
+    return _ajax_edit_named_item(request, Brand, item_id)
+
+
+@permission_required('products_edit')
+@require_POST
+def ajax_edit_product_type(request, item_id):
+    return _ajax_edit_named_item(request, ProductType, item_id)
+
+
+@permission_required('products_edit')
+@require_POST
+def ajax_edit_tag(request, item_id):
+    return _ajax_edit_named_item(request, Tag, item_id)
+
+
+@permission_required('products_edit')
+@require_POST
+def ajax_add_tag(request):
+    return _ajax_create_named_item(request, Tag, 'تگ')
+
+
+@permission_required('products_edit')
+@require_POST
+def ajax_delete_tag(request, item_id):
+    result, count = _core_delete_catalog_item(Tag, Product, item_id, relation_field='tags')
+    if result == 'deleted':
+        return JsonResponse({'success': True})
+    return JsonResponse({'success': False, 'error': 'تگ در محصول استفاده شده است.' if count else 'تگ یافت نشد.'}, status=409 if count else 404)

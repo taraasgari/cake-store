@@ -1,0 +1,13 @@
+.pa-catalog-actions{display:flex;gap:6px;margin-top:8px;align-items:center;flex-wrap:wrap}
+.pa-catalog-actions button,.pa-tag-choice{border:1px solid #B89B65;border-radius:8px;background:transparent;color:inherit;padding:8px 12px;cursor:pointer}
+.pa-catalog-actions button:disabled{opacity:.35;cursor:default}
+.pa-catalog-actions button:hover:not(:disabled),.pa-tag-choice:has(input:checked){background:#B89B65;color:#171717}
+.pa-tag-list{display:flex;gap:8px;flex-wrap:wrap;margin:10px 0}
+.pa-tag-choice{display:inline-flex;align-items:center;gap:6px}
+.pa-tag-choice input{width:auto!important}
+.pa-catalog-dialog{width:min(92vw,520px);max-height:90vh;overflow:auto;border:1px solid #B89B65;border-radius:18px;padding:26px;background:#1D1A17;color:#FAF7F2}
+.pa-catalog-dialog::backdrop{background:rgba(0,0,0,.65)}
+.pa-catalog-dialog .pa-field{display:flex;flex-direction:column;gap:8px;margin:14px 0}
+.pa-catalog-dialog input,.pa-catalog-dialog select{background:#FAF7F2;color:#171717;border:1px solid #B89B65;border-radius:8px;padding:10px;width:100%}
+.pa-catalog-dialog [role=alert]{color:#efacb9}
+[data-perfume-theme=day] .pa-catalog-dialog{background:#FAF7F2;color:#171717}

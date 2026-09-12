@@ -10,6 +10,13 @@ from .analytics_views import (
 app_name = 'first'
 
 urlpatterns = [
+    path('admin-panel/category/edit/<int:item_id>/', views.ajax_edit_category, name='ajax_edit_category'),
+    path('admin-panel/brand/edit/<int:item_id>/', views.ajax_edit_brand, name='ajax_edit_brand'),
+    path('admin-panel/product-type/edit/<int:item_id>/', views.ajax_edit_product_type, name='ajax_edit_product_type'),
+    path('admin-panel/tag/edit/<int:item_id>/', views.ajax_edit_tag, name='ajax_edit_tag'),
+    path('admin-panel/tag/add/', views.ajax_add_tag, name='ajax_add_tag'),
+    path('admin-panel/tag/delete/<int:item_id>/', views.ajax_delete_tag, name='ajax_delete_tag'),
+
     # ===== صفحات اصلی =====
     path('', views.home, name='home'),
     path('login/', views.login_view, name='login'),

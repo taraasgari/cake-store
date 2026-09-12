@@ -1,5 +1,5 @@
 {% extends 'dashboard/perfume_admin_base.html' %}
-{% load static %}
+{% load static custom_filters %}
 
 {% block title %}💬 مدیریت نظرات{% endblock %}
 
@@ -44,9 +44,9 @@
             <button type="submit" class="px-6 py-2 bg-stone-500 text-white rounded-xl hover:bg-amber-800 transition-all">
                 <i class="fas fa-filter ml-2"></i> فیلتر
             </button>
-            <a href="{% url 'first:admin_reviews' %}" class="px-6 py-2 border-2 border-gray-200 rounded-xl hover:bg-gray-50 transition-all">
+            {% if user|has_permission:'reviews_view' %}<a href="{% url 'first:admin_reviews' %}" class="px-6 py-2 border-2 border-gray-200 rounded-xl hover:bg-gray-50 transition-all">
                 <i class="fas fa-times ml-2"></i> پاک کردن
-            </a>
+            </a>{% endif %}
         </form>
     </div>
     

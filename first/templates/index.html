@@ -6,6 +6,17 @@
 <section class="home-lux-slider" data-home-slider data-bsg-edit="home-section" data-bsg-name="بخش 1 صفحه اصلی" data-bsg-kind="box">
   <div class="home-lux-slider-shell">
 
+    {% if sliders %}{% for slider in sliders %}
+    <article class="home-lux-slide {% if forloop.first %}is-active{% endif %}" data-home-slide="{{ forloop.counter0 }}">
+      <div class="home-lux-slide-bg slide-bg-one"></div>
+      <div class="home-lux-slide-copy">
+        {% if slider.title %}<h1>{{ slider.title }}</h1>{% endif %}
+        {% if slider.subtitle %}<p>{{ slider.subtitle }}</p>{% endif %}
+        {% if slider.button_text and slider.safe_link %}<div class="home-lux-slide-actions"><a class="lux-primary-btn" href="{{ slider.safe_link }}">{{ slider.button_text }}</a></div>{% endif %}
+      </div>
+      <div class="home-lux-slide-stage"><a {% if slider.safe_link %}href="{{ slider.safe_link }}"{% endif %}><img src="{{ slider.image.url }}" alt="{{ slider.title|default:'' }}" {% if not forloop.first %}loading="lazy"{% endif %}></a></div>
+    </article>
+    {% endfor %}{% else %}
     <article class="home-lux-slide is-active" data-home-slide="0">
       <div class="home-lux-slide-bg slide-bg-one"></div>
       <div class="home-lux-slide-copy">
@@ -81,12 +92,12 @@
       </div>
     </article>
 
+    {% endif %}
     <div class="home-lux-slider-ui">
-      <div class="home-lux-slider-count"><strong data-slider-current>01</strong><span>/ 03</span></div>
+      <div class="home-lux-slider-count"><strong data-slider-current>01</strong><span>/ <span data-slider-total>{% if sliders %}{{ sliders|length|stringformat:"02d" }}{% else %}03{% endif %}</span></span></div>
       <div class="home-lux-slider-dots">
-        <button class="is-active" type="button" data-home-slider-dot="0"></button>
-        <button type="button" data-home-slider-dot="1"></button>
-        <button type="button" data-home-slider-dot="2"></button>
+        {% if sliders %}{% for slider in sliders %}<button class="{% if forloop.first %}is-active{% endif %}" type="button" data-home-slider-dot="{{ forloop.counter0 }}" aria-label="اسلاید {{ forloop.counter }}"></button>{% endfor %}
+        {% else %}{% for n in '012' %}<button class="{% if forloop.first %}is-active{% endif %}" type="button" data-home-slider-dot="{{ n }}" aria-label="اسلاید {{ forloop.counter }}"></button>{% endfor %}{% endif %}
       </div>
     </div>
 
@@ -102,7 +113,6 @@
 {% firstof featured_products.0 best_sellers.0 new_products.0 as hero_product %}
 
 <section class="lux-home-hero" data-bsg-edit="home-hero" data-bsg-name="هرو صفحه اصلی" data-bsg-kind="box">
-  {% for slider in sliders %}{% if forloop.first %}<img class="hero-bg" src="{{ slider.image.url }}" alt="" data-bsg-edit="home-image-4" data-bsg-name="تصویر 4" data-bsg-kind="image">{% endif %}{% endfor %}
   <div class="hero-shade"></div><div class="hero-grid"></div><div class="hero-arch"></div>
 
   <div class="hero-copy">
@@ -219,14 +229,14 @@
   <div class="home-shop-head reveal">
     <div>
       <span class="phase-kicker">SHOP THE COLLECTION</span>
-      <h2 data-bsg-edit="home-heading-5" data-bsg-name="عنوان بخش 5" data-bsg-kind="text">محصولات فروشگاه</h2>
-      <p>محصولات واقعی فروشگاه حالا مستقیم در صفحه اصلی دیده می‌شوند.</p>
+      <h2 data-bsg-edit="home-heading-5" data-bsg-name="عنوان بخش 5" data-bsg-kind="text">جدیدترین عطرها</h2>
+      <p>تازه‌ترین رایحه‌های مجموعه را کشف کنید.</p>
     </div>
     <a href="{% url 'first:product_list' %}">مشاهده همه محصولات <i class="fa-solid fa-arrow-left"></i></a>
   </div>
 
   <div class="home-shop-grid">
-    {% for product in new_products|slice:":8" %}
+    {% for product in latest_products %}
     <article class="home-shop-card reveal">
       <a class="home-shop-media" href="{% url 'first:product_detail' product.slug %}">
         <div class="home-shop-badges">

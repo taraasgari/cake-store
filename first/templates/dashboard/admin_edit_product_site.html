@@ -495,7 +495,7 @@
                     <input class="edit-input"
                            name="slug"
                            maxlength="200"
-                           value="{{ product.slug }}"
+                           value="{% if form_data is not None %}{{ form_data.slug }}{% else %}{{ product.slug }}{% endif %}"
                            dir="ltr">
 
                     <p class="field-help">
@@ -510,7 +510,7 @@
                         <option value="">بدون دسته‌بندی</option>
 
                         {% for category in categories %}
-                            <option value="{{ category.id }}"
+                            <option value="{{ category.id }}" data-slug="{{ category.slug }}" data-parent="{{ category.parent_id|default_if_none:'' }}"
                                     {% if product.category_id == category.id %}selected{% endif %}>
                                 {{ category.name }}
                             </option>
@@ -525,7 +525,7 @@
                         <option value="">بدون برند</option>
 
                         {% for brand in brands %}
-                            <option value="{{ brand.id }}"
+                            <option value="{{ brand.id }}" data-slug="{{ brand.slug }}"
                                     {% if product.brand_id == brand.id %}selected{% endif %}>
                                 {{ brand.name }}
                             </option>
@@ -540,7 +540,7 @@
                         <option value="">بدون نوع</option>
 
                         {% for type in product_types %}
-                            <option value="{{ type.id }}"
+                            <option value="{{ type.id }}" data-slug="{{ type.slug }}"
                                     {% if product.product_type_id == type.id %}selected{% endif %}>
                                 {{ type.name }}
                             </option>
@@ -555,7 +555,7 @@
                             name="tags"
                             multiple>
                         {% for tag in tags %}
-                            <option value="{{ tag.id }}"
+                            <option value="{{ tag.id }}" data-slug="{{ tag.slug }}"
                                     {% if tag in product.tags.all %}selected{% endif %}>
                                 {{ tag.name }}
                             </option>
@@ -563,7 +563,7 @@
                     </select>
 
                     <p class="field-help">
-                        برای انتخاب چند تگ، کلید Ctrl را نگه دار.
+                        تگ‌ها را با گزینه‌های زیر انتخاب و مدیریت کنید.
                     </p>
                 </div>
             </div>
@@ -1116,6 +1116,7 @@
         </div>
     </article>
 </template>
+{% include 'dashboard/catalog_controls.html' %}
 {% endblock %}
 
 {% block extra_js %}

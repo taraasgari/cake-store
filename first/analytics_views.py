@@ -8,10 +8,10 @@ from django.utils.http import url_has_allowed_host_and_scheme
 
 from .analytics_pdf import build_pdf
 from .analytics_service import build_analytics, resolve_period
-from .decorators import owner_required
+from .decorators import permission_required
 
 
-@owner_required
+@permission_required('reports_view')
 def analytics_dashboard(request):
     """
     نمایش صفحه اصلی آمار و گزارش‌ها
@@ -20,7 +20,7 @@ def analytics_dashboard(request):
     return render(request, 'dashboard/analytics.html', context)
 
 
-@owner_required
+@permission_required('reports_view')
 def analytics_export_csv(request):
     """
     خروجی CSV از آمار فروشگاه
@@ -193,7 +193,7 @@ def analytics_export_csv(request):
     return response
 
 
-@owner_required
+@permission_required('reports_view')
 def analytics_pdf_preview(request):
     fallback_url = reverse(
         'first:analytics_dashboard'
@@ -253,7 +253,7 @@ def analytics_pdf_preview(request):
     )
 
 
-@owner_required
+@permission_required('reports_view')
 def analytics_download_pdf(request):
     """
     ساخت و نمایش یا دانلود گزارش PDF.

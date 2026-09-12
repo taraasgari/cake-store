@@ -29,18 +29,18 @@ from reportlab.platypus import (
 )
 
 
-PINK = colors.HexColor('#EC407A')
-DARK_PINK = colors.HexColor('#AD1457')
-PURPLE = colors.HexColor('#7E57C2')
+GOLD = colors.HexColor('#B89B65')
+DARK = colors.HexColor('#1D1A17')
+BURGUNDY = colors.HexColor('#7A243F')
 GREEN = colors.HexColor('#16A36A')
-BLUE = colors.HexColor('#3B82F6')
-AMBER = colors.HexColor('#F59E0B')
+BLUE = colors.HexColor('#6D7468')
+AMBER = colors.HexColor('#B89B65')
 RED = colors.HexColor('#EF4444')
 
-INK = colors.HexColor('#25232B')
-MUTED = colors.HexColor('#77727C')
-PALE = colors.HexColor('#FFF5FA')
-GRID = colors.HexColor('#E8DFE5')
+TEXT = colors.HexColor('#171717')
+MUTED = colors.HexColor('#766D60')
+CREAM = colors.HexColor('#FAF7F2')
+GRID = colors.HexColor('#E5DCCD')
 
 
 def _register_fonts():
@@ -411,6 +411,10 @@ def money(value):
 
 
 def build_pdf(data):
+    from .models import SiteSettings
+    site_name = SiteSettings.get_settings().site_name or 'فروشگاه عطر'
+    if 'آرایشی' in site_name:
+        site_name = 'فروشگاه عطر'
     buffer = io.BytesIO()
     page_size = landscape(A4)
 
@@ -424,7 +428,7 @@ def build_pdf(data):
         bottomMargin=15 * mm,
 
         title='گزارش جامع مدیریتی فروشگاه',
-        author='آرایشی شاپ',
+        author=site_name,
     )
 
     default_styles = getSampleStyleSheet()
@@ -435,7 +439,7 @@ def build_pdf(data):
         fontName=FONT_BOLD,
         fontSize=21,
         leading=31,
-        textColor=DARK_PINK,
+        textColor=DARK,
         alignment=TA_CENTER,
     )
 
@@ -445,7 +449,7 @@ def build_pdf(data):
         fontName=FONT_BOLD,
         fontSize=14,
         leading=22,
-        textColor=INK,
+        textColor=TEXT,
         alignment=TA_RIGHT,
         spaceBefore=5,
         spaceAfter=8,
@@ -457,7 +461,7 @@ def build_pdf(data):
         fontName=FONT,
         fontSize=8.5,
         leading=14,
-        textColor=INK,
+        textColor=TEXT,
         alignment=TA_RIGHT,
     )
 
@@ -481,7 +485,7 @@ def build_pdf(data):
         parent=body_style,
         fontName=FONT_BOLD,
         fontSize=13,
-        textColor=DARK_PINK,
+        textColor=DARK,
         alignment=TA_CENTER,
     )
 
@@ -589,7 +593,7 @@ def build_pdf(data):
                 (-1, -1),
                 [
                     colors.white,
-                    colors.HexColor('#FCF7FA'),
+                    colors.HexColor('#FAF7F2'),
                 ],
             ),
         ]
@@ -600,7 +604,7 @@ def build_pdf(data):
                     'BACKGROUND',
                     (0, 0),
                     (-1, 0),
-                    DARK_PINK,
+                    DARK,
                 ),
                 (
                     'TEXTCOLOR',
@@ -619,7 +623,7 @@ def build_pdf(data):
     def bar_chart(
         labels,
         values,
-        color=PINK,
+        color=GOLD,
         horizontal=False,
         title='',
     ):
@@ -682,7 +686,7 @@ def build_pdf(data):
                 rtl(title),
                 fontName=FONT_BOLD,
                 fontSize=10,
-                fillColor=INK,
+                fillColor=TEXT,
                 textAnchor='middle',
             )
         )
@@ -720,13 +724,13 @@ def build_pdf(data):
         pie.slices.fontSize = 6.5
 
         palette = [
-            PINK,
+            GOLD,
             BLUE,
             GREEN,
             AMBER,
-            PURPLE,
+            BURGUNDY,
             RED,
-            colors.HexColor('#14B8A6'),
+            colors.HexColor('#877253'),
         ]
 
         for index in range(len(pie.data)):
@@ -749,7 +753,7 @@ def build_pdf(data):
                 rtl(title),
                 fontName=FONT_BOLD,
                 fontSize=10,
-                fillColor=INK,
+                fillColor=TEXT,
                 textAnchor='middle',
             )
         )
@@ -761,7 +765,7 @@ def build_pdf(data):
 
         canvas.saveState()
 
-        canvas.setFillColor(DARK_PINK)
+        canvas.setFillColor(DARK)
 
         canvas.rect(
             0,
@@ -779,8 +783,7 @@ def build_pdf(data):
             width - 13 * mm,
             height - 7.5 * mm,
             rtl(
-                'گزارش جامع مدیریتی '
-                'آرایشی شاپ'
+                'گزارش جامع مدیریتی ' + site_name
             ),
         )
 
@@ -932,7 +935,7 @@ def build_pdf(data):
                         'BACKGROUND',
                         (0, 0),
                         (-1, -1),
-                        PALE,
+                        CREAM,
                     ),
                     (
                         'ALIGN',
@@ -1242,7 +1245,7 @@ def build_pdf(data):
                         for row
                         in top_products[:8]
                     ],
-                    PINK,
+                    GOLD,
                     horizontal=True,
                     title='پرفروش‌ترین محصولات',
                 ),
@@ -1594,7 +1597,7 @@ def build_pdf(data):
                 'BACKGROUND',
                 (0, 0),
                 (-1, 0),
-                DARK_PINK,
+                DARK,
             ),
             (
                 'GRID',

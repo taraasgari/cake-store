@@ -1,4 +1,4 @@
-{% load static %}
+{% load static custom_filters %}
 <!doctype html>
 <html lang="fa" dir="rtl" data-perfume-theme="night">
 <head>
@@ -25,17 +25,21 @@
       <span><strong>{{ settings.site_name|default:'فروشگاه عطر' }}</strong><small>OWNER CONSOLE</small></span>
     </div>
     <button class="pa-sidebar-close" type="button" data-pa-close aria-label="بستن منو"><i class="fa-solid fa-xmark"></i></button>
-    <nav class="pa-nav"><a class="pa-nav-link {% if request.resolver_match.url_name == 'owner_panel' %}active{% endif %}" href="{% url 'first:owner_panel' %}"><i class="fa-solid fa-crown"></i><span>پنل مالک</span></a>
-<a class="pa-nav-link {% if request.resolver_match.url_name == 'admin_products' %}active{% endif %}" href="{% url 'first:admin_products' %}"><i class="fa-solid fa-spray-can-sparkles"></i><span>عطرها و محصولات</span></a>
-<a class="pa-nav-link {% if request.resolver_match.url_name == 'admin_orders' %}active{% endif %}" href="{% url 'first:admin_orders' %}"><i class="fa-solid fa-receipt"></i><span>سفارش‌ها</span></a>
-<a class="pa-nav-link {% if request.resolver_match.url_name == 'warehouse' %}active{% endif %}" href="{% url 'first:warehouse' %}"><i class="fa-solid fa-warehouse"></i><span>انبار عطرها</span></a>
-<a class="pa-nav-link {% if request.resolver_match.url_name == 'warehouse_products' %}active{% endif %}" href="{% url 'first:warehouse_products' %}"><i class="fa-solid fa-boxes-stacked"></i><span>موجودی رایحه‌ها</span></a>
-<a class="pa-nav-link {% if request.resolver_match.url_name == 'analytics_dashboard' %}active{% endif %}" href="{% url 'first:analytics_dashboard' %}"><i class="fa-solid fa-chart-line"></i><span>آمار فروش</span></a>
-<a class="pa-nav-link {% if request.resolver_match.url_name == 'admin_users' %}active{% endif %}" href="{% url 'first:admin_users' %}"><i class="fa-solid fa-users"></i><span>مشتریان</span></a>
-<a class="pa-nav-link {% if request.resolver_match.url_name == 'admin_reviews' %}active{% endif %}" href="{% url 'first:admin_reviews' %}"><i class="fa-solid fa-star"></i><span>نظرات</span></a>
-<a class="pa-nav-link {% if request.resolver_match.url_name == 'site_settings' %}active{% endif %}" href="{% url 'first:site_settings' %}"><i class="fa-solid fa-sliders"></i><span>تنظیمات فروشگاه</span></a>
-<a class="pa-nav-link {% if request.resolver_match.url_name == 'number_format_settings' %}active{% endif %}" href="{% url 'first:number_format_settings' %}"><i class="fa-solid fa-hashtag"></i><span>فرمت اعداد</span></a>
-<a class="pa-nav-link {% if request.resolver_match.url_name == 'customizer' %}active{% endif %}" href="{% url 'first:customizer' %}"><i class="fa-solid fa-wand-magic-sparkles"></i><span>طراحی بصری</span></a></nav>
+    <nav class="pa-nav">{% if user.is_owner or user.is_superuser %}<a class="pa-nav-link {% if request.resolver_match.url_name == 'owner_panel' %}active{% endif %}" href="{% url 'first:owner_panel' %}"><i class="fa-solid fa-crown"></i><span>پنل مالک</span></a>{% endif %}
+{% if user|has_permission:'products_view' %}<a class="pa-nav-link {% if request.resolver_match.url_name == 'admin_products' %}active{% endif %}" href="{% url 'first:admin_products' %}"><i class="fa-solid fa-spray-can-sparkles"></i><span>عطرها و محصولات</span></a>{% endif %}
+{% if user|has_permission:'orders_view' %}<a class="pa-nav-link {% if request.resolver_match.url_name == 'admin_orders' %}active{% endif %}" href="{% url 'first:admin_orders' %}"><i class="fa-solid fa-receipt"></i><span>سفارش‌ها</span></a>{% endif %}
+{% if user|has_permission:'warehouse_view' %}<a class="pa-nav-link {% if request.resolver_match.url_name == 'warehouse' %}active{% endif %}" href="{% url 'first:warehouse' %}"><i class="fa-solid fa-warehouse"></i><span>انبار عطرها</span></a>{% endif %}
+{% if user|has_permission:'warehouse_view' %}<a class="pa-nav-link {% if request.resolver_match.url_name == 'warehouse_products' %}active{% endif %}" href="{% url 'first:warehouse_products' %}"><i class="fa-solid fa-boxes-stacked"></i><span>موجودی رایحه‌ها</span></a>{% endif %}
+{% if user|has_permission:'reports_view' %}<a class="pa-nav-link {% if request.resolver_match.url_name == 'analytics_dashboard' %}active{% endif %}" href="{% url 'first:analytics_dashboard' %}"><i class="fa-solid fa-chart-line"></i><span>آمار فروش</span></a>{% endif %}
+{% if user|has_permission:'users_view' %}<a class="pa-nav-link {% if request.resolver_match.url_name == 'admin_users' %}active{% endif %}" href="{% url 'first:admin_users' %}"><i class="fa-solid fa-users"></i><span>مشتریان</span></a>{% endif %}
+{% if user|has_permission:'reviews_view' %}<a class="pa-nav-link {% if request.resolver_match.url_name == 'admin_reviews' %}active{% endif %}" href="{% url 'first:admin_reviews' %}"><i class="fa-solid fa-star"></i><span>نظرات</span></a>{% endif %}
+{% if user|has_permission:'site_settings' %}<a class="pa-nav-link {% if request.resolver_match.url_name == 'site_settings' %}active{% endif %}" href="{% url 'first:site_settings' %}"><i class="fa-solid fa-sliders"></i><span>تنظیمات فروشگاه</span></a>{% endif %}
+{% if user|has_permission:'site_settings' %}<a class="pa-nav-link {% if request.resolver_match.url_name == 'number_format_settings' %}active{% endif %}" href="{% url 'first:number_format_settings' %}"><i class="fa-solid fa-hashtag"></i><span>فرمت اعداد</span></a>{% endif %}
+{% if user.is_owner or user.is_superuser %}<a class="pa-nav-link {% if request.resolver_match.url_name == 'customizer' %}active{% endif %}" href="{% url 'first:customizer' %}"><i class="fa-solid fa-wand-magic-sparkles"></i><span>طراحی بصری</span></a>{% endif %}
+{% if user.is_owner or user.is_superuser %}<a class="pa-nav-link" href="{% url 'first:manage_admins' %}">مدیریت ادمین‌ها</a><a class="pa-nav-link" href="{% url 'first:manage_admin_permissions' %}">دسترسی ادمین‌ها</a>{% endif %}
+{% if user|has_permission:'support_view' %}<a class="pa-nav-link" href="{% url 'customer_care:admin_support_list' %}">پشتیبانی</a>{% endif %}
+{% if user|has_permission:'returns_manage' %}<a class="pa-nav-link" href="{% url 'customer_care:admin_order_actions_list' %}">لغو و مرجوعی</a>{% endif %}
+</nav>
     <div class="pa-sidebar-foot">
       <a href="{% url 'first:home' %}"><i class="fa-solid fa-arrow-up-right-from-square"></i><span>مشاهده فروشگاه</span></a>
       <div class="pa-owner-mini"><span class="pa-owner-avatar">{{ user.username|first|upper }}</span><span><strong>{{ user.username }}</strong><small>{% if user.is_superuser %}مالک فروشگاه{% else %}مدیر فروشگاه{% endif %}</small></span></div>
@@ -56,10 +60,10 @@
         <button class="pa-icon-button" type="button" data-pa-theme title="حالت روز/شب"><i class="fa-solid fa-circle-half-stroke"></i></button>
         <details class="pa-account-menu">
           <summary><span class="pa-account-avatar">{{ user.username|first|upper }}</span><span class="pa-account-name">{{ user.username }}</span><i class="fa-solid fa-chevron-down"></i></summary>
-          <div class="pa-account-dropdown"><div class="pa-account-head"><strong>{{ user.username }}</strong><small dir="ltr">{{ user.email|default:'بدون ایمیل' }}</small></div><a href="{% url 'first:owner_panel' %}"><i class="fa-solid fa-crown"></i><span>پنل مالکیت</span></a>
+          <div class="pa-account-dropdown"><div class="pa-account-head"><strong>{{ user.username }}</strong><small dir="ltr">{{ user.email|default:'بدون ایمیل' }}</small></div>{% if user.is_owner or user.is_superuser %}<a href="{% url 'first:owner_panel' %}"><i class="fa-solid fa-crown"></i><span>پنل مالکیت</span></a>{% endif %}
 <a href="{% url 'first:profile' %}"><i class="fa-solid fa-user"></i><span>پروفایل من</span></a>
 <a href="{% url 'first:edit_profile' %}"><i class="fa-solid fa-user-pen"></i><span>ویرایش پروفایل</span></a>
-<a href="{% url 'first:customizer' %}"><i class="fa-solid fa-wand-magic-sparkles"></i><span>طراحی بصری سایت</span></a>
+{% if user.is_owner or user.is_superuser %}<a href="{% url 'first:customizer' %}"><i class="fa-solid fa-wand-magic-sparkles"></i><span>طراحی بصری سایت</span></a>{% endif %}
 <a href="{% url 'first:home' %}"><i class="fa-solid fa-store"></i><span>مشاهده فروشگاه</span></a>
 <form method="post" action="{% url 'first:logout' %}">{% csrf_token %}<button type="submit"><i class="fa-solid fa-arrow-right-from-bracket"></i><span>خروج</span></button></form></div>
         </details>

@@ -64,106 +64,29 @@
     </div>
     
     <div class="bg-white/80 backdrop-blur-lg rounded-3xl p-8 shadow-lg">
+        <section class="pa-form-card"><h2>مدیریت اسلایدر</h2><p>تصاویر اسلایدر بالای صفحه خانه</p>
+          <form method="post" enctype="multipart/form-data" class="pa-product-form">
+            {% csrf_token %}<input type="hidden" name="slider_action" value="add_slider">
+            {% include 'dashboard/slider_fields.html' with adding=True %}
+            <button class="pa-btn gold" type="submit">افزودن اسلایدر</button>
+          </form>
+          {% for slider in sliders %}
+          <article class="pa-form-card">
+            <img class="slider-preview" src="{{ slider.image.url }}" alt="{{ slider.title|default:'' }}">
+            <form method="post" enctype="multipart/form-data" class="pa-product-form">
+              {% csrf_token %}<input type="hidden" name="slider_action" value="edit_slider"><input type="hidden" name="slider_id" value="{{ slider.pk }}">
+              {% include 'dashboard/slider_fields.html' with adding=False %}
+              <button class="pa-btn gold" type="submit">ذخیره اسلایدر</button>
+            </form>
+            <form method="post" onsubmit="return confirm('اسلایدر حذف شود؟')">
+              {% csrf_token %}<input type="hidden" name="slider_action" value="delete_slider"><input type="hidden" name="slider_id" value="{{ slider.pk }}">
+              <button class="pa-btn ghost" type="submit">حذف اسلایدر</button>
+            </form>
+          </article>
+          {% empty %}<p>هنوز اسلایدری ثبت نشده است؛ اسلایدهای پیش‌فرض نمایش داده می‌شوند.</p>{% endfor %}
+        </section>
         <form method="POST" enctype="multipart/form-data">
             {% csrf_token %}
-            
-            <!-- ===== بخش اسلایدر ===== -->
-            <div class="setting-section">
-                <h3 class="text-lg font-bold text-gray-800 mb-4 flex items-center gap-2">
-                    <i class="fas fa-images text-amber-700"></i> مدیریت اسلایدر
-                </h3>
-                <p class="text-sm text-gray-500 mb-4">تصاویر اسلایدر بالای صفحه خانه</p>
-                
-                <!-- فرم افزودن اسلایدر -->
-                <div class="grid grid-cols-1 md:grid-cols-4 gap-3 p-4 bg-stone-50 rounded-xl mb-4">
-                    <div>
-                        <input type="text" name="slider_title" placeholder="عنوان اسلایدر" 
-                               class="w-full px-3 py-2 border-2 border-gray-200 rounded-xl focus:border-amber-700 outline-none bg-white/50 text-sm">
-                    </div>
-                    <div>
-                        <input type="number" name="slider_order" placeholder="ترتیب" value="0"
-                               class="w-full px-3 py-2 border-2 border-gray-200 rounded-xl focus:border-amber-700 outline-none bg-white/50 text-sm">
-                    </div>
-                    <div>
-                        <input type="text" name="slider_link" placeholder="لینک (اختیاری)"
-                               class="w-full px-3 py-2 border-2 border-gray-200 rounded-xl focus:border-amber-700 outline-none bg-white/50 text-sm">
-                    </div>
-                    <div class="flex gap-2">
-                        <input type="file" name="slider_image" accept="image/*" 
-                               class="flex-1 px-3 py-2 border-2 border-gray-200 rounded-xl focus:border-amber-700 outline-none bg-white/50 text-sm">
-                        <button type="submit" name="slider_action" value="add_slider" 
-                                class="px-4 py-2 btn-pink rounded-xl text-sm whitespace-nowrap">
-                            <i class="fas fa-plus ml-1"></i> افزودن
-                        </button>
-                    </div>
-                </div>
-                
-                <!-- لیست اسلایدرها -->
-                <div class="overflow-x-auto">
-                    <table class="w-full">
-                        <thead class="border-b-2 border-gray-200">
-                            <tr class="text-right text-sm text-gray-500">
-                                <th class="py-2 px-3">تصویر</th>
-                                <th class="py-2 px-3">عنوان</th>
-                                <th class="py-2 px-3">ترتیب</th>
-                                <th class="py-2 px-3">لینک</th>
-                                <th class="py-2 px-3">وضعیت</th>
-                                <th class="py-2 px-3">عملیات</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {% for slider in sliders %}
-                            <tr class="border-b border-gray-100 hover:bg-stone-50 transition-all">
-                                <td class="py-2 px-3">
-                                    <img src="{{ slider.image.url }}" alt="{{ slider.title }}" class="slider-preview">
-                                </td>
-                                <td class="py-2 px-3 font-bold">{{ slider.title }}</td>
-                                <td class="py-2 px-3">{{ slider.order }}</td>
-                                <td class="py-2 px-3 text-sm">{{ slider.link|default:"-" }}</td>
-                                <td class="py-2 px-3">
-                                    <span class="px-2 py-1 rounded-full text-xs font-bold {% if slider.is_active %}bg-green-100 text-green-600{% else %}bg-red-100 text-red-600{% endif %}">
-                                        {{ slider.is_active|yesno:"فعال,غیرفعال" }}
-                                    </span>
-                                </td>
-                                <td class="py-2 px-3">
-                                    <!-- فرم ویرایش اسلایدر -->
-                                    <form method="POST" enctype="multipart/form-data" class="inline-flex items-center gap-1 flex-wrap">
-                                        {% csrf_token %}
-                                        <input type="hidden" name="slider_id" value="{{ slider.id }}">
-                                        <input type="text" name="slider_title" value="{{ slider.title }}" 
-                                               class="w-24 px-2 py-1 border-2 border-gray-200 rounded-lg text-sm focus:border-amber-700 outline-none bg-white/50">
-                                        <input type="number" name="slider_order" value="{{ slider.order }}" 
-                                               class="w-12 px-2 py-1 border-2 border-gray-200 rounded-lg text-sm focus:border-amber-700 outline-none bg-white/50">
-                                        <input type="text" name="slider_link" value="{{ slider.link|default:'' }}" 
-                                               class="w-24 px-2 py-1 border-2 border-gray-200 rounded-lg text-sm focus:border-amber-700 outline-none bg-white/50">
-                                        <input type="file" name="slider_image" accept="image/*" 
-                                               class="w-20 px-1 py-1 border-2 border-gray-200 rounded-lg text-sm">
-                                        <label class="flex items-center gap-1 text-sm">
-                                            <input type="checkbox" name="slider_is_active" {% if slider.is_active %}checked{% endif %}>
-                                            فعال
-                                        </label>
-                                        <button type="submit" name="slider_action" value="edit_slider" 
-                                                class="px-2 py-1 bg-blue-500 text-white rounded-lg text-sm hover:bg-blue-600 transition-all">
-                                            <i class="fas fa-save"></i>
-                                        </button>
-                                        <button type="submit" name="slider_action" value="delete_slider" 
-                                                class="px-2 py-1 bg-red-500 text-white rounded-lg text-sm hover:bg-red-600 transition-all"
-                                                onclick="return confirm('آیا از حذف این اسلایدر مطمئن هستید؟')">
-                                            <i class="fas fa-trash"></i>
-                                        </button>
-                                    </form>
-                                </td>
-                            </tr>
-                            {% empty %}
-                            <tr>
-                                <td colspan="6" class="text-center py-4 text-gray-400">هیچ اسلایدری وجود ندارد</td>
-                            </tr>
-                            {% endfor %}
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-            
             <!-- ===== اطلاعات پایه ===== -->
             <div class="setting-section">
                 <h3 class="text-lg font-bold text-gray-800 mb-4 flex items-center gap-2">
