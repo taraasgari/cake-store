@@ -1,0 +1,17 @@
+{% extends 'base.html' %}
+{% block title %}لغو و مرجوعی{% endblock %}
+{% block content %}
+<div class="max-w-5xl mx-auto px-4 py-10">
+  <h1 class="text-2xl font-bold mb-6">درخواست‌های لغو و مرجوعی</h1>
+  <div class="space-y-3">
+    {% for action in actions %}
+      <a href="{% url 'customer_care:order_action_detail' action.pk %}" class="block bg-white rounded-2xl shadow p-5">
+        <div class="flex justify-between"><b>{{ action.get_kind_display }} · سفارش #{{ action.order.order_number }}</b><span>{{ action.get_status_display }}</span></div>
+        <div class="text-sm text-gray-500 mt-2">{{ action.created_at|date:"Y/m/d H:i" }} · {{ action.refund_amount }} تومان</div>
+      </a>
+    {% empty %}
+      <div class="bg-white rounded-2xl p-8 text-center text-gray-500">هنوز درخواستی ثبت نشده است.</div>
+    {% endfor %}
+  </div>
+</div>
+{% endblock %}

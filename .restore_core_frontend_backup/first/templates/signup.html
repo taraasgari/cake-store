@@ -1,0 +1,46 @@
+{% extends 'perfume_base.html' %}
+{% block title %}ثبت‌نام | {{ settings.site_name|default:"VÉLORA" }}{% endblock %}
+{% block content %}
+<section class="auth-x">
+  <div class="auth-art">
+    <div class="auth-grid"></div><div class="auth-number">02</div><div class="auth-orbit a1"></div><div class="auth-orbit a2"></div>
+    <div class="auth-bottle alt"><div class="auth-cap"></div><div class="auth-glass"><b>VÉLORA</b><small>PRIVATE MEMBER</small></div></div>
+    <div class="auth-art-copy"><span>JOIN THE HOUSE</span><h2>رایحه‌هایت را<br>شخصی‌تر انتخاب کن.</h2><p>حساب بساز، عطرها را ذخیره کن و سفارش‌هایت را راحت‌تر دنبال کن.</p></div>
+  </div>
+
+  <div class="auth-form-side">
+    <div class="auth-card signup-card">
+      <div class="auth-diamond"><i class="fa-regular fa-gem"></i></div>
+      <span class="eyebrow-x">JOIN VÉLORA</span><h1>ساخت حساب</h1><p class="auth-lead">چند اطلاعات کوتاه و حساب شما آماده است.</p>
+
+      {% if form.errors %}<div class="auth-errors"><b>لطفاً خطاها را بررسی کنید:</b>{% for field in form %}{% for error in field.errors %}<span>{{ field.label }}: {{ error }}</span>{% endfor %}{% endfor %}{% for error in form.non_field_errors %}<span>{{ error }}</span>{% endfor %}</div>{% endif %}
+
+      <form method="POST" class="auth-form signup-grid" novalidate>
+        {% csrf_token %}
+        <label class="auth-field wide">نام کاربری
+          <span><i class="fa-regular fa-user"></i><input type="text" name="username" id="id_username" placeholder="نام کاربری" value="{{ form.username.value|default:'' }}" required></span>
+        </label>
+        <label class="auth-field">ایمیل
+          <span><i class="fa-regular fa-envelope"></i><input type="email" name="email" id="id_email" placeholder="name@example.com" value="{{ form.email.value|default:'' }}" required></span>
+        </label>
+        <label class="auth-field">شماره تلفن
+          <span><i class="fa-solid fa-mobile-screen-button"></i><input type="tel" name="phone" id="id_phone" placeholder="09123456789" value="{{ form.phone.value|default:'' }}" required></span>
+        </label>
+        <label class="auth-field">رمز عبور
+          <span><i class="fa-solid fa-lock"></i><input type="password" name="password1" id="id_password1" placeholder="حداقل ۸ کاراکتر" required><button type="button" data-password-toggle="id_password1"><i class="fa-regular fa-eye"></i></button></span>
+        </label>
+        <label class="auth-field">تکرار رمز عبور
+          <span><i class="fa-solid fa-shield-halved"></i><input type="password" name="password2" id="id_password2" placeholder="تکرار رمز عبور" required><button type="button" data-password-toggle="id_password2"><i class="fa-regular fa-eye"></i></button></span>
+        </label>
+
+        <label class="checkbox-x terms wide">
+          <input type="checkbox" name="agree_terms" id="agree_terms" {% if form.agree_terms.value %}checked{% endif %} required><i></i>
+          <b>با <a href="{% url 'first:customer_service' 'terms' %}" target="_blank">قوانین و مقررات</a> و <a href="{% url 'first:customer_service' 'privacy' %}" target="_blank">حریم خصوصی</a> موافقم.</b>
+        </label>
+        <button class="auth-submit wide" type="submit"><span>ایجاد حساب کاربری</span><i class="fa-solid fa-arrow-left"></i></button>
+      </form>
+      <div class="auth-switch"><span>قبلاً حساب ساخته‌اید؟</span><a href="{% url 'first:login' %}">ورود به حساب</a></div>
+    </div>
+  </div>
+</section>
+{% endblock %}

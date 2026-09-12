@@ -1,9 +1,9 @@
-{% extends 'base.html' %}
+{% extends 'dashboard/perfume_admin_base.html' %}
 {% load static %}
 
 {% block title %}📋 مدیریت سفارشات{% endblock %}
 
-{% block content %}
+{% block admin_content %}
 <div class="max-w-7xl mx-auto px-4">
     <div class="flex justify-between items-center mb-8">
         <div>
@@ -30,10 +30,10 @@
             </thead>
             <tbody>
                 {% for order in page_obj %}
-                <tr class="border-b border-gray-100 hover:bg-pink-50 transition-all">
+                <tr class="border-b border-gray-100 hover:bg-stone-50 transition-all">
                     <td class="py-3 px-4 font-bold">#{{ order.order_number }}</td>
                     <td class="py-3 px-4">{{ order.user.username }}</td>
-                    <td class="py-3 px-4 font-bold text-pink-500">{{ order.total|floatformat:0 }}</td>
+                    <td class="py-3 px-4 font-bold text-amber-700">{{ order.total|floatformat:0 }}</td>
                     <td class="py-3 px-4">
                         <span class="px-3 py-1 rounded-full text-xs font-bold
                             {% if order.status == 'pending' %}bg-yellow-100 text-yellow-600
@@ -57,7 +57,7 @@
                     <td class="py-3 px-4">
                         <form method="POST" action="{% url 'first:update_order_status' order.id %}" class="flex gap-2">
                             {% csrf_token %}
-                            <select name="status" class="px-3 py-1 border-2 border-gray-200 rounded-lg text-sm focus:border-pink-500 outline-none">
+                            <select name="status" class="px-3 py-1 border-2 border-gray-200 rounded-lg text-sm focus:border-amber-700 outline-none">
                                 <option value="{{ order.status }}" selected>{{ order.get_status_display }}</option>
                                 {% if order.status == 'pending' and order.payment_method == 'cash' %}
                                     <option value="processing">در حال پردازش</option>
@@ -96,17 +96,17 @@
             </p>
             <div class="flex gap-2">
                 {% if page_obj.has_previous %}
-                <a href="?page={{ page_obj.previous_page_number }}" class="px-4 py-2 border-2 border-gray-200 rounded-xl hover:bg-pink-50 transition-all">قبلی</a>
+                <a href="?page={{ page_obj.previous_page_number }}" class="px-4 py-2 border-2 border-gray-200 rounded-xl hover:bg-stone-50 transition-all">قبلی</a>
                 {% endif %}
                 {% for num in page_obj.paginator.page_range %}
                     {% if num == page_obj.number %}
-                    <span class="px-4 py-2 bg-gradient-to-r from-pink-500 to-purple-600 text-white rounded-xl">{{ num }}</span>
+                    <span class="px-4 py-2 bg-gradient-to-r from-amber-700 to-stone-800 text-white rounded-xl">{{ num }}</span>
                     {% elif num > page_obj.number|add:'-3' and num < page_obj.number|add:'3' %}
-                    <a href="?page={{ num }}" class="px-4 py-2 border-2 border-gray-200 rounded-xl hover:bg-pink-50 transition-all">{{ num }}</a>
+                    <a href="?page={{ num }}" class="px-4 py-2 border-2 border-gray-200 rounded-xl hover:bg-stone-50 transition-all">{{ num }}</a>
                     {% endif %}
                 {% endfor %}
                 {% if page_obj.has_next %}
-                <a href="?page={{ page_obj.next_page_number }}" class="px-4 py-2 border-2 border-gray-200 rounded-xl hover:bg-pink-50 transition-all">بعدی</a>
+                <a href="?page={{ page_obj.next_page_number }}" class="px-4 py-2 border-2 border-gray-200 rounded-xl hover:bg-stone-50 transition-all">بعدی</a>
                 {% endif %}
             </div>
         </div>

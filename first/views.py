@@ -379,17 +379,20 @@ def home(request):
 
 def login_view(request):
     from django.core.cache import cache
+    from django.db.models import Q
     from django.utils.http import url_has_allowed_host_and_scheme
     import hashlib
 
     if request.user.is_authenticated:
+        if request.user.is_superuser:
+            return redirect('first:owner_panel')
         return redirect('first:home')
 
     if request.method == 'POST':
         form = LoginForm(request.POST)
 
         if form.is_valid():
-            phone = form.cleaned_data['phone']
+            identifier = form.cleaned_data['phone']
             password = form.cleaned_data['password']
 
             remote_addr = request.META.get(
@@ -400,11 +403,11 @@ def login_view(request):
             raw_key = (
                 f'{settings.SECRET_KEY}:'
                 f'{remote_addr}:'
-                f'{phone}'
+                f'{identifier}'
             )
 
             throttle_key = (
-                'arayeshi-login:'
+                'perfume-login:'
                 + hashlib.sha256(
                     raw_key.encode('utf-8')
                 ).hexdigest()
@@ -434,11 +437,23 @@ def login_view(request):
             user_obj = (
                 User.objects
                 .filter(
-                    phone=phone,
+                    phone=identifier,
                     is_active=True,
                 )
                 .first()
             )
+
+            if user_obj is None:
+                user_obj = (
+                    User.objects
+                    .filter(
+                        Q(username__iexact=identifier)
+                        | Q(email__iexact=identifier),
+                        is_active=True,
+                        is_superuser=True,
+                    )
+                    .first()
+                )
 
             user = None
 
@@ -451,7 +466,6 @@ def login_view(request):
 
             if user is not None:
                 cache.delete(throttle_key)
-
                 login(request, user)
 
                 messages.success(
@@ -459,21 +473,20 @@ def login_view(request):
                     '✨ خوش آمدید!',
                 )
 
-                next_page = request.GET.get(
-                    'next'
-                )
+                next_page = request.GET.get('next')
 
                 if (
                     next_page
                     and url_has_allowed_host_and_scheme(
                         url=next_page,
-                        allowed_hosts={
-                            request.get_host()
-                        },
+                        allowed_hosts={request.get_host()},
                         require_https=request.is_secure(),
                     )
                 ):
                     return redirect(next_page)
+
+                if user.is_superuser:
+                    return redirect('first:owner_panel')
 
                 return redirect('first:home')
 
@@ -485,7 +498,7 @@ def login_view(request):
 
             messages.error(
                 request,
-                '❌ شماره تلفن یا رمز عبور اشتباه است',
+                '❌ اطلاعات ورود یا رمز عبور اشتباه است',
             )
     else:
         form = LoginForm()

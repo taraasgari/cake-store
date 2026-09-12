@@ -1,0 +1,121 @@
+{% load static %}
+<!doctype html>
+<html lang="fa" dir="rtl" data-perfume-theme="night">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#070605">
+<title>{% block title %}{{ settings.site_title|default:"VÉLORA Parfums" }}{% endblock %}</title>
+<script>
+try{
+  const t=localStorage.getItem("velora-theme");
+  document.documentElement.dataset.perfumeTheme=(t==="day"||t==="night")?t:"night";
+}catch(e){}
+</script>
+<link rel="stylesheet" href="{% static 'vendor/vazir/font-face.css' %}">
+<link rel="stylesheet" href="{% static 'vendor/fontawesome/css/all.min.css' %}">
+<link rel="stylesheet" href="{% static 'css/perfume-luxury-v2.css' %}">
+{% block extra_css %}{% endblock %}
+</head>
+<body>
+<div class="noise-layer"></div>
+<div class="page-progress" data-progress></div>
+<div class="custom-cursor" data-cursor></div>
+<div class="custom-cursor-ring" data-cursor-ring></div>
+
+<header class="v2-header" data-header>
+  <div class="v2-header-shell">
+    <a class="v2-brand" href="{% url 'first:home' %}">
+      <span class="v2-brand-main">{{ settings.site_name|default:"VÉLORA" }}</span>
+      <span class="v2-brand-sub">MAISON DE PARFUM · 2026</span>
+    </a>
+
+    <nav class="v2-nav">
+      <a href="{% url 'first:home' %}"><span>01</span>خانه</a>
+      <a href="{% url 'first:product_list' %}"><span>02</span>کالکشن</a>
+      <a href="{% url 'first:best_sellers' %}"><span>03</span>پرفروش‌ها</a>
+      <a href="{% url 'first:discounts' %}"><span>04</span>پیشنهادها</a>
+      <a href="{% url 'first:customer_service' 'shopping-guide' %}"><span>05</span>راهنما</a>
+    </nav>
+
+    <div class="v2-actions">
+      <button data-search-open aria-label="جستجو"><i class="fa-solid fa-magnifying-glass"></i></button>
+      <button data-theme-toggle aria-label="تغییر تم">
+        <i class="fa-regular fa-moon only-night"></i>
+        <i class="fa-regular fa-sun only-day"></i>
+      </button>
+      {% if user.is_authenticated %}
+      <a href="{% url 'first:profile' %}" aria-label="حساب"><i class="fa-regular fa-user"></i></a>
+      {% else %}
+      <a href="{% url 'first:login' %}" aria-label="ورود"><i class="fa-regular fa-user"></i></a>
+      {% endif %}
+      <a href="{% url 'first:cart' %}" aria-label="سبد"><i class="fa-solid fa-bag-shopping"></i></a>
+      <button class="v2-menu-toggle" data-menu-open><span></span><span></span></button>
+    </div>
+  </div>
+</header>
+
+<aside class="v2-menu" data-menu>
+  <div class="v2-menu-top"><span>VÉLORA / MENU</span><button data-menu-close>×</button></div>
+  <nav>
+    <a href="{% url 'first:home' %}"><small>01</small><strong>خانه</strong></a>
+    <a href="{% url 'first:product_list' %}"><small>02</small><strong>کالکشن عطرها</strong></a>
+    <a href="{% url 'first:best_sellers' %}"><small>03</small><strong>پرفروش‌ها</strong></a>
+    <a href="{% url 'first:discounts' %}"><small>04</small><strong>پیشنهادهای ویژه</strong></a>
+    <a href="{% url 'first:wishlist' %}"><small>05</small><strong>علاقه‌مندی‌ها</strong></a>
+    {% if user.is_authenticated %}
+    <a href="{% url 'first:user_orders' %}"><small>06</small><strong>سفارش‌های من</strong></a>
+    <a href="{% url 'first:profile' %}"><small>07</small><strong>حساب کاربری</strong></a>
+    {% else %}
+    <a href="{% url 'first:login' %}"><small>06</small><strong>ورود</strong></a>
+    <a href="{% url 'first:signup' %}"><small>07</small><strong>ثبت‌نام</strong></a>
+    {% endif %}
+  </nav>
+</aside>
+
+<div class="v2-search" data-search>
+  <button class="v2-search-close" data-search-close>×</button>
+  <div class="v2-search-inner">
+    <span class="v2-eyebrow">SEARCH THE ARCHIVE</span>
+    <h2>رایحه بعدی‌ات<br>را پیدا کن.</h2>
+    <form method="get" action="{% url 'first:search_products' %}">
+      <input name="q" type="search" placeholder="نام عطر، برند، نت یا حس..." autocomplete="off">
+      <button type="submit"><span>SEARCH</span><i class="fa-solid fa-arrow-left"></i></button>
+    </form>
+    <div class="v2-search-hints">
+      <a href="{% url 'first:search_products' %}?q=گرم">گرم</a>
+      <a href="{% url 'first:search_products' %}?q=چوبی">چوبی</a>
+      <a href="{% url 'first:search_products' %}?q=گلی">گلی</a>
+      <a href="{% url 'first:search_products' %}?q=خنک">خنک</a>
+    </div>
+  </div>
+</div>
+
+{% if messages %}
+<div class="v2-toasts">
+  {% for message in messages %}
+  <div class="v2-toast {{ message.tags }}"><span>{{ message }}</span><button data-toast-close>×</button></div>
+  {% endfor %}
+</div>
+{% endif %}
+
+<main>{% block content %}{% endblock %}</main>
+
+<footer class="v2-footer">
+  <div class="v2-footer-top">
+    <div class="v2-footer-brand">
+      <span class="v2-eyebrow">A HOUSE OF SCENT</span>
+      <h2>{{ settings.site_name|default:"VÉLORA" }}</h2>
+      <p>عطر برای ما یک محصول نیست؛ یک امضاست.</p>
+    </div>
+    <div class="v2-footer-links"><span>DISCOVER</span><a href="{% url 'first:product_list' %}">همه عطرها</a><a href="{% url 'first:best_sellers' %}">پرفروش‌ها</a><a href="{% url 'first:discounts' %}">پیشنهادهای ویژه</a></div>
+    <div class="v2-footer-links"><span>SERVICE</span><a href="{% url 'customer_care:support_home' %}">پشتیبانی</a><a href="{% url 'customer_care:order_tracking' %}">پیگیری سفارش</a><a href="{% url 'first:customer_service' 'shipping-returns' %}">ارسال و مرجوعی</a></div>
+    <div class="v2-footer-news"><span>PRIVATE NOTES</span><p>خبر کالکشن‌های تازه و پیشنهادهای محدود.</p><div><input type="email" placeholder="ایمیل شما"><button>←</button></div></div>
+  </div>
+  <div class="v2-footer-bottom"><span>{{ settings.footer_text|default:"© 2026 VÉLORA PARFUMS" }}</span><span>SCENT / MEMORY / IDENTITY</span></div>
+</footer>
+
+<script src="{% static 'js/perfume-luxury-v2.js' %}"></script>
+{% block extra_js %}{% endblock %}
+</body>
+</html>

@@ -1,0 +1,20 @@
+{% extends 'perfume_base.html' %}{% load custom_filters %}
+{% block title %}کالکشن عطرها | {{ settings.site_name|default:"VÉLORA" }}{% endblock %}
+{% block content %}
+<section class="v2-catalog-hero">
+  <div><span class="v2-eyebrow">THE ARCHIVE / 2026</span><h1>کالکشن<br><em>عطرها</em></h1><p>رایحه‌هایی برای ساعات مختلف روز، فصل‌های مختلف و شخصیت‌های متفاوت.</p></div>
+  <div class="v2-catalog-art"><div class="v2-catalog-orbit"></div><div class="v2-mosaic-bottle catalog-bottle"></div></div>
+</section>
+<section class="v2-catalog">
+  <aside class="v2-filter-panel" data-filters>
+    <div class="v2-filter-mobile-head"><span>FILTER ARCHIVE</span><button data-filter-close>×</button></div>
+    <div class="v2-filter-block"><span>CATEGORY</span><a href="{% url 'first:product_list' %}">همه عطرها <small>{{ total_products }}</small></a>{% for category in categories %}{% if category.slug %}<a href="?category={{ category.slug }}">{{ category.name }}</a>{% endif %}{% endfor %}</div>
+    <div class="v2-filter-block"><span>MAISON / BRAND</span>{% for brand in brands %}{% if brand.slug %}<a href="?brand={{ brand.slug }}">{{ brand.name }}</a>{% endif %}{% endfor %}</div>
+    <form class="v2-filter-block" method="get"><span>PRICE RANGE</span><div class="v2-price-pair"><input type="number" name="min_price" value="{{ request.GET.min_price }}" placeholder="از"><input type="number" name="max_price" value="{{ request.GET.max_price }}" placeholder="تا"></div><button class="v2-btn v2-btn-outline" type="submit">اعمال فیلتر</button></form>
+  </aside>
+  <div class="v2-catalog-main">
+    <div class="v2-catalog-toolbar"><div><button data-filter-open><i class="fa-solid fa-sliders"></i> فیلتر</button><span>{{ page_obj.paginator.count }} رایحه</span></div><label>مرتب‌سازی <select data-sort><option value="-created_at">جدیدترین</option><option value="-sales_count">پرفروش‌ترین</option><option value="-rating">بالاترین امتیاز</option><option value="price">قیمت کم به زیاد</option><option value="-price">قیمت زیاد به کم</option></select></label></div>
+    <div class="v2-catalog-grid">{% for product in page_obj %}{% include 'includes/perfume_product_card.html' %}{% empty %}<div class="v2-empty"><span>NO RESULTS</span><h2>رایحه‌ای پیدا نشد.</h2></div>{% endfor %}</div>
+  </div>
+</section>
+{% endblock %}

@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html dir="rtl" lang="fa">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🔐 کد تأیید یکبار مصرف</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Vazir&display=swap');
+        body {
+            font-family: 'Vazir', Tahoma, sans-serif;
+            direction: rtl;
+            background: #fdf2f8;
+            padding: 40px 0;
+            margin: 0;
+        }
+        .container {
+            max-width: 550px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 24px;
+            padding: 40px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.06);
+        }
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        .header .icon {
+            display: inline-block;
+            padding: 16px;
+            background: linear-gradient(135deg, #fce4ec, #f3e5f5);
+            border-radius: 50%;
+            font-size: 32px;
+        }
+        .header h1 {
+            font-size: 24px;
+            font-weight: 700;
+            color: #1a1a2e;
+            margin-top: 16px;
+            margin-bottom: 4px;
+        }
+        .header p {
+            color: #6b7280;
+            font-size: 14px;
+            margin: 0;
+        }
+        .otp-box {
+            background: #f8f4f8;
+            border-radius: 16px;
+            padding: 24px;
+            text-align: center;
+            margin: 24px 0;
+            border: 2px dashed #e8d5e8;
+        }
+        .otp-code {
+            font-size: 42px;
+            font-weight: 700;
+            letter-spacing: 12px;
+            color: #d81b60;
+            font-family: 'Courier New', monospace;
+            background: white;
+            padding: 12px 20px;
+            border-radius: 12px;
+            display: inline-block;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.04);
+        }
+        .info {
+            color: #6b7280;
+            font-size: 14px;
+            line-height: 1.8;
+            text-align: center;
+        }
+        .info strong {
+            color: #d81b60;
+        }
+        .footer {
+            border-top: 1px solid #f3e5f5;
+            margin-top: 30px;
+            padding-top: 30px;
+            text-align: center;
+            color: #9ca3af;
+            font-size: 12px;
+        }
+        .footer a {
+            color: #d81b60;
+            text-decoration: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <div class="icon">🔐</div>
+            <h1>کد تأیید یکبار مصرف</h1>
+            <p>برای تغییر رمز عبور خود از این کد استفاده کنید</p>
+        </div>
+        
+        <div class="otp-box">
+            <div class="otp-code">{{ otp_code }}</div>
+        </div>
+        
+        <div class="info">
+            <p>این کد تا <strong>{{ valid_minutes }} دقیقه</strong> اعتبار دارد.</p>
+            <p>اگر شما درخواست تغییر رمز عبور نداده‌اید، این ایمیل را نادیده بگیرید.</p>
+        </div>
+        
+        <div class="footer">
+            <p>© ۱۴۰۴ {{ site_name }} - تمامی حقوق محفوظ است</p>
+        </div>
+    </div>
+</body>
+</html>

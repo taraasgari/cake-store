@@ -1,0 +1,53 @@
+{% load static %}
+<!doctype html>
+<html lang="fa" dir="rtl">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>استودیو طراحی | {{ settings.site_name|default:'فروشگاه عطر' }}</title>
+  <link rel="stylesheet" href="{% static 'vendor/vazir/font-face.css' %}">
+  <link rel="stylesheet" href="{% static 'vendor/fontawesome/css/all.min.css' %}">
+  <link rel="stylesheet" href="{% static 'css/perfume-admin-v1.css' %}">
+</head>
+<body class="pa-studio-body">
+<form class="pa-hidden-csrf">{% csrf_token %}</form>
+<div class="pa-studio" data-studio data-save-url="{% url 'first:customizer_save' %}" data-upload-url="{% url 'first:customizer_upload' %}">
+  <header class="pa-studio-top">
+    <div class="pa-studio-brand"><a href="{% url 'first:owner_panel' %}" title="بازگشت"><i class="fa-solid fa-arrow-right"></i></a><span class="pa-monogram">V</span><span><strong>استودیو طراحی بصری</strong><small>PERFUME VISUAL STUDIO</small></span></div>
+    <div class="pa-device-switch"><button class="active" type="button" data-device="desktop"><i class="fa-solid fa-desktop"></i></button><button type="button" data-device="tablet"><i class="fa-solid fa-tablet-screen-button"></i></button><button type="button" data-device="mobile"><i class="fa-solid fa-mobile-screen"></i></button></div>
+    <div class="pa-studio-actions"><button class="pa-secondary" type="button" data-studio-reset><i class="fa-solid fa-arrow-rotate-left"></i> بازنشانی</button><button class="pa-primary" type="button" data-studio-save><i class="fa-solid fa-floppy-disk"></i> ذخیره تغییرات</button></div>
+  </header>
+
+  <div class="pa-studio-grid">
+    <aside class="pa-studio-panel">
+      <section>
+        <span class="pa-eyebrow">SITE PALETTE</span><h2>رنگ‌های برند</h2>
+        <div class="pa-color-list"><label><span>طلایی اصلی</span><input type="color" data-theme-field="primary"></label><label><span>قهوه‌ای</span><input type="color" data-theme-field="secondary"></label><label><span>طلایی روشن</span><input type="color" data-theme-field="accent"></label><label><span>پس‌زمینه پایه</span><input type="color" data-theme-field="bg"></label><label><span>رنگ متن</span><input type="color" data-theme-field="text"></label></div>
+      </section>
+
+      <section>
+        <span class="pa-eyebrow">SELECTED AREA</span><h2 data-selected-name>یک بخش را انتخاب کنید</h2><p class="pa-studio-help">در پیش‌نمایش روی بخش‌هایی که کادر طلایی دارند کلیک کنید.</p>
+        <div class="pa-editor-fields" data-editor-fields hidden>
+          <label data-text-field><span>متن</span><textarea rows="4" data-rule-text></textarea></label>
+          <label data-image-field hidden><span>آدرس تصویر</span><input type="text" data-rule-src placeholder="/media/..."></label>
+          <div class="pa-upload-box" data-upload-box hidden><input type="file" accept="image/*" data-rule-file><button type="button" class="pa-secondary full" data-rule-upload><i class="fa-solid fa-cloud-arrow-up"></i> آپلود تصویر</button></div>
+          <div class="pa-field-pair"><label><span>رنگ متن</span><input type="color" data-style="color"></label><label><span>پس‌زمینه</span><input type="color" data-style="backgroundColor"></label></div>
+          <div class="pa-field-pair"><label><span>اندازه متن</span><input type="text" placeholder="32px" data-style="fontSize"></label><label><span>گردی گوشه</span><input type="text" placeholder="18px" data-style="borderRadius"></label></div>
+          <div class="pa-field-pair"><label><span>فاصله داخلی</span><input type="text" placeholder="24px" data-style="padding"></label><label><span>شفافیت</span><input type="number" min="0" max="1" step=".05" data-style="opacity"></label></div>
+          <label><span>سایه</span><input type="text" placeholder="0 20px 60px rgba(0,0,0,.2)" data-style="boxShadow"></label>
+          <label class="pa-check-row"><input type="checkbox" data-rule-hidden><span>مخفی کردن این بخش</span></label>
+          <button class="pa-danger-soft" type="button" data-rule-clear>حذف تغییرات این بخش</button>
+        </div>
+      </section>
+
+      <section><span class="pa-eyebrow">EDITABLE AREAS</span><div class="pa-region-list" data-region-list></div></section>
+    </aside>
+
+    <main class="pa-preview-shell"><div class="pa-preview-toolbar"><span><i class="fa-solid fa-circle"></i> پیش‌نمایش زنده فروشگاه</span><button type="button" data-preview-refresh><i class="fa-solid fa-rotate"></i></button></div><div class="pa-preview-frame desktop" data-preview-frame><iframe title="پیش‌نمایش فروشگاه" src="{% url 'first:home' %}?visual_preview=1" data-preview></iframe></div></main>
+  </div>
+  <div class="pa-studio-toast" data-studio-toast></div>
+</div>
+{{ customizer_payload|json_script:"pa-customizer-payload" }}
+<script src="{% static 'js/perfume-visual-studio.js' %}"></script>
+</body>
+</html>

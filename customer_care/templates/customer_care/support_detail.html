@@ -1,27 +1,69 @@
-{% extends 'base.html' %}
-{% block title %}{{ ticket.reference }}{% endblock %}
+{% extends 'perfume_base.html' %}
+{% block title %}{{ ticket.reference }} | پشتیبانی{% endblock %}
 {% block content %}
-<div class="max-w-4xl mx-auto px-4 py-10">
-  <div class="bg-white rounded-3xl shadow p-6">
-    <div class="border-b pb-4 mb-5">
-      <h1 class="text-xl font-bold">{{ ticket.subject }}</h1>
-      <div class="text-sm text-gray-500 mt-2">{{ ticket.reference }} · {{ ticket.get_status_display }}{% if ticket.order %} · سفارش #{{ ticket.order.order_number }}{% endif %}</div>
-    </div>
-    <div class="space-y-4">
-      {% for message in ticket.messages.all %}
-        <div class="{% if message.is_staff_reply %}bg-purple-50 mr-8{% else %}bg-gray-50 ml-8{% endif %} rounded-2xl p-4">
-          <div class="text-xs text-gray-500 mb-2">{% if message.is_staff_reply %}پشتیبانی{% else %}شما{% endif %} · {{ message.created_at|date:"Y/m/d H:i" }}</div>
-          <div class="whitespace-pre-line">{{ message.body }}</div>
+<section class="p8-page">
+  <div class="p8-wrap">
+
+    <header class="p8-page-head">
+      <div>
+        <span class="p8-kicker">{{ ticket.reference }}</span>
+        <h1>{{ ticket.subject }}</h1>
+        <p>
+          وضعیت: {{ ticket.get_status_display }}
+          {% if ticket.order %} · سفارش #{{ ticket.order.order_number }}{% endif %}
+        </p>
+      </div>
+      <a class="p8-secondary" href="{% url 'customer_care:support_home' %}">بازگشت به تیکت‌ها</a>
+    </header>
+
+    <div class="p8-thread-layout">
+
+      <section class="p8-thread">
+        {% for message in ticket.messages.all %}
+        <article class="p8-message {% if message.is_staff_reply %}staff{% else %}customer{% endif %}">
+          <div class="p8-message-meta">
+            <span>
+              {% if message.is_staff_reply %}
+              <i class="fa-solid fa-headset"></i> پشتیبانی
+              {% else %}
+              <i class="fa-regular fa-user"></i> شما
+              {% endif %}
+            </span>
+            <small>{{ message.created_at|date:'Y/m/d H:i' }}</small>
+          </div>
+          <p>{{ message.body|linebreaksbr }}</p>
+        </article>
+        {% empty %}
+        <div class="p8-empty-card compact"><p>هنوز پیامی برای این تیکت ثبت نشده است.</p></div>
+        {% endfor %}
+      </section>
+
+      <aside class="p8-thread-side">
+        <span class="p8-kicker">TICKET STATUS</span>
+        <h2>{{ ticket.get_status_display }}</h2>
+
+        {% if ticket.order %}
+        <div class="p8-thread-order">
+          <small>سفارش مرتبط</small>
+          <strong>#{{ ticket.order.order_number }}</strong>
         </div>
-      {% endfor %}
+        {% endif %}
+
+        {% if ticket.status != 'closed' %}
+        <form method="post" action="{% url 'customer_care:support_reply' ticket.reference %}" class="p8-form">
+          {% csrf_token %}
+          {{ message_form.as_p }}
+          <button class="p8-primary full" type="submit">
+            ارسال پاسخ
+            <i class="fa-solid fa-arrow-left"></i>
+          </button>
+        </form>
+        {% else %}
+        <div class="p8-closed-note">این تیکت بسته شده است.</div>
+        {% endif %}
+      </aside>
+
     </div>
-    {% if ticket.status != 'closed' %}
-      <form method="post" action="{% url 'customer_care:support_reply' ticket.reference %}" class="mt-6">
-        {% csrf_token %}
-        {{ message_form.as_p }}
-        <button class="bg-pink-600 text-white px-5 py-3 rounded-xl">ارسال پاسخ</button>
-      </form>
-    {% endif %}
   </div>
-</div>
+</section>
 {% endblock %}

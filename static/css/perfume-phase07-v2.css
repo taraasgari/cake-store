@@ -1,0 +1,59 @@
+/* Phase 07 v2 — final theme authority */
+
+html[data-perfume-theme="day"]{
+  color-scheme:light!important;
+}
+
+html[data-perfume-theme="night"]{
+  color-scheme:dark!important;
+}
+
+html[data-perfume-theme="day"] body{
+  background:#eee2d4!important;
+  color:#18120e!important;
+}
+
+html[data-perfume-theme="day"] .phase-main{
+  background:
+    radial-gradient(
+      circle at 82% 5%,
+      rgba(165,105,47,.10),
+      transparent 22%
+    ),
+    linear-gradient(
+      180deg,
+      #eee2d4,
+      #dfccb7
+    )!important;
+}
+
+html[data-perfume-theme="night"] body{
+  background:#090706!important;
+  color:#f7f0e7!important;
+}
+
+html[data-perfume-theme="night"] .phase-main{
+  background:
+    radial-gradient(
+      circle at 82% 5%,
+      rgba(165,98,42,.10),
+      transparent 22%
+    ),
+    linear-gradient(
+      180deg,
+      #090706,
+      #100b08
+    )!important;
+}
+
+html[data-perfume-theme="day"] [data-theme-toggle]{
+  background:#e2cfb8!important;
+  color:#7c4c21!important;
+  border-color:rgba(120,76,34,.26)!important;
+}
+
+html[data-perfume-theme="night"] [data-theme-toggle]{
+  background:#17110d!important;
+  color:#e3c286!important;
+  border-color:rgba(218,178,112,.22)!important;
+}

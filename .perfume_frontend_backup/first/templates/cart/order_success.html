@@ -1,0 +1,23 @@
+{% extends 'base.html' %}
+
+{% block title %}✅ سفارش ثبت شد{% endblock %}
+
+{% block content %}
+<div class="max-w-2xl mx-auto text-center py-16">
+    <div class="text-6xl text-green-500 mb-6">
+        <i class="fas fa-check-circle"></i>
+    </div>
+    <h1 class="text-3xl font-bold gradient-text mb-4">سفارش شما با موفقیت ثبت شد!</h1>
+    <p class="text-gray-600 text-lg mb-2">شماره سفارش: <span class="font-bold">{{ order.order_number }}</span></p>
+    <p class="text-gray-500 mb-8">به زودی با شما تماس خواهیم گرفت</p>
+    
+    <div class="flex flex-wrap gap-4 justify-center">
+        <a href="{% url 'first:home' %}" class="px-6 py-3 bg-pink-500 text-white rounded-xl hover:shadow-lg transition-all">
+            <i class="fas fa-home ml-2"></i> بازگشت به خانه
+        </a>
+        <a href="{% url 'first:order_detail' order.order_number %}" class="px-6 py-3 border-2 border-pink-500 text-pink-500 rounded-xl hover:bg-pink-500 hover:text-white transition-all">
+            <i class="fas fa-eye ml-2"></i> مشاهده سفارش
+        </a>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,101 @@
+{% load static %}
+<!doctype html>
+<html lang="fa" dir="rtl" data-perfume-theme="night">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#080705">
+<title>{% block title %}{{ settings.site_title|default:"VÉLORA Parfums" }}{% endblock %}</title>
+<script>
+try{
+ const t=localStorage.getItem("velora-theme");
+ document.documentElement.dataset.perfumeTheme=(t==="day"||t==="night")?t:"night";
+}catch(e){}
+</script>
+<link rel="stylesheet" href="{% static 'vendor/vazir/font-face.css' %}">
+<link rel="stylesheet" href="{% static 'vendor/fontawesome/css/all.min.css' %}">
+<link rel="stylesheet" href="{% static 'css/perfume-phase01.css' %}">
+    <link rel="stylesheet" href="{% static 'css/perfume-global-compat.css' %}">
+<link rel="stylesheet" href="{% static 'css/perfume-phase03-final.css' %}">
+    {% block extra_css %}{% endblock %}
+</head>
+<body class="velora-body">
+<div class="page-grain"></div><div class="scroll-progress" data-progress></div>
+
+<div class="top-lux-bar">
+  <span>ارسال مطمئن و بسته‌بندی حرفه‌ای</span><i>✦</i>
+  <span>تضمین اصالت کالا</span><i>✦</i>
+  <span>مشاوره انتخاب رایحه</span>
+</div>
+
+<header class="pro-header" data-header>
+  <div class="pro-header-main">
+    <a class="pro-logo" href="{% url 'first:home' %}">
+      <span class="logo-mark">{% if settings.logo %}<img src="{{ settings.logo.url }}" alt="">{% else %}V{% endif %}</span>
+      <span class="logo-copy"><b>{{ settings.site_name|default:"VÉLORA" }}</b><small>MAISON DE PARFUM</small></span>
+    </a>
+
+    <form class="header-search" method="get" action="{% url 'first:search_products' %}">
+      <button type="submit"><i class="fa-solid fa-magnifying-glass"></i></button>
+      <input name="q" type="search" placeholder="نام عطر، برند، رایحه یا نت موردنظر..." autocomplete="off">
+      <span>SEARCH</span>
+    </form>
+
+    <div class="header-actions">
+      <button type="button" data-theme-toggle title="روز / شب"><i class="fa-regular fa-moon night-icon"></i><i class="fa-regular fa-sun day-icon"></i></button>
+      {% if user.is_authenticated %}<a href="{% url 'first:profile' %}"><i class="fa-regular fa-user"></i></a>{% else %}<a href="{% url 'first:login' %}"><i class="fa-regular fa-user"></i></a>{% endif %}
+      <a href="{% url 'first:wishlist' %}"><i class="fa-regular fa-heart"></i></a>
+      <a class="cart-link" href="{% url 'first:cart' %}"><i class="fa-solid fa-bag-shopping"></i><span>سبد خرید</span></a>
+      <button class="menu-trigger" type="button" data-menu-open><i></i><i></i></button>
+    </div>
+  </div>
+
+  <div class="pro-header-nav">
+    <nav>
+      <a href="{% url 'first:home' %}">خانه</a>
+      <a href="{% url 'first:product_list' %}">همه عطرها</a>
+      <a href="{% url 'first:best_sellers' %}">پرفروش‌ترین‌ها</a>
+      <a href="{% url 'first:discounts' %}">پیشنهاد ویژه</a>
+      <a href="{% url 'first:customer_service' 'shopping-guide' %}">راهنمای انتخاب عطر</a>
+      <a href="{% url 'customer_care:order_tracking' %}">پیگیری سفارش</a>
+    </nav>
+    <a class="header-support" href="{% url 'customer_care:support_home' %}"><i class="fa-solid fa-headset"></i> پشتیبانی</a>
+  </div>
+</header>
+
+<aside class="mobile-drawer" data-menu>
+  <div><span>VÉLORA / MENU</span><button data-menu-close>×</button></div>
+  <nav>
+    <a href="{% url 'first:home' %}"><small>01</small>خانه</a>
+    <a href="{% url 'first:product_list' %}"><small>02</small>کالکشن عطرها</a>
+    <a href="{% url 'first:best_sellers' %}"><small>03</small>پرفروش‌ها</a>
+    <a href="{% url 'first:discounts' %}"><small>04</small>پیشنهادها</a>
+    <a href="{% url 'first:wishlist' %}"><small>05</small>علاقه‌مندی‌ها</a>
+    {% if user.is_authenticated %}
+    <a href="{% url 'first:user_orders' %}"><small>06</small>سفارش‌های من</a>
+    <a href="{% url 'first:profile' %}"><small>07</small>حساب کاربری</a>
+    {% else %}
+    <a href="{% url 'first:login' %}"><small>06</small>ورود</a>
+    <a href="{% url 'first:signup' %}"><small>07</small>ثبت‌نام</a>
+    {% endif %}
+  </nav>
+</aside>
+
+{% if messages %}<div class="phase-toasts">{% for message in messages %}<div><span>{{ message }}</span><button data-toast-close>×</button></div>{% endfor %}</div>{% endif %}
+
+<main>{% block content %}{% endblock %}</main>
+
+<footer class="phase-footer">
+  <div class="footer-grid">
+    <div><span class="eyebrow-x">A HOUSE OF SCENT</span><h2>{{ settings.site_name|default:"VÉLORA" }}</h2><p>رایحه‌ای که فقط انتخاب نمی‌شود؛ بخشی از هویت شما می‌شود.</p></div>
+    <div><b>DISCOVER</b><a href="{% url 'first:product_list' %}">همه عطرها</a><a href="{% url 'first:best_sellers' %}">پرفروش‌ها</a><a href="{% url 'first:discounts' %}">پیشنهادها</a></div>
+    <div><b>SERVICE</b><a href="{% url 'customer_care:support_home' %}">پشتیبانی</a><a href="{% url 'customer_care:order_tracking' %}">پیگیری سفارش</a><a href="{% url 'first:customer_service' 'shipping-returns' %}">ارسال و مرجوعی</a></div>
+    <div><b>PRIVATE NOTES</b><p>خبر کالکشن‌های تازه و پیشنهادهای محدود.</p><div class="newsletter"><input placeholder="ایمیل شما"><button>←</button></div></div>
+  </div>
+  <div class="footer-bottom"><span>{{ settings.footer_text|default:"© 2026 VÉLORA PARFUMS" }}</span><span>SCENT / MEMORY / IDENTITY</span></div>
+</footer>
+
+<script src="{% static 'js/perfume-phase01.js' %}"></script>
+{% block extra_js %}{% endblock %}
+    <script src="{% static 'js/perfume-phase03-final.js' %}"></script>
+</body></html>

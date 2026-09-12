@@ -1,0 +1,85 @@
+{% extends 'perfume_base.html' %}
+{% load custom_filters %}
+{% block title %}{{ settings.site_title|default:"VÉLORA — عطر فراتر از زمان" }}{% endblock %}
+{% block content %}
+{% firstof featured_products.0 best_sellers.0 new_products.0 as hero_product %}
+
+<section class="v2-hero">
+  {% for slider in sliders %}{% if forloop.first %}<img class="v2-hero-bg" src="{{ slider.image.url }}" alt="">{% endif %}{% endfor %}
+  <div class="v2-hero-overlay"></div><div class="v2-hero-gridlines"></div><div class="v2-hero-arch"></div>
+
+  <div class="v2-hero-left">
+    <span class="v2-eyebrow">A HIGHER FORM OF BEAUTY</span>
+    <h1><span>رایحه‌ای</span><em>فراتر از زمان</em></h1>
+    <p>کالکشنی برای کسانی که می‌خواهند رایحه‌شان قبل از آن‌ها وارد شود و بعد از آن‌ها بماند.</p>
+    <div class="v2-hero-actions">
+      <a class="v2-btn v2-btn-gold" href="{% url 'first:product_list' %}"><span>کشف کالکشن</span><i class="fa-solid fa-arrow-left"></i></a>
+      <a class="v2-btn v2-btn-link" href="#manifesto"><span class="v2-play"><i class="fa-solid fa-play"></i></span>داستان خانه عطر</a>
+    </div>
+    <div class="v2-hero-proof"><div class="v2-avatar-stack"><i></i><i></i><i></i><i></i></div><span>برای کسانی که عطر را بخشی از شخصیت می‌دانند</span></div>
+  </div>
+
+  <div class="v2-hero-center">
+    <div class="v2-orbit o1"></div><div class="v2-orbit o2"></div><div class="v2-orbit o3"></div>
+    <div class="v2-spark s1"></div><div class="v2-spark s2"></div><div class="v2-spark s3"></div>
+    {% if hero_product and hero_product.main_image %}
+    <a href="{% url 'first:product_detail' hero_product.slug %}" class="v2-hero-product"><img src="{{ hero_product.main_image.url }}" alt="{{ hero_product.name }}"></a>
+    {% else %}
+    <div class="v2-hero-bottle"><div class="cap"></div><div class="glass"><span>VÉLORA</span><small>ÉCLAT · EXTRAIT</small></div></div>
+    {% endif %}
+    <div class="v2-hero-label"><span>01 / SIGNATURE</span><strong>{% if hero_product %}{{ hero_product.name }}{% else %}ÉCLAT NOIR{% endif %}</strong></div>
+  </div>
+
+  <aside class="v2-hero-right">
+    <div class="v2-mini-feature"><span>01</span><i class="fa-regular fa-gem"></i><div><b>ترکیب‌های منتخب</b><small>مواد اولیه باکیفیت</small></div></div>
+    <div class="v2-mini-feature"><span>02</span><i class="fa-regular fa-clock"></i><div><b>حضور ماندگار</b><small>رایحه‌ای با امضای مشخص</small></div></div>
+    <div class="v2-mini-feature"><span>03</span><i class="fa-regular fa-heart"></i><div><b>انتخاب شخصی</b><small>برای سبک و شخصیت شما</small></div></div>
+  </aside>
+  <div class="v2-scroll-note">SCROLL TO DISCOVER <span></span></div>
+</section>
+
+<section class="v2-ticker"><div><span>AUTHENTICITY</span><i>✦</i><span>EXTRAIT</span><i>✦</i><span>CRAFT</span><i>✦</i><span>MEMORY</span><i>✦</i><span>IDENTITY</span><i>✦</i><span>AUTHENTICITY</span><i>✦</i><span>EXTRAIT</span></div></section>
+
+<section class="v2-icons-section" id="manifesto">
+  <div class="v2-section-number">01</div>
+  <div class="v2-section-head reveal">
+    <div><span class="v2-eyebrow">OUR SIGNATURE COLLECTION</span><h2>آیکون‌ها،<br>در هر نت.</h2></div>
+    <div><p>چهار شخصیت، چهار برداشت از حضور. از مینیمال و روشن تا تاریک، گرم و عمیق.</p><a href="{% url 'first:product_list' %}">مشاهده کالکشن کامل ←</a></div>
+  </div>
+  <div class="v2-featured-grid">
+    {% for product in best_sellers|slice:":4" %}{% include 'includes/perfume_product_card.html' %}
+    {% empty %}{% for product in featured_products|slice:":4" %}{% include 'includes/perfume_product_card.html' %}
+    {% empty %}{% for product in new_products|slice:":4" %}{% include 'includes/perfume_product_card.html' %}{% endfor %}{% endfor %}{% endfor %}
+  </div>
+</section>
+
+<section class="v2-editorial-split reveal">
+  <div class="v2-split-art"><div class="v2-face-art"></div><div class="v2-art-copy">YOUR SCENT<br>ENTERS FIRST.</div><span class="v2-art-index">02</span></div>
+  <div class="v2-split-copy">
+    <span class="v2-eyebrow">PERFUME FINDER</span><h2>رایحه‌ات باید شبیه خودت باشد؛ نه شبیه بقیه.</h2><p>از حس شروع کن. روشن، چوبی، گلی یا گرم. مسیر انتخاب را کوتاه کرده‌ایم.</p>
+    <div class="v2-scent-links">
+      <a href="{% url 'first:search_products' %}?q=خنک"><span>01</span><b>FRESH</b><small>شفاف / مرکباتی</small></a>
+      <a href="{% url 'first:search_products' %}?q=چوبی"><span>02</span><b>WOODY</b><small>خشک / عمیق</small></a>
+      <a href="{% url 'first:search_products' %}?q=گلی"><span>03</span><b>FLORAL</b><small>نرم / روشن</small></a>
+      <a href="{% url 'first:search_products' %}?q=گرم"><span>04</span><b>AMBER</b><small>گرم / شبانه</small></a>
+    </div>
+  </div>
+</section>
+
+<section class="v2-mosaic">
+  <a class="v2-mosaic-card large" href="{% url 'first:product_list' %}?sort=-created_at"><span>NEW / 2026</span><h3>تازه‌رسیده‌ها</h3><p>رایحه‌هایی که تازه وارد آرشیو شده‌اند.</p><b>DISCOVER ↗</b><div class="v2-mosaic-bottle"></div></a>
+  <a class="v2-mosaic-card dark" href="{% url 'first:best_sellers' %}"><span>ICONS</span><h3>پرفروش‌ترین‌ها</h3><b>VIEW EDIT ↗</b><div class="v2-mosaic-rings"></div></a>
+  <a class="v2-mosaic-card warm" href="{% url 'first:product_list' %}"><span>GIFTING</span><h3>هدیه‌ای که<br>فراموش نمی‌شود.</h3><b>SELECT A GIFT ↗</b><div class="v2-gift-cube"></div></a>
+</section>
+
+<section class="v2-craft reveal">
+  <div class="v2-craft-copy"><span class="v2-section-number inline">03</span><span class="v2-eyebrow">FROM NATURE TO ART</span><h2>از ماده خام،<br>تا یک امضای نامرئی.</h2><p>هر عطر یک تعادل است: شروعی که توجه را می‌گیرد، قلبی که شخصیت می‌سازد و پایه‌ای که در حافظه می‌ماند.</p><a class="v2-btn v2-btn-outline" href="{% url 'first:customer_service' 'shopping-guide' %}">راهنمای انتخاب عطر ←</a></div>
+  <div class="v2-craft-art"><div class="petal p1"></div><div class="petal p2"></div><div class="petal p3"></div><div class="petal p4"></div><span>NATURE<br>INSPIRES<br>EVERYTHING</span></div>
+</section>
+
+{% if new_products %}
+<section class="v2-new-section"><div class="v2-section-head reveal"><div><span class="v2-eyebrow">NEW DISCOVERIES</span><h2>تازه وارد آرشیو</h2></div><a href="{% url 'first:product_list' %}?sort=-created_at">مشاهده همه ←</a></div><div class="v2-featured-grid">{% for product in new_products|slice:":4" %}{% include 'includes/perfume_product_card.html' %}{% endfor %}</div></section>
+{% endif %}
+
+<section class="v2-quote"><span>04</span><blockquote>“Perfume is the most intense form of memory.”</blockquote><small>JEAN-PAUL GUERLAIN</small></section>
+{% endblock %}

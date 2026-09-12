@@ -1,0 +1,1452 @@
+{% extends 'dashboard/perfume_admin_base.html' %}
+{% load static %}
+
+{% block title %}ویرایش {{ product.name }}{% endblock %}
+
+{% block extra_css %}
+<style>
+    .edit-product {
+        --line: #eadfe6;
+        --muted: #7b7280;
+        max-width: 1120px;
+        margin: auto;
+    }
+
+    .edit-card {
+        padding: clamp(1rem, 3vw, 2rem);
+        border: 1px solid var(--line);
+        border-radius: 1.6rem;
+        background: rgba(255,255,255,.9);
+        box-shadow: 0 25px 65px -45px rgba(75,18,50,.55);
+    }
+
+    .edit-section {
+        margin-top: 1.2rem;
+        padding: 1.2rem;
+        border: 1px solid var(--line);
+        border-radius: 1.15rem;
+        background: rgba(250,247,249,.72);
+    }
+
+    .section-title {
+        display: flex;
+        align-items: center;
+        gap: .55rem;
+        margin-bottom: 1rem;
+        font-size: 1rem;
+        font-weight: 950;
+    }
+
+    .section-title i {
+        color: #ec407a;
+    }
+
+    .field-label {
+        display: block;
+        margin-bottom: .4rem;
+        font-size: .76rem;
+        font-weight: 900;
+    }
+
+    .field-help {
+        margin-top: .35rem;
+        color: var(--muted);
+        font-size: .66rem;
+        line-height: 1.7;
+    }
+
+    .edit-input,
+    .edit-select,
+    .edit-textarea {
+        width: 100%;
+        padding: .78rem .9rem;
+        border: 1px solid var(--line);
+        border-radius: .8rem;
+        color: inherit;
+        background: rgba(255,255,255,.85);
+        outline: none;
+        transition: .2s;
+    }
+
+    .edit-input:focus,
+    .edit-select:focus,
+    .edit-textarea:focus {
+        border-color: #ec407a;
+        box-shadow: 0 0 0 3px rgba(236,64,122,.1);
+    }
+
+    .primary-btn,
+    .secondary-btn,
+    .danger-btn {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: .4rem;
+        padding: .72rem 1rem;
+        border-radius: .8rem;
+        font-size: .75rem;
+        font-weight: 900;
+        transition: .2s;
+    }
+
+    .primary-btn {
+        color: #fff;
+        background: linear-gradient(135deg,#ec407a,#ab47bc);
+    }
+
+    .secondary-btn {
+        border: 1px solid var(--line);
+        background: #fff;
+    }
+
+    .danger-btn {
+        color: #b91c1c;
+        border: 1px solid #fecaca;
+        background: #fff1f2;
+    }
+
+    .primary-btn:hover,
+    .secondary-btn:hover,
+    .danger-btn:hover {
+        transform: translateY(-1px);
+    }
+
+    .current-images,
+    .new-preview-grid {
+        display: grid;
+        grid-template-columns: repeat(4,minmax(0,1fr));
+        gap: .8rem;
+    }
+
+    .image-card {
+        position: relative;
+        overflow: hidden;
+        border: 2px solid var(--line);
+        border-radius: 1rem;
+        background: #fff;
+    }
+
+    .image-card.main {
+        border-color: #ec407a;
+        box-shadow: 0 0 0 3px rgba(236,64,122,.1);
+    }
+
+    .image-card img {
+        width: 100%;
+        aspect-ratio: 1;
+        object-fit: contain;
+        background: #f7f4f6;
+    }
+
+    .image-card-info {
+        padding: .65rem;
+        font-size: .68rem;
+    }
+
+    .image-label {
+        position: absolute;
+        top: .5rem;
+        right: .5rem;
+        padding: .3rem .5rem;
+        border-radius: .5rem;
+        color: #fff;
+        background: #ec407a;
+        font-size: .58rem;
+        font-weight: 900;
+    }
+
+    .delete-image {
+        display: flex;
+        align-items: center;
+        gap: .4rem;
+        margin-top: .45rem;
+        color: #b91c1c;
+        font-size: .65rem;
+        font-weight: 800;
+    }
+
+    .upload-box {
+        display: flex;
+        min-height: 135px;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        padding: 1rem;
+        border: 2px dashed #d8bdcc;
+        border-radius: 1rem;
+        text-align: center;
+        background: rgba(236,64,122,.035);
+        cursor: pointer;
+        transition: .2s;
+    }
+
+    .upload-box:hover {
+        border-color: #ec407a;
+        background: rgba(236,64,122,.07);
+    }
+
+    .upload-box i {
+        margin-bottom: .5rem;
+        color: #ec407a;
+        font-size: 2rem;
+    }
+
+    .new-preview-grid {
+        margin-top: .8rem;
+    }
+
+    .new-preview {
+        position: relative;
+        overflow: hidden;
+        border: 1px solid var(--line);
+        border-radius: .8rem;
+    }
+
+    .new-preview img {
+        width: 100%;
+        aspect-ratio: 1;
+        object-fit: contain;
+        background: #f7f4f6;
+    }
+
+    .new-preview span {
+        display: block;
+        overflow: hidden;
+        padding: .45rem;
+        font-size: .6rem;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+    }
+
+    .toggle-row {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 1rem;
+    }
+
+    .switch {
+        position: relative;
+        width: 52px;
+        height: 29px;
+        flex: none;
+    }
+
+    .switch input {
+        position: absolute;
+        opacity: 0;
+    }
+
+    .switch span {
+        position: absolute;
+        inset: 0;
+        border-radius: 999px;
+        background: #d1d5db;
+        cursor: pointer;
+        transition: .2s;
+    }
+
+    .switch span::after {
+        content: '';
+        position: absolute;
+        top: 4px;
+        right: 4px;
+        width: 21px;
+        height: 21px;
+        border-radius: 50%;
+        background: #fff;
+        box-shadow: 0 2px 7px rgba(0,0,0,.2);
+        transition: .2s;
+    }
+
+    .switch input:checked + span {
+        background: #ec407a;
+    }
+
+    .switch input:checked + span::after {
+        transform: translateX(-23px);
+    }
+
+    .variant-row {
+        display: grid;
+        grid-template-columns: 1.15fr .7fr .7fr 1fr 1fr .75fr;
+        gap: .6rem;
+        padding: 1rem;
+        margin-top: .75rem;
+        border: 1px solid var(--line);
+        border-radius: 1rem;
+        background: #fff;
+    }
+
+    .variant-field label {
+        display: block;
+        margin-bottom: .35rem;
+        font-size: .62rem;
+        font-weight: 900;
+    }
+
+    .variant-field input,
+    .variant-field select {
+        width: 100%;
+        padding: .62rem;
+        border: 1px solid var(--line);
+        border-radius: .65rem;
+        background: transparent;
+        font-size: .72rem;
+        outline: none;
+    }
+
+    .variant-field input:focus,
+    .variant-field select:focus {
+        border-color: #ec407a;
+    }
+
+    .variant-extra {
+        grid-column: 1/-1;
+        display: flex;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: .7rem;
+        padding-top: .65rem;
+        border-top: 1px dashed var(--line);
+    }
+
+    .color-dot {
+        width: 35px;
+        height: 35px;
+        border: 3px solid #fff;
+        border-radius: .5rem;
+        box-shadow: 0 0 0 1px #d1d5db;
+        overflow: hidden;
+    }
+
+    .color-dot img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+    }
+
+    .variant-old-image {
+        width: 42px;
+        height: 42px;
+        object-fit: contain;
+        border: 1px solid var(--line);
+        border-radius: .5rem;
+    }
+
+    .hidden-section {
+        display: none !important;
+    }
+
+    .color-panel {
+        margin-top: 1rem;
+        padding: 1rem;
+        border: 1px dashed #d8bdcc;
+        border-radius: 1rem;
+    }
+
+    .color-preview {
+        width: 48px;
+        height: 48px;
+        flex: none;
+        border: 3px solid #fff;
+        border-radius: .7rem;
+        background: #ef4444;
+        box-shadow: 0 0 0 1px #d1d5db;
+    }
+
+    .status-grid {
+        display: grid;
+        grid-template-columns: repeat(4,1fr);
+        gap: .7rem;
+    }
+
+    .status-option {
+        display: flex;
+        align-items: center;
+        gap: .5rem;
+        padding: .8rem;
+        border: 1px solid var(--line);
+        border-radius: .8rem;
+        font-size: .75rem;
+        font-weight: 850;
+        background: #fff;
+    }
+
+    .save-bar {
+        position: sticky;
+        bottom: 1rem;
+        z-index: 20;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 1rem;
+        margin-top: 1.2rem;
+        padding: .8rem 1rem;
+        border: 1px solid var(--line);
+        border-radius: 1rem;
+        background: rgba(255,255,255,.94);
+        box-shadow: 0 15px 40px rgba(0,0,0,.12);
+        backdrop-filter: blur(12px);
+    }
+
+    [data-theme="dark"] .edit-product {
+        --line: #4a444e;
+        --muted: #b8b0ba;
+    }
+
+    [data-theme="dark"] .edit-card,
+    [data-theme="dark"] .edit-section,
+    [data-theme="dark"] .variant-row,
+    [data-theme="dark"] .image-card,
+    [data-theme="dark"] .status-option,
+    [data-theme="dark"] .secondary-btn,
+    [data-theme="dark"] .save-bar {
+        background: #32323b;
+    }
+
+    [data-theme="dark"] .edit-input,
+    [data-theme="dark"] .edit-select,
+    [data-theme="dark"] .edit-textarea {
+        background: #292930;
+    }
+
+    @media (max-width:900px) {
+        .variant-row {
+            grid-template-columns: repeat(3,1fr);
+        }
+
+        .current-images,
+        .new-preview-grid {
+            grid-template-columns: repeat(3,1fr);
+        }
+    }
+
+    @media (max-width:640px) {
+        .variant-row {
+            grid-template-columns: 1fr 1fr;
+        }
+
+        .current-images,
+        .new-preview-grid {
+            grid-template-columns: repeat(2,1fr);
+        }
+
+        .status-grid {
+            grid-template-columns: 1fr 1fr;
+        }
+
+        .save-bar {
+            align-items: stretch;
+            flex-direction: column;
+        }
+
+        .save-bar > div {
+            display: grid !important;
+            grid-template-columns: 1fr 1fr;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block admin_content %}
+<div class="edit-product">
+    <div class="flex items-center justify-between gap-4 mb-6">
+        <div>
+            <h1 class="text-2xl md:text-3xl font-black pink-gradient-text">
+                ویرایش محصول
+            </h1>
+            <p class="text-sm text-gray-500 mt-1">{{ product.name }}</p>
+        </div>
+
+        <a class="secondary-btn"
+           href="{% url 'first:product_detail' product.slug %}">
+            <i class="fas fa-arrow-right"></i>
+            بازگشت به محصول
+        </a>
+    </div>
+
+    <form id="editProductForm"
+          class="edit-card"
+          method="post"
+          enctype="multipart/form-data"
+          novalidate>
+
+        {% csrf_token %}
+
+        <section class="edit-section !mt-0">
+            <h2 class="section-title">
+                <i class="fas fa-circle-info"></i>
+                اطلاعات اصلی
+            </h2>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div class="md:col-span-2">
+                    <label class="field-label">نام محصول *</label>
+                    <input class="edit-input"
+                           name="name"
+                           required
+                           maxlength="200"
+                           value="{{ product.name }}">
+                </div>
+
+                <div class="md:col-span-2">
+                    <label class="field-label">اسلاگ</label>
+                    <input class="edit-input"
+                           name="slug"
+                           maxlength="200"
+                           value="{{ product.slug }}"
+                           dir="ltr">
+
+                    <p class="field-help">
+                        اگر خالی باشد، از نام محصول ساخته می‌شود.
+                    </p>
+                </div>
+
+                <div>
+                    <label class="field-label">دسته‌بندی</label>
+
+                    <select class="edit-select" name="category">
+                        <option value="">بدون دسته‌بندی</option>
+
+                        {% for category in categories %}
+                            <option value="{{ category.id }}"
+                                    {% if product.category_id == category.id %}selected{% endif %}>
+                                {{ category.name }}
+                            </option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <div>
+                    <label class="field-label">برند</label>
+
+                    <select class="edit-select" name="brand">
+                        <option value="">بدون برند</option>
+
+                        {% for brand in brands %}
+                            <option value="{{ brand.id }}"
+                                    {% if product.brand_id == brand.id %}selected{% endif %}>
+                                {{ brand.name }}
+                            </option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <div>
+                    <label class="field-label">نوع محصول</label>
+
+                    <select class="edit-select" name="product_type">
+                        <option value="">بدون نوع</option>
+
+                        {% for type in product_types %}
+                            <option value="{{ type.id }}"
+                                    {% if product.product_type_id == type.id %}selected{% endif %}>
+                                {{ type.name }}
+                            </option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <div>
+                    <label class="field-label">تگ‌های محصول</label>
+
+                    <select class="edit-select min-h-28"
+                            name="tags"
+                            multiple>
+                        {% for tag in tags %}
+                            <option value="{{ tag.id }}"
+                                    {% if tag in product.tags.all %}selected{% endif %}>
+                                {{ tag.name }}
+                            </option>
+                        {% endfor %}
+                    </select>
+
+                    <p class="field-help">
+                        برای انتخاب چند تگ، کلید Ctrl را نگه دار.
+                    </p>
+                </div>
+            </div>
+        </section>
+
+        <section class="edit-section">
+            <h2 class="section-title">
+                <i class="fas fa-coins"></i>
+                قیمت و موجودی
+            </h2>
+
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div>
+                    <label class="field-label">
+                        قیمت اصلی (تومان) *
+                    </label>
+
+                    <input id="price"
+                           class="edit-input"
+                           name="price"
+                           type="number"
+                           min="0"
+                           step="1"
+                           required
+                           value="{{ product.price|floatformat:0 }}">
+                </div>
+
+                <div>
+                    <label class="field-label">
+                        قیمت تخفیف‌خورده
+                    </label>
+
+                    <input id="discountPrice"
+                           class="edit-input"
+                           name="discount_price"
+                           type="number"
+                           min="0"
+                           step="1"
+                           value="{% if product.discount_price %}{{ product.discount_price|floatformat:0 }}{% endif %}">
+                </div>
+
+                <div>
+                    <label class="field-label">
+                        موجودی محصول ساده
+                    </label>
+
+                    <input id="stock"
+                           class="edit-input"
+                           name="stock"
+                           type="number"
+                           min="0"
+                           step="1"
+                           value="{{ product.stock }}">
+
+                    <p class="field-help">
+                        برای محصول دارای تنوع، موجودی هر مدل جداست.
+                    </p>
+                </div>
+            </div>
+        </section>
+
+        <section class="edit-section">
+            <h2 class="section-title">
+                <i class="fas fa-images"></i>
+                تصاویر محصول
+            </h2>
+
+            <h3 class="text-sm font-black mb-3">تصاویر فعلی</h3>
+
+            <div class="current-images">
+                {% if product.main_image %}
+                <article class="image-card main">
+                    <span class="image-label">
+                        <i class="fas fa-star ml-1"></i>
+                        تصویر اصلی
+                    </span>
+
+                    <img src="{{ product.main_image.url }}"
+                         alt="{{ product.name }}">
+
+                    <div class="image-card-info">
+                        تصویر اصلی فعلی
+                    </div>
+                </article>
+                {% endif %}
+
+                {% for image in product.images.all %}
+                <article class="image-card">
+                    <img src="{{ image.image.url }}"
+                         alt="{{ image.alt_text|default:product.name }}">
+
+                    <div class="image-card-info">
+                        تصویر گالری {{ forloop.counter }}
+
+                        <label class="delete-image">
+                            <input type="checkbox"
+                                   name="delete_gallery_ids"
+                                   value="{{ image.id }}">
+                            حذف هنگام ذخیره
+                        </label>
+                    </div>
+                </article>
+                {% endfor %}
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mt-5">
+                <label class="upload-box">
+                    <i class="fas fa-star"></i>
+                    <strong class="text-sm">تعویض تصویر اصلی</strong>
+
+                    <span class="field-help">
+                        JPG، PNG یا WEBP با حداقل ابعاد ۵۰۰×۵۰۰
+                    </span>
+
+                    <input id="newMainImage"
+                           class="hidden"
+                           type="file"
+                           name="new_main_image"
+                           accept="image/jpeg,image/png,image/webp">
+
+                    <span id="newMainName"
+                          class="text-xs text-pink-500 mt-2"></span>
+                </label>
+
+                <label class="upload-box">
+                    <i class="fas fa-images"></i>
+                    <strong class="text-sm">افزودن تصاویر گالری</strong>
+
+                    <span class="field-help">
+                        چند عکس را هم‌زمان انتخاب کن؛ مجموعاً حداکثر ۸ عکس
+                    </span>
+
+                    <input id="newGalleryImages"
+                           class="hidden"
+                           type="file"
+                           name="new_gallery_images"
+                           accept="image/jpeg,image/png,image/webp"
+                           multiple>
+
+                    <span id="newGalleryCount"
+                          class="text-xs text-pink-500 mt-2"></span>
+                </label>
+            </div>
+
+            <div id="newImagePreviews"
+                 class="new-preview-grid"></div>
+        </section>
+
+        <section class="edit-section">
+            <div class="toggle-row">
+                <div>
+                    <h2 class="section-title !mb-1">
+                        <i class="fas fa-swatchbook"></i>
+                        تنوع‌های محصول
+                    </h2>
+
+                    <p class="field-help">
+                        رنگ، حجم، سایز، قیمت، عکس و موجودی هر مدل را ویرایش کن.
+                    </p>
+                </div>
+
+                <label class="switch">
+                    <input id="hasVariants"
+                           type="checkbox"
+                           name="has_variants"
+                           {% if product.has_variants %}checked{% endif %}>
+                    <span></span>
+                </label>
+            </div>
+
+            <div id="variantsSection"
+                 class="{% if not product.has_variants %}hidden-section{% endif %}">
+
+                <div class="flex justify-end mt-4">
+                    <button id="addVariant"
+                            class="secondary-btn"
+                            type="button">
+                        <i class="fas fa-plus"></i>
+                        افزودن تنوع
+                    </button>
+                </div>
+
+                <div id="variantRows">
+                    {% for variant in product.variants.all %}
+                    <article class="variant-row"
+                             data-key="existing-{{ variant.id }}">
+
+                        <input type="hidden"
+                               name="variant_keys"
+                               value="existing-{{ variant.id }}">
+
+                        <input type="hidden"
+                               name="variant_ids"
+                               value="{{ variant.id }}">
+
+                        <div class="variant-field">
+                            <label>رنگ</label>
+
+                            <select name="variant_colors"
+                                    class="variant-color-select">
+
+                                <option value="">بدون رنگ</option>
+
+                                {% for color in colors %}
+                                    <option value="{{ color.id }}"
+                                            data-code="{{ color.code }}"
+                                            data-image="{% if color.image %}{{ color.image.url }}{% endif %}"
+                                            {% if variant.color_id == color.id %}selected{% endif %}>
+                                        {{ color.name }}
+                                    </option>
+                                {% endfor %}
+                            </select>
+                        </div>
+
+                        <div class="variant-field">
+                            <label>حجم (ml)</label>
+
+                            <input name="variant_volumes"
+                                   type="number"
+                                   min="0"
+                                   value="{{ variant.volume_ml|default:'' }}">
+                        </div>
+
+                        <div class="variant-field">
+                            <label>سایز</label>
+
+                            <input name="variant_sizes"
+                                   maxlength="20"
+                                   value="{{ variant.size|default:'' }}">
+                        </div>
+
+                        <div class="variant-field">
+                            <label>قیمت اختصاصی</label>
+
+                            <input name="variant_prices"
+                                   type="number"
+                                   min="0"
+                                   value="{% if variant.price %}{{ variant.price|floatformat:0 }}{% endif %}">
+                        </div>
+
+                        <div class="variant-field">
+                            <label>قیمت تخفیف</label>
+
+                            <input name="variant_discount_prices"
+                                   type="number"
+                                   min="0"
+                                   value="{% if variant.discount_price %}{{ variant.discount_price|floatformat:0 }}{% endif %}">
+                        </div>
+
+                        <div class="variant-field">
+                            <label>موجودی *</label>
+
+                            <input name="variant_stocks"
+                                   type="number"
+                                   min="0"
+                                   required
+                                   value="{{ variant.stock }}">
+                        </div>
+
+                        <div class="variant-extra">
+                            <span class="color-dot"></span>
+
+                            {% if variant.image %}
+                                <img class="variant-old-image"
+                                     src="{{ variant.image.url }}"
+                                     alt="تصویر تنوع">
+                            {% endif %}
+
+                            <label class="text-xs font-black flex items-center gap-2">
+                                <input type="radio"
+                                       name="variant_default"
+                                       value="existing-{{ variant.id }}"
+                                       {% if variant.is_default %}checked{% endif %}>
+                                تنوع پیش‌فرض
+                            </label>
+
+                            <label class="secondary-btn cursor-pointer">
+                                <i class="fas fa-image"></i>
+                                تعویض تصویر
+
+                                <input class="variant-image hidden"
+                                       name="variant_image_existing-{{ variant.id }}"
+                                       type="file"
+                                       accept="image/jpeg,image/png,image/webp">
+                            </label>
+
+                            <span class="variant-image-name text-xs text-gray-500"></span>
+
+                            <button class="danger-btn remove-variant"
+                                    type="button">
+                                <i class="fas fa-trash"></i>
+                                حذف تنوع
+                            </button>
+                        </div>
+                    </article>
+                    {% endfor %}
+                </div>
+
+                <div class="color-panel">
+                    <div class="flex items-center justify-between gap-3">
+                        <div>
+                            <strong class="text-sm">ساخت رنگ جدید</strong>
+
+                            <p class="field-help">
+                                رنگ را با کد، انتخابگر یا قطره‌چکان انتخاب کن.
+                            </p>
+                        </div>
+
+                        <button id="eyeDropper"
+                                class="secondary-btn"
+                                type="button">
+                            <i class="fas fa-eye-dropper"></i>
+                            قطره‌چکان
+                        </button>
+                    </div>
+
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-3 mt-3">
+                        <div>
+                            <label class="field-label">نام رنگ</label>
+
+                            <input id="newColorName"
+                                   class="edit-input"
+                                   type="text"
+                                   placeholder="مثلاً رزگلد">
+                        </div>
+
+                        <div>
+                            <label class="field-label">رنگ انتخابی</label>
+
+                            <div class="flex gap-2">
+                                <span id="colorPreview"
+                                      class="color-preview"></span>
+
+                                <input id="colorPicker"
+                                       type="color"
+                                       value="#ef4444"
+                                       class="h-12 w-14 cursor-pointer">
+
+                                <input id="colorCode"
+                                       class="edit-input"
+                                       value="#EF4444"
+                                       maxlength="7"
+                                       dir="ltr">
+                            </div>
+                        </div>
+
+                        <div class="md:col-span-2">
+                            <label class="field-label">
+                                تصویر یا بافت رنگ
+                            </label>
+
+                            <input id="newColorImage"
+                                   class="edit-input"
+                                   type="file"
+                                   accept="image/jpeg,image/png,image/webp">
+                        </div>
+                    </div>
+
+                    <div class="flex justify-end mt-3">
+                        <button id="saveColor"
+                                class="primary-btn"
+                                type="button">
+                            <i class="fas fa-check"></i>
+                            ذخیره و افزودن رنگ
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="edit-section">
+            <h2 class="section-title">
+                <i class="fas fa-align-right"></i>
+                توضیحات محصول
+            </h2>
+
+            <div class="space-y-4">
+                <div>
+                    <label class="field-label">توضیحات کوتاه</label>
+
+                    <input class="edit-input"
+                           name="short_description"
+                           maxlength="300"
+                           value="{{ product.short_description|default:'' }}">
+                </div>
+
+                <div>
+                    <label class="field-label">توضیحات کامل</label>
+
+                    <textarea class="edit-textarea"
+                              name="description"
+                              rows="7">{{ product.description|default:'' }}</textarea>
+                </div>
+            </div>
+        </section>
+
+        <section class="edit-section">
+            <h2 class="section-title">
+                <i class="fas fa-toggle-on"></i>
+                وضعیت نمایش
+            </h2>
+
+            <div class="status-grid">
+                <label class="status-option">
+                    <input type="checkbox"
+                           name="is_active"
+                           {% if product.is_active %}checked{% endif %}>
+                    فعال
+                </label>
+
+                <label class="status-option">
+                    <input type="checkbox"
+                           name="is_new"
+                           {% if product.is_new %}checked{% endif %}>
+                    محصول جدید
+                </label>
+
+                <label class="status-option">
+                    <input type="checkbox"
+                           name="is_featured"
+                           {% if product.is_featured %}checked{% endif %}>
+                    محصول ویژه
+                </label>
+
+                <label class="status-option">
+                    <input type="checkbox"
+                           name="is_best_seller"
+                           {% if product.is_best_seller %}checked{% endif %}>
+                    پرفروش
+                </label>
+            </div>
+        </section>
+
+        <div class="save-bar">
+            <p class="field-help">
+                <i class="fas fa-circle-info text-pink-500 ml-1"></i>
+                حذف تصاویر و تنوع‌ها فقط بعد از ذخیره اعمال می‌شود.
+            </p>
+
+            <div class="flex gap-2">
+                <a class="secondary-btn"
+                   href="{% url 'first:product_detail' product.slug %}">
+                    انصراف
+                </a>
+
+                <button id="submitButton"
+                        class="primary-btn"
+                        type="submit">
+                    <i class="fas fa-floppy-disk"></i>
+                    ذخیره تغییرات
+                </button>
+            </div>
+        </div>
+    </form>
+</div>
+
+<template id="variantTemplate">
+    <article class="variant-row"
+             data-key="__KEY__">
+
+        <input type="hidden"
+               name="variant_keys"
+               value="__KEY__">
+
+        <input type="hidden"
+               name="variant_ids"
+               value="">
+
+        <div class="variant-field">
+            <label>رنگ</label>
+
+            <select name="variant_colors"
+                    class="variant-color-select">
+
+                <option value="">بدون رنگ</option>
+
+                {% for color in colors %}
+                    <option value="{{ color.id }}"
+                            data-code="{{ color.code }}"
+                            data-image="{% if color.image %}{{ color.image.url }}{% endif %}">
+                        {{ color.name }}
+                    </option>
+                {% endfor %}
+            </select>
+        </div>
+
+        <div class="variant-field">
+            <label>حجم (ml)</label>
+            <input name="variant_volumes"
+                   type="number"
+                   min="0">
+        </div>
+
+        <div class="variant-field">
+            <label>سایز</label>
+            <input name="variant_sizes"
+                   maxlength="20">
+        </div>
+
+        <div class="variant-field">
+            <label>قیمت اختصاصی</label>
+            <input name="variant_prices"
+                   type="number"
+                   min="0">
+        </div>
+
+        <div class="variant-field">
+            <label>قیمت تخفیف</label>
+            <input name="variant_discount_prices"
+                   type="number"
+                   min="0">
+        </div>
+
+        <div class="variant-field">
+            <label>موجودی *</label>
+            <input name="variant_stocks"
+                   type="number"
+                   min="0"
+                   value="0"
+                   required>
+        </div>
+
+        <div class="variant-extra">
+            <span class="color-dot"></span>
+
+            <label class="text-xs font-black flex items-center gap-2">
+                <input type="radio"
+                       name="variant_default"
+                       value="__KEY__">
+                تنوع پیش‌فرض
+            </label>
+
+            <label class="secondary-btn cursor-pointer">
+                <i class="fas fa-image"></i>
+                تصویر تنوع
+
+                <input class="variant-image hidden"
+                       name="variant_image___KEY__"
+                       type="file"
+                       accept="image/jpeg,image/png,image/webp">
+            </label>
+
+            <span class="variant-image-name text-xs text-gray-500"></span>
+
+            <button class="danger-btn remove-variant"
+                    type="button">
+                <i class="fas fa-trash"></i>
+                حذف تنوع
+            </button>
+        </div>
+    </article>
+</template>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+(() => {
+    'use strict';
+
+    const form = document.getElementById('editProductForm');
+    const variantsToggle = document.getElementById('hasVariants');
+    const variantsSection = document.getElementById('variantsSection');
+    const variantRows = document.getElementById('variantRows');
+    const variantTemplate = document.getElementById('variantTemplate');
+
+    let variantSerial = 0;
+
+    function bindVariantRow(row) {
+        const select = row.querySelector('.variant-color-select');
+        const colorDot = row.querySelector('.color-dot');
+        const imageInput = row.querySelector('.variant-image');
+        const imageName = row.querySelector('.variant-image-name');
+        const removeButton = row.querySelector('.remove-variant');
+
+        function updateColorPreview() {
+            const option = select.options[select.selectedIndex];
+            const code = option?.dataset.code || '#ffffff';
+            const image = option?.dataset.image || '';
+
+            colorDot.style.background = code;
+
+            colorDot.innerHTML = image
+                ? `<img src="${image}" alt="رنگ">`
+                : '';
+        }
+
+        select.addEventListener('change', updateColorPreview);
+        updateColorPreview();
+
+        imageInput.addEventListener('change', () => {
+            imageName.textContent =
+                imageInput.files[0]?.name || '';
+        });
+
+        removeButton.addEventListener('click', () => {
+            row.remove();
+
+            if (
+                variantRows.children.length &&
+                !variantRows.querySelector(
+                    '[name="variant_default"]:checked'
+                )
+            ) {
+                variantRows.querySelector(
+                    '[name="variant_default"]'
+                ).checked = true;
+            }
+        });
+    }
+
+    variantRows
+        .querySelectorAll('.variant-row')
+        .forEach(bindVariantRow);
+
+    document.getElementById('addVariant')
+        .addEventListener('click', () => {
+            const key = `new-${variantSerial++}`;
+            const wrapper = document.createElement('div');
+
+            wrapper.innerHTML = variantTemplate.innerHTML
+                .replaceAll('__KEY__', key)
+                .trim();
+
+            const row = wrapper.firstElementChild;
+
+            variantRows.appendChild(row);
+            bindVariantRow(row);
+
+            if (variantRows.children.length === 1) {
+                row.querySelector(
+                    '[name="variant_default"]'
+                ).checked = true;
+            }
+        });
+
+    function updateVariantsStatus() {
+        variantsSection.classList.toggle(
+            'hidden-section',
+            !variantsToggle.checked
+        );
+
+        const stockInput = document.getElementById('stock');
+        stockInput.disabled = variantsToggle.checked;
+
+        if (
+            variantsToggle.checked &&
+            !variantRows.children.length
+        ) {
+            document.getElementById('addVariant').click();
+        }
+    }
+
+    variantsToggle.addEventListener(
+        'change',
+        updateVariantsStatus
+    );
+
+    updateVariantsStatus();
+
+    const mainImageInput =
+        document.getElementById('newMainImage');
+
+    const galleryInput =
+        document.getElementById('newGalleryImages');
+
+    const galleryPreview =
+        document.getElementById('newImagePreviews');
+
+    mainImageInput.addEventListener('change', () => {
+        document.getElementById('newMainName').textContent =
+            mainImageInput.files[0]?.name || '';
+    });
+
+    galleryInput.addEventListener('change', () => {
+        galleryPreview.innerHTML = '';
+
+        document.getElementById(
+            'newGalleryCount'
+        ).textContent = galleryInput.files.length
+            ? `${galleryInput.files.length} عکس انتخاب شد`
+            : '';
+
+        [...galleryInput.files].forEach(file => {
+            const imageUrl = URL.createObjectURL(file);
+            const card = document.createElement('div');
+
+            card.className = 'new-preview';
+
+            card.innerHTML = `
+                <img src="${imageUrl}" alt="پیش‌نمایش">
+                <span></span>
+            `;
+
+            card.querySelector('span').textContent = file.name;
+            galleryPreview.appendChild(card);
+        });
+    });
+
+    const colorPicker =
+        document.getElementById('colorPicker');
+
+    const colorCode =
+        document.getElementById('colorCode');
+
+    const colorPreview =
+        document.getElementById('colorPreview');
+
+    function normalizeHex(value) {
+        const normalized = value.trim().toUpperCase();
+
+        return /^#[0-9A-F]{6}$/.test(normalized)
+            ? normalized
+            : null;
+    }
+
+    function setColor(value) {
+        const normalized = normalizeHex(value);
+
+        if (!normalized) return;
+
+        colorPicker.value = normalized.toLowerCase();
+        colorCode.value = normalized;
+        colorPreview.style.background = normalized;
+    }
+
+    colorPicker.addEventListener('input', () => {
+        setColor(colorPicker.value);
+    });
+
+    colorCode.addEventListener('input', () => {
+        if (normalizeHex(colorCode.value)) {
+            setColor(colorCode.value);
+        }
+    });
+
+    setColor(colorCode.value);
+
+    document.getElementById('eyeDropper')
+        .addEventListener('click', async () => {
+            if (!window.EyeDropper) {
+                alert(
+                    'مرورگر شما قطره‌چکان را پشتیبانی نمی‌کند.'
+                );
+                return;
+            }
+
+            try {
+                const result = await new EyeDropper().open();
+                setColor(result.sRGBHex);
+            } catch (error) {
+                // کاربر قطره‌چکان را بسته است.
+            }
+        });
+
+    document.getElementById('saveColor')
+        .addEventListener('click', async () => {
+            const colorName =
+                document.getElementById('newColorName')
+                    .value.trim();
+
+            const normalizedCode =
+                normalizeHex(colorCode.value);
+
+            if (!colorName || !normalizedCode) {
+                alert('نام و کد معتبر رنگ را وارد کن.');
+                return;
+            }
+
+            const body = new FormData();
+
+            body.append('name', colorName);
+            body.append('code', normalizedCode);
+
+            const image =
+                document.getElementById('newColorImage')
+                    .files[0];
+
+            if (image) {
+                body.append('image', image);
+            }
+
+            try {
+                const response = await fetch(
+                    "{% url 'first:ajax_add_color' %}",
+                    {
+                        method: 'POST',
+                        headers: {
+                            'X-CSRFToken': form.querySelector(
+                                '[name="csrfmiddlewaretoken"]'
+                            ).value
+                        },
+                        body
+                    }
+                );
+
+                const result = await response.json();
+
+                if (!response.ok || !result.success) {
+                    throw new Error(
+                        result.error || 'خطا در ساخت رنگ'
+                    );
+                }
+
+                document
+                    .querySelectorAll('.variant-color-select')
+                    .forEach(select => {
+                        const exists = [...select.options]
+                            .some(option =>
+                                String(option.value) ===
+                                String(result.id)
+                            );
+
+                        if (exists) return;
+
+                        const option = new Option(
+                            result.name,
+                            result.id
+                        );
+
+                        option.dataset.code = result.code;
+                        option.dataset.image =
+                            result.image_url || '';
+
+                        select.add(option);
+                    });
+
+                document.getElementById(
+                    'newColorName'
+                ).value = '';
+
+                document.getElementById(
+                    'newColorImage'
+                ).value = '';
+
+                alert('رنگ با موفقیت اضافه شد.');
+            } catch (error) {
+                alert(error.message);
+            }
+        });
+
+    form.addEventListener('submit', event => {
+        const price = Number(
+            document.getElementById('price').value
+        );
+
+        const discount = Number(
+            document.getElementById('discountPrice')
+                .value || 0
+        );
+
+        if (!price || price < 0) {
+            event.preventDefault();
+            alert('قیمت اصلی را درست وارد کن.');
+            return;
+        }
+
+        if (discount && discount >= price) {
+            event.preventDefault();
+            alert(
+                'قیمت تخفیف باید کمتر از قیمت اصلی باشد.'
+            );
+            return;
+        }
+
+        if (
+            variantsToggle.checked &&
+            !variantRows.children.length
+        ) {
+            event.preventDefault();
+            alert('حداقل یک تنوع اضافه کن.');
+            return;
+        }
+
+        const submitButton =
+            document.getElementById('submitButton');
+
+        submitButton.disabled = true;
+
+        submitButton.innerHTML = `
+            <i class="fas fa-spinner fa-spin"></i>
+            در حال ذخیره...
+        `;
+    });
+})();
+</script>
+{% endblock %}

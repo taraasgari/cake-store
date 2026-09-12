@@ -1,139 +1,95 @@
-{% extends 'base.html' %}
-{% load static %}
-
-{% block title %}✨ ورود به آرایشی شاپ ✨{% endblock %}
-
+{% extends 'perfume_base.html' %}
+{% block title %}ورود | {{ settings.site_name|default:'فروشگاه عطر' }}{% endblock %}
 {% block content %}
-<div class="min-h-[80vh] flex items-center justify-center py-12">
-    <div class="w-full max-w-md">
-        <div class="card-3d">
-            <div class="card-3d-inner">
-                <div class="relative bg-white/80 backdrop-blur-xl rounded-3xl shadow-2xl p-8 border border-white/20">
-                    <!-- دکوراسیون بالایی -->
-                    <div class="absolute -top-12 left-1/2 transform -translate-x-1/2">
-                        <div class="w-24 h-24 bg-gradient-to-br from-pink-500 to-purple-600 rounded-3xl rotate-45 shadow-2xl flex items-center justify-center animate-float">
-                            <i class="fas fa-spa text-white text-4xl -rotate-45"></i>
-                        </div>
-                    </div>
+<section class="auth-lux-page">
+  <div class="auth-lux-shell">
 
-                    <div class="mt-8 text-center">
-                        <h2 class="text-3xl font-bold gradient-text">خوش آمدید</h2>
-                        <p class="text-gray-500 mt-2">وارد حساب کاربری خود شوید</p>
-                    </div>
-
-                    <!-- نمایش پیام‌ها -->
-                    {% if messages %}
-                    <div class="mt-4 space-y-2">
-                        {% for message in messages %}
-                        <div class="p-3 rounded-xl text-sm {% if message.tags == 'success' %}bg-green-50 text-green-600 border border-green-200{% elif message.tags == 'error' %}bg-red-50 text-red-600 border border-red-200{% else %}bg-blue-50 text-blue-600 border border-blue-200{% endif %}">
-                            {{ message }}
-                        </div>
-                        {% endfor %}
-                    </div>
-                    {% endif %}
-
-                    <form method="POST" class="mt-8 space-y-6" novalidate>
-                        {% csrf_token %}
-
-                        <div class="space-y-4">
-                            <div class="relative group">
-                                <div class="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none">
-                                    <i class="fas fa-user text-pink-400 group-focus-within:text-pink-600 transition-colors"></i>
-                                </div>
-                                <input type="text" name="phone" id="id_phone"
-                                       class="w-full pr-12 pl-4 py-3 border-2 border-gray-200 rounded-xl focus:border-pink-500 focus:ring-4 focus:ring-pink-100 transition-all outline-none bg-white/50"
-                                       placeholder="شماره تلفن *"
-                                       value="{{ form.phone.value|default:'' }}"
-                                       required>
-                                {% if form.phone.errors %}
-                                <div class="text-red-500 text-xs mt-1">{{ form.phone.errors.0 }}</div>
-                                {% endif %}
-                                <div class="text-gray-400 text-xs mt-1">شماره تلفن ثبت‌شده خود را وارد کنید</div>
-                            </div>
-
-                            <div class="relative group">
-                                <div class="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none">
-                                    <i class="fas fa-lock text-pink-400 group-focus-within:text-pink-600 transition-colors"></i>
-                                </div>
-                                <input type="password" name="password" id="id_password"
-                                       class="w-full pr-12 pl-12 py-3 border-2 border-gray-200 rounded-xl focus:border-pink-500 focus:ring-4 focus:ring-pink-100 transition-all outline-none bg-white/50"
-                                       placeholder="رمز عبور *"
-                                       required>
-                                <button type="button" onclick="togglePassword()"
-                                        class="absolute inset-y-0 left-0 flex items-center pl-3 text-gray-400 hover:text-pink-500 transition-colors">
-                                    <i class="fas fa-eye" id="eye-icon"></i>
-                                </button>
-                                {% if form.password.errors %}
-                                <div class="text-red-500 text-xs mt-1">{{ form.password.errors.0 }}</div>
-                                {% endif %}
-                            </div>
-                        </div>
-
-                        <!-- ===== لینک فراموشی رمز ===== -->
-                        <div class="flex items-center justify-between">
-                            <label class="flex items-center gap-2 text-sm text-gray-600 cursor-pointer">
-                                <input type="checkbox" name="remember" id="remember"
-                                       class="w-4 h-4 text-pink-500 rounded border-gray-300 focus:ring-pink-500">
-                                <span>مرا به خاطر بسپار</span>
-                            </label>
-                            <a href="{% url 'first:forgot_password' %}"
-                               class="text-sm text-pink-500 hover:text-pink-700 transition-colors font-medium">
-                                رمز عبور را فراموش کرده‌اید؟
-                            </a>
-                        </div>
-
-                        <!-- دکمه ورود -->
-                        <button type="submit"
-                                class="w-full py-3 bg-gradient-to-r from-pink-500 to-purple-600 text-white rounded-xl font-bold text-lg hover:shadow-2xl transition-all hover:scale-105 transform duration-300 relative overflow-hidden group">
-                            <span class="relative z-10">
-                                <i class="fas fa-sign-in-alt ml-2"></i> ورود
-                            </span>
-                            <div class="absolute inset-0 bg-gradient-to-r from-pink-600 to-purple-700 opacity-0 group-hover:opacity-100 transition-opacity"></div>
-                        </button>
-                    </form>
-
-                    <div class="mt-8 text-center">
-                        <p class="text-gray-500">حساب کاربری ندارید؟</p>
-                        <a href="{% url 'first:signup' %}" class="inline-block mt-2 text-pink-500 hover:text-pink-700 font-bold transition-colors">
-                            <i class="fas fa-user-plus ml-1"></i> ثبت‌نام کنید
-                        </a>
-                    </div>
-
-                    <!-- خطوط تزیینی -->
-                    <div class="absolute top-0 left-0 w-32 h-32 bg-pink-200/20 rounded-full -translate-x-1/2 -translate-y-1/2 blur-3xl"></div>
-                    <div class="absolute bottom-0 right-0 w-32 h-32 bg-purple-200/20 rounded-full translate-x-1/2 translate-y-1/2 blur-3xl"></div>
-                </div>
-            </div>
+    <div class="auth-lux-form-side">
+      <div class="auth-lux-card">
+        <div class="auth-lux-heading">
+          <span>MEMBER ACCESS</span>
+          <h1>خوش آمدید</h1>
+          <p>برای ادامه خرید، مشاهده سفارش‌ها و علاقه‌مندی‌ها وارد حساب خود شوید.</p>
         </div>
+
+        {% if form.non_field_errors %}
+        <div class="auth-lux-errors">
+          {% for error in form.non_field_errors %}<span>{{ error }}</span>{% endfor %}
+        </div>
+        {% endif %}
+
+        <form method="post" class="auth-lux-form" novalidate>
+          {% csrf_token %}
+
+          <div class="auth-field">
+            <label for="id_phone">شماره تلفن / ورود مالک</label>
+            <div class="auth-input">
+              <i class="fa-solid fa-mobile-screen-button"></i>
+              <input type="text" name="phone" id="id_phone" inputmode="tel"
+                     autocomplete="tel" placeholder="09123456789 یا owner"
+                     value="{{ form.phone.value|default:'' }}" required>
+            </div>
+            {% if form.phone.errors %}<small class="auth-field-error">{{ form.phone.errors.0 }}</small>{% endif %}
+          </div>
+
+          <div class="auth-field">
+            <label for="id_password">رمز عبور</label>
+            <div class="auth-input">
+              <i class="fa-solid fa-lock"></i>
+              <input type="password" name="password" id="id_password"
+                     autocomplete="current-password" placeholder="رمز عبور" required>
+              <button type="button" data-auth-password="id_password" aria-label="نمایش رمز">
+                <i class="fa-regular fa-eye"></i>
+              </button>
+            </div>
+            {% if form.password.errors %}<small class="auth-field-error">{{ form.password.errors.0 }}</small>{% endif %}
+          </div>
+
+          <div class="auth-lux-row">
+            <label class="auth-check">
+              <input type="checkbox" name="remember">
+              <span></span>
+              مرا به خاطر بسپار
+            </label>
+            <a href="{% url 'first:forgot_password' %}">رمز را فراموش کرده‌اید؟</a>
+          </div>
+
+          <button class="auth-submit" type="submit">
+            <span>ورود به حساب</span>
+            <i class="fa-solid fa-arrow-left"></i>
+          </button>
+        </form>
+
+        <div class="auth-switch">
+          <span>حساب ندارید؟</span>
+          <a href="{% url 'first:signup' %}">ثبت‌نام کنید</a>
+        </div>
+      </div>
     </div>
-</div>
 
-<script>
-function togglePassword() {
-    const password = document.getElementById('id_password');
-    const icon = document.getElementById('eye-icon');
-    if (password.type === 'password') {
-        password.type = 'text';
-        icon.className = 'fas fa-eye-slash';
-    } else {
-        password.type = 'password';
-        icon.className = 'fas fa-eye';
-    }
-}
+    <div class="auth-lux-visual-side">
+      <div class="auth-visual-glow"></div>
+      <div class="auth-visual-ring ring-one"></div>
+      <div class="auth-visual-ring ring-two"></div>
 
-// ===== ورود با کلید Enter =====
-document.addEventListener('DOMContentLoaded', function() {
-    const inputs = document.querySelectorAll('input');
-    inputs.forEach(input => {
-        input.addEventListener('keypress', function(e) {
-            if (e.key === 'Enter') {
-                const form = this.closest('form');
-                if (form) {
-                    form.submit();
-                }
-            }
-        });
-    });
-});
-</script>
+      <div class="auth-visual-copy">
+        <span>VÉLORA PRIVATE HOUSE</span>
+        <h2>بازگشت به<br>خانه‌ی رایحه‌ها</h2>
+        <p>تجربه‌ای شخصی‌تر برای انتخاب، ذخیره و پیگیری عطرهای شما.</p>
+      </div>
+
+      <div class="auth-bottle auth-bottle-gold">
+        <div class="auth-bottle-cap"></div>
+        <div class="auth-bottle-label"><strong>VÉLORA</strong><small>PRIVATE EDIT</small></div>
+      </div>
+
+      <div class="auth-visual-notes">
+        <div><span>01</span><b>ORDERS</b><small>سفارش‌های شما</small></div>
+        <div><span>02</span><b>WISHLIST</b><small>علاقه‌مندی‌ها</small></div>
+        <div><span>03</span><b>MEMBER</b><small>تجربه شخصی‌تر</small></div>
+      </div>
+    </div>
+
+  </div>
+</section>
 {% endblock %}

@@ -1,0 +1,2255 @@
+{% extends 'base.html' %}
+{% load static custom_filters %}
+
+{% block title %}
+    {{ settings.site_title|default:'آرایشی شاپ | زیبایی به سبک تو' }}
+{% endblock %}
+
+{% block extra_css %}
+<style>
+    .home-shell {
+        --home-surface: rgba(255, 255, 255, .94);
+        --home-muted: #6b7280;
+        --home-line: rgba(236, 64, 122, .13);
+        --home-shadow: 0 24px 70px -38px rgba(75, 18, 50, .5);
+
+        display: flex;
+        flex-direction: column;
+        gap: 4.5rem;
+    }
+
+    [data-theme="dark"] .home-shell {
+        --home-surface: rgba(43, 43, 52, .94);
+        --home-muted: #b8b5c0;
+        --home-line: rgba(255, 255, 255, .08);
+        --home-shadow: 0 24px 70px -34px rgba(0, 0, 0, .85);
+    }
+
+    /* ========================================
+       اسلایدر اصلی
+    ======================================== */
+
+    .store-slider {
+        position: relative;
+        width: 100%;
+        height: clamp(260px, 31vw, 465px);
+        overflow: hidden;
+        isolation: isolate;
+        border-radius: 2rem;
+        background: #fce7f3;
+        box-shadow: var(--home-shadow);
+    }
+
+    .store-slide {
+        position: absolute;
+        inset: 0;
+        opacity: 0;
+        visibility: hidden;
+        pointer-events: none;
+        transition: opacity .75s ease, visibility .75s ease;
+    }
+
+    .store-slide.is-active {
+        z-index: 1;
+        opacity: 1;
+        visibility: visible;
+        pointer-events: auto;
+    }
+
+    .store-slide-link {
+        position: relative;
+        display: block;
+        width: 100%;
+        height: 100%;
+    }
+
+    .store-slide-image {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        object-position: center;
+        transform: scale(1.035);
+        transition: transform 6s ease;
+    }
+
+    .store-slide.is-active .store-slide-image {
+        transform: scale(1);
+    }
+
+    .store-slide-overlay {
+        position: absolute;
+        inset: 0;
+        display: flex;
+        align-items: center;
+        padding: clamp(1.4rem, 5vw, 4.5rem);
+        background:
+            linear-gradient(
+                90deg,
+                rgba(20, 5, 16, .04),
+                rgba(20, 5, 16, .72)
+            );
+    }
+
+    .store-slide-content {
+        width: min(540px, 70%);
+        color: white;
+    }
+
+    .store-slide-label {
+        display: inline-flex;
+        align-items: center;
+        gap: .45rem;
+        padding: .45rem .8rem;
+        border: 1px solid rgba(255, 255, 255, .34);
+        border-radius: 999px;
+        background: rgba(255, 255, 255, .15);
+        backdrop-filter: blur(10px);
+        font-size: .72rem;
+        font-weight: 900;
+    }
+
+    .store-slide-content h1,
+    .store-slide-content h2 {
+        margin-top: .9rem;
+        font-size: clamp(1.8rem, 4.3vw, 4rem);
+        line-height: 1.25;
+        font-weight: 950;
+        text-shadow: 0 10px 35px rgba(0, 0, 0, .32);
+    }
+
+    .store-slide-content p {
+        max-width: 480px;
+        margin-top: .75rem;
+        color: rgba(255, 255, 255, .84);
+        font-size: clamp(.75rem, 1.4vw, .98rem);
+        line-height: 1.9;
+    }
+
+    .store-slide-button {
+        display: inline-flex;
+        align-items: center;
+        gap: .55rem;
+        margin-top: 1.25rem;
+        padding: .76rem 1.2rem;
+        border-radius: .85rem;
+        color: #b91c5c;
+        background: white;
+        font-size: .78rem;
+        font-weight: 900;
+        box-shadow: 0 14px 32px rgba(0, 0, 0, .2);
+        transition: transform .25s ease;
+    }
+
+    .store-slide-button:hover {
+        transform: translateY(-3px);
+    }
+
+    .store-slider-controls {
+        position: absolute;
+        z-index: 5;
+        top: 50%;
+        right: 1rem;
+        left: 1rem;
+        bottom: auto;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: .5rem;
+        transform: translateY(-50%);
+        pointer-events: none;
+    }
+
+    .store-slider-arrow {
+        display: grid;
+        place-items: center;
+        width: 43px;
+        height: 43px;
+        border: 1px solid rgba(255, 255, 255, .3);
+        border-radius: 50%;
+        color: white;
+        background: rgba(15, 15, 20, .48);
+        backdrop-filter: blur(10px);
+        transition: .2s ease;
+
+        pointer-events: auto;
+}
+
+    .store-slider-arrow:hover {
+        background: var(--primary-color);
+        transform: scale(1.08);
+    }
+
+    .store-slider-dots {
+        position: absolute;
+        z-index: 5;
+        right: 1.3rem;
+        bottom: 1.5rem;
+        display: flex;
+        align-items: center;
+        gap: .42rem;
+    }
+
+    .store-slider-dot {
+        width: 8px;
+        height: 8px;
+        padding: 0;
+        border: 0;
+        border-radius: 999px;
+        background: rgba(255, 255, 255, .55);
+        transition: .3s ease;
+    }
+
+    .store-slider-dot.is-active {
+        width: 27px;
+        background: white;
+    }
+
+    .store-slider-empty {
+        position: absolute;
+        inset: 0;
+        display: flex;
+        align-items: center;
+        padding: clamp(1.5rem, 5vw, 4.5rem);
+        overflow: hidden;
+        color: white;
+        background:
+            radial-gradient(
+                circle at 15% 20%,
+                rgba(255, 255, 255, .23),
+                transparent 25%
+            ),
+            linear-gradient(
+                135deg,
+                #f05b98,
+                #d22472 50%,
+                #7135a6
+            );
+    }
+
+    .store-slider-empty::before {
+        content: '\f5d7';
+        position: absolute;
+        left: 7%;
+        bottom: -25%;
+        font-family: "Font Awesome 6 Free";
+        font-size: clamp(10rem, 25vw, 20rem);
+        font-weight: 900;
+        opacity: .12;
+        transform: rotate(-15deg);
+    }
+
+    .store-slider-empty .store-slide-content {
+        position: relative;
+        z-index: 2;
+    }
+
+    /* ========================================
+       دسته‌بندی‌های تصویری
+    ======================================== */
+
+    .image-category-section {
+        display: flex;
+        flex-direction: column;
+        gap: 1.4rem;
+    }
+
+    .section-heading {
+        display: flex;
+        align-items: end;
+        justify-content: space-between;
+        gap: 1rem;
+    }
+
+    .section-kicker {
+        display: inline-flex;
+        align-items: center;
+        gap: .45rem;
+        margin-bottom: .45rem;
+        color: var(--primary-color);
+        font-size: .72rem;
+        font-weight: 900;
+    }
+
+    .section-title {
+        font-size: clamp(1.35rem, 2.8vw, 2.15rem);
+        line-height: 1.3;
+        font-weight: 950;
+    }
+
+    .section-subtitle {
+        margin-top: .38rem;
+        color: var(--home-muted);
+        font-size: .78rem;
+    }
+
+    .section-link {
+        display: inline-flex;
+        align-items: center;
+        gap: .45rem;
+        flex: 0 0 auto;
+        color: var(--primary-color);
+        font-size: .78rem;
+        font-weight: 900;
+    }
+
+    .section-link i {
+        transition: transform .2s ease;
+    }
+
+    .section-link:hover i {
+        transform: translateX(-4px);
+    }
+
+    .image-category-list {
+        display: grid;
+        grid-template-columns: repeat(8, minmax(0, 1fr));
+        gap: 1.25rem;
+    }
+
+    .image-category-card {
+        display: flex;
+        min-width: 0;
+        flex-direction: column;
+        align-items: center;
+        gap: .75rem;
+        text-align: center;
+    }
+
+    .image-category-picture {
+        position: relative;
+        display: grid;
+        place-items: center;
+        width: clamp(82px, 8vw, 125px);
+        aspect-ratio: 1;
+        overflow: hidden;
+        border: 4px solid white;
+        border-radius: 50%;
+        color: var(--primary-color);
+        background:
+            linear-gradient(
+                145deg,
+                #ffe5f0,
+                #f8d7ff
+            );
+        box-shadow:
+            0 13px 35px -20px rgba(82, 25, 61, .55),
+            0 0 0 1px rgba(236, 64, 122, .08);
+        transition: .3s ease;
+    }
+
+    [data-theme="dark"] .image-category-picture {
+        border-color: #35313b;
+        background: linear-gradient(145deg, #533449, #43304f);
+    }
+
+    .image-category-picture::after {
+        content: '';
+        position: absolute;
+        inset: 0;
+        border-radius: inherit;
+        box-shadow: inset 0 0 0 1px rgba(255, 255, 255, .32);
+        pointer-events: none;
+    }
+
+    .image-category-picture img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        transition: transform .4s ease;
+    }
+
+    .image-category-picture i {
+        font-size: clamp(2rem, 4vw, 3.6rem);
+    }
+    .image-category-picture[style*="background-image"] i {
+        display: none;
+    }
+    .image-category-card:hover .image-category-picture {
+        border-color: rgba(236, 64, 122, .4);
+        transform: translateY(-7px) scale(1.035);
+        box-shadow: 0 22px 45px -22px rgba(211, 37, 111, .55);
+    }
+
+    .image-category-card:hover .image-category-picture img {
+        transform: scale(1.09);
+    }
+
+    .image-category-name {
+        width: 100%;
+        overflow: hidden;
+        font-size: .82rem;
+        font-weight: 900;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+        transition: color .2s ease;
+    }
+
+    .image-category-card:hover .image-category-name {
+        color: var(--primary-color);
+    }
+
+    .image-category-count {
+        margin-top: -.5rem;
+        color: var(--home-muted);
+        font-size: .62rem;
+    }
+
+    /* ========================================
+       مزایای فروشگاه
+    ======================================== */
+
+    .trust-strip {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        overflow: hidden;
+        border: 1px solid var(--home-line);
+        border-radius: 1.6rem;
+        background: var(--home-surface);
+        box-shadow: var(--home-shadow);
+    }
+
+    .trust-item {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: .85rem;
+        padding: 1.2rem .8rem;
+        border-left: 1px solid var(--home-line);
+    }
+
+    .trust-item:last-child {
+        border-left: 0;
+    }
+
+    .trust-icon {
+        display: grid;
+        place-items: center;
+        width: 48px;
+        height: 48px;
+        flex: 0 0 auto;
+        border-radius: 1rem;
+        color: var(--primary-color);
+        background: rgba(236, 64, 122, .09);
+        font-size: 1.25rem;
+    }
+
+    .trust-item strong {
+        display: block;
+        font-size: .86rem;
+    }
+
+    .trust-item p {
+        margin-top: .2rem;
+        color: var(--home-muted);
+        font-size: .68rem;
+    }
+
+    /* ========================================
+       بخش محصولات
+    ======================================== */
+
+    .home-section {
+        display: flex;
+        flex-direction: column;
+        gap: 1.4rem;
+    }
+
+    .product-grid {
+        display: grid;
+        grid-template-columns: repeat(4, minmax(0, 1fr));
+        gap: 1rem;
+    }
+
+    .home-product-card {
+        min-width: 0;
+        overflow: hidden;
+        border: 1px solid var(--home-line);
+        border-radius: 1.45rem;
+        background: var(--home-surface);
+        box-shadow: 0 16px 45px -34px rgba(72, 15, 48, .55);
+        transition: .3s ease;
+    }
+
+    .home-product-card:hover {
+        transform: translateY(-7px);
+        border-color: rgba(236, 64, 122, .35);
+        box-shadow: var(--home-shadow);
+    }
+
+    .product-media-wrap {
+        position: relative;
+        padding: .65rem;
+    }
+
+    .product-media {
+        position: relative;
+        display: block;
+        height: 275px;
+        overflow: hidden;
+        border-radius: 1.05rem;
+        background: linear-gradient(145deg, #fff5f8, #f6edf8);
+    }
+
+    [data-theme="dark"] .product-media {
+        background: linear-gradient(145deg, #3b3540, #302d36);
+    }
+
+    .product-media img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        transition: transform .5s ease;
+    }
+
+    .home-product-card:hover .product-media img {
+        transform: scale(1.055);
+    }
+
+    .product-image-placeholder {
+        display: grid;
+        place-items: center;
+        width: 100%;
+        height: 100%;
+        color: rgba(236, 64, 122, .24);
+        font-size: 4.8rem;
+    }
+
+    .product-badges {
+        position: absolute;
+        z-index: 2;
+        top: .75rem;
+        right: .75rem;
+        display: flex;
+        flex-direction: column;
+        align-items: flex-start;
+        gap: .35rem;
+    }
+
+    .product-badge {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        min-width: 38px;
+        height: 27px;
+        padding: 0 .55rem;
+        border-radius: .55rem;
+        color: white;
+        font-size: .64rem;
+        font-weight: 950;
+        box-shadow: 0 8px 18px rgba(0, 0, 0, .13);
+    }
+
+    .product-badge-discount {
+        background: #ef365f;
+    }
+
+    .product-badge-new {
+        background: #10a878;
+    }
+
+    .product-badge-best {
+        background: #8b5cf6;
+    }
+
+    .product-quick-view {
+        position: absolute;
+        z-index: 2;
+        left: 50%;
+        bottom: .85rem;
+        display: inline-flex;
+        align-items: center;
+        gap: .45rem;
+        padding: .62rem .85rem;
+        border-radius: .7rem;
+        color: white;
+        background: rgba(29, 15, 25, .76);
+        backdrop-filter: blur(10px);
+        font-size: .7rem;
+        font-weight: 850;
+        opacity: 0;
+        transform: translate(-50%, 12px);
+        transition: .25s ease;
+        white-space: nowrap;
+    }
+
+    .home-product-card:hover .product-quick-view {
+        opacity: 1;
+        transform: translate(-50%, 0);
+    }
+
+    .product-wishlist {
+        position: absolute;
+        z-index: 4;
+        top: 1.4rem;
+        left: 1.4rem;
+        display: grid;
+        place-items: center;
+        width: 38px;
+        height: 38px;
+        border-radius: 50%;
+        color: #d63166;
+        background: rgba(255, 255, 255, .92);
+        box-shadow: 0 10px 25px rgba(0, 0, 0, .11);
+        transition: .2s ease;
+    }
+
+    .product-wishlist:hover {
+        color: white;
+        background: #e63870;
+        transform: scale(1.08);
+    }
+
+    .product-card-body {
+        padding: .5rem 1.05rem 1.15rem;
+    }
+
+    .product-meta {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: .5rem;
+        color: var(--home-muted);
+        font-size: .63rem;
+    }
+
+    .product-stock {
+        display: inline-flex;
+        align-items: center;
+        gap: .25rem;
+    }
+
+    .product-stock-available {
+        color: #0d9a6b;
+    }
+
+    .product-stock-empty {
+        color: #d94a61;
+    }
+
+    .product-title {
+        display: -webkit-box;
+        min-height: 3rem;
+        margin-top: .7rem;
+        overflow: hidden;
+        -webkit-box-orient: vertical;
+        -webkit-line-clamp: 2;
+        font-size: .86rem;
+        line-height: 1.65;
+        font-weight: 850;
+    }
+
+    .product-title a:hover {
+        color: var(--primary-color);
+    }
+
+    .product-rating {
+        display: flex;
+        align-items: center;
+        gap: .28rem;
+        margin-top: .6rem;
+        color: #f0a21b;
+        font-size: .68rem;
+    }
+
+    .product-category {
+        margin-right: auto;
+        max-width: 55%;
+        overflow: hidden;
+        color: var(--home-muted);
+        text-overflow: ellipsis;
+        white-space: nowrap;
+    }
+
+    .product-price-row {
+        display: flex;
+        align-items: end;
+        justify-content: space-between;
+        gap: .7rem;
+        min-height: 47px;
+        margin-top: .75rem;
+        padding-top: .75rem;
+        border-top: 1px solid var(--home-line);
+    }
+
+    .product-prices {
+        display: flex;
+        align-items: baseline;
+        flex-wrap: wrap;
+        gap: .3rem;
+    }
+
+    .product-prices del {
+        width: 100%;
+        color: #a8a8af;
+        font-size: .64rem;
+    }
+
+    .product-prices strong {
+        font-size: 1rem;
+        font-weight: 950;
+    }
+
+    .product-prices small {
+        color: var(--home-muted);
+        font-size: .56rem;
+    }
+
+    .product-cart-btn {
+        display: grid;
+        place-items: center;
+        width: 42px;
+        height: 42px;
+        flex: 0 0 auto;
+        border-radius: .85rem;
+        color: white;
+        background:
+            linear-gradient(
+                135deg,
+                var(--primary-color),
+                var(--secondary-color)
+            );
+        box-shadow: 0 10px 25px rgba(216, 27, 96, .22);
+        transition: .2s ease;
+    }
+
+    .product-cart-btn:hover {
+        transform: translateY(-3px);
+    }
+
+    .product-cart-disabled {
+        opacity: .38;
+        box-shadow: none;
+    }
+
+    /* ========================================
+       تخفیف ویژه
+    ======================================== */
+
+    .deal-section {
+        position: relative;
+        overflow: hidden;
+        padding: clamp(1.35rem, 3vw, 2.25rem);
+        border-radius: 2rem;
+        background:
+            linear-gradient(
+                140deg,
+                #d91d61,
+                #a71c74 57%,
+                #6b2ca5
+            );
+        box-shadow: 0 30px 80px -42px rgba(173, 28, 106, .75);
+    }
+
+    .deal-section::before {
+        content: '';
+        position: absolute;
+        inset: 0;
+        background:
+            radial-gradient(
+                circle at 8% 0%,
+                rgba(255, 255, 255, .2),
+                transparent 26%
+            );
+        pointer-events: none;
+    }
+
+    .deal-heading {
+        position: relative;
+        display: flex;
+        align-items: end;
+        justify-content: space-between;
+        gap: 1rem;
+        margin-bottom: 1.3rem;
+        color: white;
+    }
+
+    .deal-heading-label {
+        display: inline-flex;
+        align-items: center;
+        gap: .4rem;
+        color: rgba(255, 255, 255, .78);
+        font-size: .72rem;
+        font-weight: 900;
+    }
+
+    .deal-heading h2 {
+        margin-top: .25rem;
+        font-size: clamp(1.4rem, 3vw, 2.25rem);
+        font-weight: 950;
+    }
+
+    .deal-heading p {
+        margin-top: .4rem;
+        color: rgba(255, 255, 255, .75);
+        font-size: .75rem;
+    }
+
+    .deal-timer {
+        direction: ltr;
+        display: flex;
+        align-items: center;
+        gap: .4rem;
+    }
+
+    .timer-box {
+        display: grid;
+        place-items: center;
+        min-width: 47px;
+        height: 47px;
+        padding: 0 .45rem;
+        border-radius: .8rem;
+        color: #b21d66;
+        background: white;
+        font-size: .84rem;
+        font-weight: 950;
+        box-shadow: 0 10px 25px rgba(0, 0, 0, .14);
+    }
+
+    .timer-separator {
+        color: white;
+        font-weight: 900;
+    }
+
+    .deal-section .home-product-card {
+        background: white;
+        border-color: rgba(255, 255, 255, .28);
+    }
+
+    [data-theme="dark"] .deal-section .home-product-card {
+        background: #2b2b34;
+    }
+
+    .deal-more {
+        position: relative;
+        display: flex;
+        justify-content: center;
+        margin-top: 1.3rem;
+    }
+
+    .deal-more a {
+        display: inline-flex;
+        align-items: center;
+        gap: .55rem;
+        padding: .72rem 1.15rem;
+        border: 1px solid rgba(255, 255, 255, .28);
+        border-radius: .85rem;
+        color: white;
+        background: rgba(255, 255, 255, .1);
+        backdrop-filter: blur(10px);
+        font-size: .76rem;
+        font-weight: 900;
+    }
+
+    /* ========================================
+       بنرهای تبلیغاتی
+    ======================================== */
+
+    .editorial-grid {
+        display: grid;
+        grid-template-columns: 1.2fr .8fr;
+        gap: 1rem;
+    }
+
+    .editorial-banner {
+        position: relative;
+        min-height: 245px;
+        overflow: hidden;
+        padding: clamp(1.5rem, 4vw, 3rem);
+        border-radius: 2rem;
+        color: white;
+        box-shadow: var(--home-shadow);
+    }
+
+    .editorial-banner > * {
+        position: relative;
+        z-index: 2;
+    }
+
+    .editorial-banner::before {
+        content: '';
+        position: absolute;
+        width: 290px;
+        height: 290px;
+        left: -90px;
+        bottom: -140px;
+        border: 55px solid rgba(255, 255, 255, .09);
+        border-radius: 50%;
+    }
+
+    .editorial-banner .banner-icon {
+        position: absolute;
+        z-index: 1;
+        left: 7%;
+        top: 50%;
+        color: rgba(255, 255, 255, .16);
+        font-size: clamp(6rem, 13vw, 10rem);
+        transform: translateY(-50%) rotate(-12deg);
+    }
+
+    .editorial-banner small {
+        font-size: .7rem;
+        font-weight: 900;
+        opacity: .78;
+    }
+
+    .editorial-banner h3 {
+        max-width: 480px;
+        margin-top: .7rem;
+        font-size: clamp(1.45rem, 3.2vw, 2.65rem);
+        line-height: 1.35;
+        font-weight: 950;
+    }
+
+    .editorial-banner p {
+        max-width: 440px;
+        margin-top: .7rem;
+        color: rgba(255, 255, 255, .75);
+        font-size: .75rem;
+        line-height: 1.8;
+    }
+
+    .editorial-banner a {
+        display: inline-flex;
+        align-items: center;
+        gap: .5rem;
+        margin-top: 1.2rem;
+        padding: .65rem 1rem;
+        border-radius: .8rem;
+        color: #8b245b;
+        background: white;
+        font-size: .75rem;
+        font-weight: 900;
+    }
+
+    .editorial-skin {
+        background: linear-gradient(135deg, #ef72a7, #bd2b72);
+    }
+
+    .editorial-fragrance {
+        background: linear-gradient(135deg, #6d5ed8, #35217d);
+    }
+
+    /* ========================================
+       برندها و خبرنامه
+    ======================================== */
+
+    .brand-strip {
+        display: grid;
+        grid-template-columns: repeat(5, minmax(0, 1fr));
+        gap: .75rem;
+    }
+
+    .brand-card {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        min-height: 92px;
+        padding: .85rem;
+        border: 1px solid var(--home-line);
+        border-radius: 1.25rem;
+        color: var(--home-muted);
+        background: var(--home-surface);
+        font-weight: 900;
+        transition: .25s ease;
+    }
+
+    .brand-card:hover {
+        transform: translateY(-4px);
+        color: var(--primary-color);
+        border-color: rgba(236, 64, 122, .35);
+    }
+
+    .brand-card img {
+        max-width: 105px;
+        max-height: 54px;
+        object-fit: contain;
+        filter: grayscale(1);
+        opacity: .72;
+        transition: .25s ease;
+    }
+
+    .brand-card:hover img {
+        filter: none;
+        opacity: 1;
+    }
+
+    .newsletter-box {
+        position: relative;
+        display: grid;
+        grid-template-columns: 1fr auto;
+        align-items: center;
+        gap: 1.5rem;
+        overflow: hidden;
+        padding: clamp(1.5rem, 4vw, 3rem);
+        border: 1px solid var(--home-line);
+        border-radius: 2rem;
+        background: var(--home-surface);
+        box-shadow: var(--home-shadow);
+    }
+
+    .newsletter-box::before {
+        content: '';
+        position: absolute;
+        width: 330px;
+        height: 330px;
+        right: -160px;
+        top: -170px;
+        border-radius: 50%;
+        background: rgba(236, 64, 122, .09);
+    }
+
+    .newsletter-copy,
+    .newsletter-action {
+        position: relative;
+    }
+
+    .newsletter-copy > span {
+        color: var(--primary-color);
+        font-size: .7rem;
+        font-weight: 900;
+    }
+
+    .newsletter-copy h2 {
+        margin-top: .45rem;
+        font-size: clamp(1.3rem, 2.8vw, 2rem);
+        font-weight: 950;
+    }
+
+    .newsletter-copy p {
+        margin-top: .5rem;
+        color: var(--home-muted);
+        font-size: .75rem;
+    }
+
+    .newsletter-action {
+        display: flex;
+        align-items: center;
+        gap: .5rem;
+        min-width: min(100%, 350px);
+        padding: .45rem;
+        border: 1px solid var(--home-line);
+        border-radius: 1rem;
+        background: rgba(236, 64, 122, .07);
+    }
+
+    .newsletter-action input {
+        width: 230px;
+        min-width: 0;
+        padding: .65rem .75rem;
+        color: inherit;
+        background: transparent;
+        outline: none;
+        font-size: .75rem;
+    }
+
+    .newsletter-action button {
+        flex: 0 0 auto;
+        padding: .72rem 1rem;
+        border-radius: .75rem;
+        color: white;
+        background:
+            linear-gradient(
+                135deg,
+                var(--primary-color),
+                var(--secondary-color)
+            );
+        font-size: .72rem;
+        font-weight: 900;
+    }
+
+    /* حالت خالی */
+
+    .home-empty {
+        grid-column: 1 / -1;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        min-height: 220px;
+        padding: 2rem;
+        border: 1px dashed rgba(236, 64, 122, .28);
+        border-radius: 1.5rem;
+        text-align: center;
+        background: var(--home-surface);
+    }
+
+    .home-empty i {
+        color: rgba(236, 64, 122, .3);
+        font-size: 2.8rem;
+    }
+
+    .home-empty strong {
+        margin-top: .85rem;
+    }
+
+    .home-empty p {
+        margin-top: .4rem;
+        color: var(--home-muted);
+        font-size: .72rem;
+    }
+
+    /* ========================================
+       ریسپانسیو
+    ======================================== */
+
+    @media (max-width: 1100px) {
+        .image-category-list {
+            grid-template-columns: repeat(6, minmax(0, 1fr));
+        }
+
+        .product-grid {
+            grid-template-columns: repeat(3, minmax(0, 1fr));
+        }
+    }
+
+    @media (max-width: 800px) {
+        .home-shell {
+            gap: 3.5rem;
+        }
+
+        .store-slider {
+            height: 330px;
+            border-radius: 1.45rem;
+        }
+
+        .store-slide-content {
+            width: min(500px, 80%);
+        }
+
+        .image-category-list {
+            display: flex;
+            overflow-x: auto;
+            gap: 1rem;
+            padding: .4rem .2rem 1rem;
+            scroll-snap-type: x mandatory;
+            scrollbar-width: none;
+        }
+
+        .image-category-list::-webkit-scrollbar {
+            display: none;
+        }
+
+        .image-category-card {
+            flex: 0 0 105px;
+            scroll-snap-align: start;
+        }
+
+        .image-category-picture {
+            width: 92px;
+        }
+
+        .trust-strip {
+            grid-template-columns: 1fr 1fr;
+        }
+
+        .trust-item:nth-child(2) {
+            border-left: 0;
+        }
+
+        .trust-item:nth-child(-n + 2) {
+            border-bottom: 1px solid var(--home-line);
+        }
+
+        .product-grid {
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+        }
+
+        .product-media {
+            height: 245px;
+        }
+
+        .editorial-grid {
+            grid-template-columns: 1fr;
+        }
+
+        .brand-strip {
+            grid-template-columns: repeat(3, minmax(0, 1fr));
+        }
+
+        .newsletter-box {
+            grid-template-columns: 1fr;
+        }
+
+        .newsletter-action {
+            width: 100%;
+        }
+
+        .newsletter-action input {
+            width: 100%;
+        }
+    }
+
+    @media (max-width: 540px) {
+        .home-shell {
+            gap: 3rem;
+        }
+
+        .store-slider {
+            height: 225px;
+            border-radius: 1.1rem;
+        }
+
+        .store-slide-overlay {
+            padding: 1.15rem;
+        }
+
+        .store-slide-content {
+            width: 76%;
+        }
+
+        .store-slide-content h1,
+        .store-slide-content h2 {
+            margin-top: .55rem;
+            font-size: 1.35rem;
+        }
+
+        .store-slide-content p {
+            display: none;
+        }
+
+        .store-slide-label {
+            padding: .35rem .55rem;
+            font-size: .57rem;
+        }
+
+        .store-slide-button {
+            margin-top: .75rem;
+            padding: .56rem .75rem;
+            font-size: .63rem;
+        }
+
+        .store-slider-controls {
+            display: none;
+        }
+
+        .store-slider-dots {
+            right: 1rem;
+            bottom: .8rem;
+        }
+
+        .section-heading {
+            align-items: flex-start;
+        }
+
+        .section-subtitle {
+            display: none;
+        }
+
+        .image-category-card {
+            flex-basis: 94px;
+        }
+
+        .image-category-picture {
+            width: 82px;
+            border-width: 3px;
+        }
+
+        .image-category-name {
+            font-size: .7rem;
+        }
+
+        .trust-item {
+            justify-content: flex-start;
+            padding: 1rem;
+        }
+
+        .trust-icon {
+            width: 42px;
+            height: 42px;
+        }
+
+        .product-grid {
+            gap: .65rem;
+        }
+
+        .home-product-card {
+            border-radius: 1.1rem;
+        }
+
+        .product-media-wrap {
+            padding: .45rem;
+        }
+
+        .product-media {
+            height: 195px;
+            border-radius: .85rem;
+        }
+
+        .product-card-body {
+            padding: .4rem .72rem .9rem;
+        }
+
+        .product-meta > span:first-child,
+        .product-category {
+            display: none;
+        }
+
+        .product-title {
+            min-height: 2.8rem;
+            font-size: .74rem;
+        }
+
+        .product-prices strong {
+            font-size: .8rem;
+        }
+
+        .product-cart-btn {
+            width: 36px;
+            height: 36px;
+            border-radius: .7rem;
+        }
+
+        .product-quick-view {
+            display: none;
+        }
+
+        .product-wishlist {
+            top: 1rem;
+            left: 1rem;
+            width: 34px;
+            height: 34px;
+        }
+
+        .deal-section {
+            margin-inline: -.45rem;
+            padding: 1rem .7rem 1.25rem;
+            border-radius: 1.45rem;
+        }
+
+        .deal-heading {
+            align-items: flex-start;
+        }
+
+        .deal-heading p {
+            display: none;
+        }
+
+        .timer-box {
+            min-width: 36px;
+            height: 36px;
+            font-size: .7rem;
+        }
+
+        .editorial-banner {
+            min-height: 225px;
+            border-radius: 1.45rem;
+        }
+
+        .brand-strip {
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+        }
+
+        .newsletter-action {
+            flex-direction: column;
+            align-items: stretch;
+        }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+        .store-slide,
+        .store-slide-image,
+        .image-category-picture,
+        .home-product-card {
+            transition: none !important;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="home-shell">
+
+    <!-- اسلایدر اصلی -->
+    <section
+        class="store-slider"
+        id="storeSlider"
+        aria-label="پیشنهادهای ویژه فروشگاه">
+
+        {% if sliders %}
+            {% for slider in sliders %}
+                <article
+                    class="store-slide {% if forloop.first %}is-active{% endif %}"
+                    data-store-slide
+                    aria-hidden="{% if forloop.first %}false{% else %}true{% endif %}">
+
+                    <a
+                        href="{{ slider.link|default:'#' }}"
+                        class="store-slide-link">
+
+                        <img
+                            src="{{ slider.image.url }}"
+                            alt="{{ slider.title|default:'پیشنهاد ویژه فروشگاه' }}"
+                            class="store-slide-image"
+                            {% if not forloop.first %}loading="lazy"{% endif %}>
+
+                        {% if slider.title or slider.subtitle or slider.button_text %}
+                            <div class="store-slide-overlay">
+                                <div class="store-slide-content">
+
+                                    <span class="store-slide-label">
+                                        <i class="fas fa-sparkles"></i>
+                                        پیشنهاد ویژه
+                                    </span>
+
+                                    {% if forloop.first %}
+                                        <h1>
+                                            {{ slider.title|default:'زیبایی به سبک تو' }}
+                                        </h1>
+                                    {% else %}
+                                        <h2>
+                                            {{ slider.title|default:'انتخابی تازه برای تو' }}
+                                        </h2>
+                                    {% endif %}
+
+                                    {% if slider.subtitle %}
+                                        <p>{{ slider.subtitle }}</p>
+                                    {% endif %}
+
+                                    {% if slider.button_text %}
+                                        <span class="store-slide-button">
+                                            {{ slider.button_text }}
+                                            <i class="fas fa-arrow-left"></i>
+                                        </span>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        {% endif %}
+                    </a>
+                </article>
+            {% endfor %}
+
+            {% if sliders|length > 1 %}
+                <div
+                    class="store-slider-dots"
+                    aria-label="انتخاب اسلاید">
+
+                    {% for slider in sliders %}
+                        <button
+                            type="button"
+                            class="store-slider-dot {% if forloop.first %}is-active{% endif %}"
+                            data-store-dot="{{ forloop.counter0 }}"
+                            aria-label="نمایش اسلاید {{ forloop.counter }}">
+                        </button>
+                    {% endfor %}
+                </div>
+
+                <div class="store-slider-controls">
+                    <button
+                        type="button"
+                        class="store-slider-arrow"
+                        data-store-next
+                        aria-label="اسلاید بعدی">
+                        <i class="fas fa-chevron-right"></i>
+                    </button>
+
+                    <button
+                        type="button"
+                        class="store-slider-arrow"
+                        data-store-previous
+                        aria-label="اسلاید قبلی">
+                        <i class="fas fa-chevron-left"></i>
+                    </button>
+                </div>
+            {% endif %}
+
+        {% else %}
+            <div class="store-slider-empty">
+                <div class="store-slide-content">
+
+                    <span class="store-slide-label">
+                        <i class="fas fa-sparkles"></i>
+                        فروشگاه زیبایی
+                    </span>
+
+                    <h1>محصولات خاص برای زیبایی تو</h1>
+
+                    <p>
+                        برای نمایش تصاویر دلخواه، اسلایدهای فروشگاه
+                        را از پنل مدیریت اضافه کن.
+                    </p>
+
+                    <a
+                        href="{% url 'first:product_list' %}"
+                        class="store-slide-button">
+                        مشاهده محصولات
+                        <i class="fas fa-arrow-left"></i>
+                    </a>
+                </div>
+            </div>
+        {% endif %}
+    </section>
+
+    <!-- دسته‌بندی‌های تصویری -->
+    <section class="image-category-section">
+
+        <header class="section-heading">
+            <div>
+                <span class="section-kicker">
+                    <i class="fas fa-table-cells-large"></i>
+                    دسته‌بندی محصولات
+                </span>
+
+                <h2 class="section-title">
+                    خرید براساس دسته‌بندی
+                </h2>
+
+                <p class="section-subtitle">
+                    محصول موردنظرت را سریع‌تر پیدا کن
+                </p>
+            </div>
+
+            <a
+                href="{% url 'first:product_list' %}"
+                class="section-link">
+                مشاهده همه
+                <i class="fas fa-arrow-left"></i>
+            </a>
+        </header>
+
+        <div class="image-category-list">
+
+<div class="image-category-list">
+
+    {% for category in categories %}
+        <a
+            href="{% url 'first:category_products' category.slug %}"
+            class="image-category-card">
+
+            <span
+                class="image-category-picture"
+                data-bsg-edit="category-image-{{ category.id }}"
+                data-bsg-name="تصویر یا لوگوی {{ category.name }}">
+
+                {% if category.image %}
+                    <img
+                        src="{{ category.image.url }}"
+                        alt="{{ category.name }}"
+                        loading="lazy">
+                {% else %}
+                    <i class="fas {{ category.icon|default:'fa-sparkles' }}"></i>
+                {% endif %}
+            </span>
+
+            <strong
+                class="image-category-name"
+                title="{{ category.name }}">
+                {{ category.name }}
+            </strong>
+
+            <span class="image-category-count">
+                {{ category.products.count|format_number }}
+                محصول
+            </span>
+        </a>
+
+    {% empty %}
+        <div class="home-empty">
+            <i class="fas fa-layer-group"></i>
+
+            <strong>
+                هنوز دسته‌بندی ایجاد نشده
+            </strong>
+
+            <p>
+                دسته‌بندی‌ها و تصاویرشان را از پنل مدیریت اضافه کن.
+            </p>
+        </div>
+    {% endfor %}
+</div>
+    </section>
+
+    <!-- مزایای فروشگاه -->
+    <section
+        class="trust-strip"
+        aria-label="مزایای خرید از فروشگاه">
+
+        <div class="trust-item">
+            <span class="trust-icon">
+                <i class="fas fa-shield-heart"></i>
+            </span>
+
+            <div>
+                <strong>ضمانت اصالت</strong>
+                <p>تضمین کیفیت تمام محصولات</p>
+            </div>
+        </div>
+
+        <div class="trust-item">
+            <span class="trust-icon">
+                <i class="fas fa-truck-fast"></i>
+            </span>
+
+            <div>
+                <strong>ارسال سریع</strong>
+                <p>تحویل امن در سراسر کشور</p>
+            </div>
+        </div>
+
+        <div class="trust-item">
+            <span class="trust-icon">
+                <i class="fas fa-headset"></i>
+            </span>
+
+            <div>
+                <strong>مشاوره خرید</strong>
+                <p>همراهی قبل و بعد از سفارش</p>
+            </div>
+        </div>
+
+        <div class="trust-item">
+            <span class="trust-icon">
+                <i class="fas fa-arrow-rotate-left"></i>
+            </span>
+
+            <div>
+                <strong>بازگشت آسان</strong>
+                <p>فرایند شفاف و بدون دردسر</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- تخفیف‌های ویژه -->
+    <section class="deal-section">
+
+        <header class="deal-heading">
+            <div>
+                <span class="deal-heading-label">
+                    <i class="fas fa-bolt"></i>
+                    پیشنهاد شگفت‌انگیز
+                </span>
+
+                <h2>تخفیف‌های داغ امروز</h2>
+
+                <p>
+                    قبل از تمام‌شدن زمان، انتخابت را نهایی کن
+                </p>
+            </div>
+
+            <div
+                class="deal-timer"
+                aria-label="زمان باقی‌مانده">
+
+                <span class="timer-box" id="dealHours">
+                    ۰۰
+                </span>
+
+                <span class="timer-separator">:</span>
+
+                <span class="timer-box" id="dealMinutes">
+                    ۰۰
+                </span>
+
+                <span class="timer-separator">:</span>
+
+                <span class="timer-box" id="dealSeconds">
+                    ۰۰
+                </span>
+            </div>
+        </header>
+
+        <div class="product-grid">
+            {% for product in discounted_products|slice:':4' %}
+                {% include 'includes/home_product_card.html' with product=product %}
+            {% empty %}
+                <div class="home-empty">
+                    <i class="fas fa-tags"></i>
+
+                    <strong>
+                        فعلاً محصول تخفیف‌دار نداریم
+                    </strong>
+
+                    <p>
+                        برای نمایش محصول در این بخش،
+                        قیمت تخفیف را در پنل وارد کن.
+                    </p>
+                </div>
+            {% endfor %}
+        </div>
+
+        <div class="deal-more">
+            <a href="{% url 'first:discounts' %}">
+                مشاهده همه تخفیف‌ها
+                <i class="fas fa-arrow-left"></i>
+            </a>
+        </div>
+    </section>
+
+    <!-- محصولات ویژه -->
+    <section class="home-section">
+
+        <header class="section-heading">
+            <div>
+                <span class="section-kicker">
+                    <i class="fas fa-gem"></i>
+                    منتخب آرایشی شاپ
+                </span>
+
+                <h2 class="section-title">
+                    محصولات پیشنهادی برای تو
+                </h2>
+
+                <p class="section-subtitle">
+                    انتخاب‌های ویژه با تمرکز بر کیفیت و محبوبیت
+                </p>
+            </div>
+
+            <a
+                href="{% url 'first:product_list' %}"
+                class="section-link">
+                مشاهده همه
+                <i class="fas fa-arrow-left"></i>
+            </a>
+        </header>
+
+        <div class="product-grid">
+
+            {% for product in featured_products|slice:':8' %}
+                {% include 'includes/home_product_card.html' with product=product %}
+
+            {% empty %}
+                {% for product in new_products|slice:':4' %}
+                    {% include 'includes/home_product_card.html' with product=product %}
+
+                {% empty %}
+                    <div class="home-empty">
+                        <i class="fas fa-box-open"></i>
+
+                        <strong>
+                            هنوز محصول ویژه‌ای انتخاب نشده
+                        </strong>
+
+                        <p>
+                            از پنل مدیریت گزینه «محصول ویژه» را فعال کن.
+                        </p>
+                    </div>
+                {% endfor %}
+            {% endfor %}
+        </div>
+    </section>
+
+    <!-- بنرهای تبلیغاتی -->
+    <section
+        class="editorial-grid"
+        aria-label="راهنمای انتخاب محصولات">
+
+        <article class="editorial-banner editorial-skin">
+            <i class="fas fa-spa banner-icon"></i>
+
+            <small>روتین مراقبت شخصی</small>
+
+            <h3>
+                پوست سالم، شروع یک آرایش زیباست
+            </h3>
+
+            <p>
+                محصولات مراقبتی مناسب نوع پوستت را پیدا کن
+                و روتین روزانه‌ات را کامل‌تر بساز.
+            </p>
+
+            <a href="{% url 'first:product_list' %}">
+                کشف محصولات مراقبتی
+                <i class="fas fa-arrow-left"></i>
+            </a>
+        </article>
+
+        <article class="editorial-banner editorial-fragrance">
+            <i class="fas fa-spray-can-sparkles banner-icon"></i>
+
+            <small>امضای شخصی تو</small>
+
+            <h3>
+                رایحه‌ای که ماندگار می‌شود
+            </h3>
+
+            <p>
+                از میان انتخاب‌های خاص، عطر هماهنگ
+                با شخصیتت را پیدا کن.
+            </p>
+
+            <a href="{% url 'first:product_list' %}">
+                مشاهده انتخاب‌ها
+                <i class="fas fa-arrow-left"></i>
+            </a>
+        </article>
+    </section>
+
+    <!-- پرفروش‌ترین‌ها -->
+    <section class="home-section">
+
+        <header class="section-heading">
+            <div>
+                <span class="section-kicker">
+                    <i class="fas fa-crown"></i>
+                    انتخاب مشتری‌ها
+                </span>
+
+                <h2 class="section-title">
+                    پرفروش‌ترین محصولات
+                </h2>
+
+                <p class="section-subtitle">
+                    محبوب‌هایی که بارها انتخاب شده‌اند
+                </p>
+            </div>
+
+            <a
+                href="{% url 'first:best_sellers' %}"
+                class="section-link">
+                همه پرفروش‌ها
+                <i class="fas fa-arrow-left"></i>
+            </a>
+        </header>
+
+        <div class="product-grid">
+            {% for product in best_sellers|slice:':4' %}
+                {% include 'includes/home_product_card.html' with product=product %}
+            {% empty %}
+                <div class="home-empty">
+                    <i class="fas fa-ranking-star"></i>
+
+                    <strong>
+                        پرفروش‌ها هنوز مشخص نشده‌اند
+                    </strong>
+
+                    <p>
+                        محصولات دارای نشان پرفروش
+                        در این قسمت نمایش داده می‌شوند.
+                    </p>
+                </div>
+            {% endfor %}
+        </div>
+    </section>
+
+    <!-- محصولات جدید -->
+    <section class="home-section">
+
+        <header class="section-heading">
+            <div>
+                <span class="section-kicker">
+                    <i class="fas fa-sparkles"></i>
+                    تازه رسیده‌ها
+                </span>
+
+                <h2 class="section-title">
+                    جدیدترین محصولات فروشگاه
+                </h2>
+
+                <p class="section-subtitle">
+                    اولین نفر باش که تازه‌های دنیای زیبایی را می‌بیند
+                </p>
+            </div>
+
+            <a
+                href="{% url 'first:product_list' %}?sort=-created_at"
+                class="section-link">
+                همه جدیدها
+                <i class="fas fa-arrow-left"></i>
+            </a>
+        </header>
+
+        <div class="product-grid">
+            {% for product in new_products|slice:':4' %}
+                {% include 'includes/home_product_card.html' with product=product %}
+            {% empty %}
+                <div class="home-empty">
+                    <i class="fas fa-box"></i>
+
+                    <strong>
+                        محصول جدیدی ثبت نشده است
+                    </strong>
+
+                    <p>
+                        محصولات دارای نشان «جدید»
+                        در این قسمت نمایش داده می‌شوند.
+                    </p>
+                </div>
+            {% endfor %}
+        </div>
+    </section>
+
+    <!-- برندها -->
+    {% if brands %}
+        <section class="home-section">
+
+            <header class="section-heading">
+                <div>
+                    <span class="section-kicker">
+                        <i class="fas fa-award"></i>
+                        برندهای معتبر
+                    </span>
+
+                    <h2 class="section-title">
+                        خرید از برند محبوبت
+                    </h2>
+                </div>
+            </header>
+
+            <div class="brand-strip">
+                {% for brand in brands %}
+                    <a
+                        href="{% url 'first:brand_products' brand.slug %}"
+                        class="brand-card"
+                        aria-label="محصولات برند {{ brand.name }}">
+
+                        {% if brand.logo %}
+                            <img
+                                src="{{ brand.logo.url }}"
+                                alt="{{ brand.name }}"
+                                loading="lazy">
+                        {% else %}
+                            <span>{{ brand.name }}</span>
+                        {% endif %}
+                    </a>
+                {% endfor %}
+            </div>
+        </section>
+    {% endif %}
+
+    <!-- خبرنامه -->
+    <section class="newsletter-box">
+
+        <div class="newsletter-copy">
+            <span>
+                <i class="fas fa-envelope-open-text"></i>
+                خبرنامه زیبایی
+            </span>
+
+            <h2>
+                از تخفیف‌ها و تازه‌ها باخبر شو
+            </h2>
+
+            <p>
+                ایمیلت را وارد کن تا پیشنهادهای اختصاصی
+                فروشگاه را از دست ندهی.
+            </p>
+        </div>
+
+        <form
+            class="newsletter-action"
+            action="#"
+            method="get"
+            onsubmit="event.preventDefault(); this.querySelector('button').textContent='ثبت شد ✓';">
+
+            <label
+                for="newsletterEmail"
+                class="sr-only">
+                ایمیل
+            </label>
+
+            <input
+                id="newsletterEmail"
+                type="email"
+                placeholder="example@email.com"
+                required
+                dir="ltr"
+                autocomplete="email">
+
+            <button type="submit">
+                عضویت در خبرنامه
+            </button>
+        </form>
+    </section>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    /*
+     * اسلایدر خودکار صفحه اصلی
+     */
+    (function () {
+        const slider = document.getElementById('storeSlider');
+
+        if (!slider) {
+            return;
+        }
+
+        const slides = Array.from(
+            slider.querySelectorAll('[data-store-slide]')
+        );
+
+        const dots = Array.from(
+            slider.querySelectorAll('[data-store-dot]')
+        );
+
+        const nextButton = slider.querySelector(
+            '[data-store-next]'
+        );
+
+        const previousButton = slider.querySelector(
+            '[data-store-previous]'
+        );
+
+        if (slides.length <= 1) {
+            return;
+        }
+
+        let activeIndex = 0;
+        let autoPlayTimer = null;
+        let touchStartX = 0;
+
+        function showSlide(index) {
+            activeIndex = (
+                index + slides.length
+            ) % slides.length;
+
+            slides.forEach(function (slide, slideIndex) {
+                const isActive = slideIndex === activeIndex;
+
+                slide.classList.toggle(
+                    'is-active',
+                    isActive
+                );
+
+                slide.setAttribute(
+                    'aria-hidden',
+                    isActive ? 'false' : 'true'
+                );
+            });
+
+            dots.forEach(function (dot, dotIndex) {
+                const isActive = dotIndex === activeIndex;
+
+                dot.classList.toggle(
+                    'is-active',
+                    isActive
+                );
+
+                dot.setAttribute(
+                    'aria-current',
+                    isActive ? 'true' : 'false'
+                );
+            });
+        }
+
+        function stopAutoPlay() {
+            if (autoPlayTimer) {
+                window.clearInterval(autoPlayTimer);
+            }
+
+            autoPlayTimer = null;
+        }
+
+        function startAutoPlay() {
+            stopAutoPlay();
+
+            const reducedMotion = window.matchMedia(
+                '(prefers-reduced-motion: reduce)'
+            ).matches;
+
+            if (!reducedMotion) {
+                autoPlayTimer = window.setInterval(
+                    function () {
+                        showSlide(activeIndex + 1);
+                    },
+                    3000
+                );
+            }
+        }
+
+        function restartAutoPlay() {
+            stopAutoPlay();
+            startAutoPlay();
+        }
+
+        if (nextButton) {
+            nextButton.addEventListener(
+                'click',
+                function (event) {
+                    event.preventDefault();
+                    event.stopPropagation();
+
+                    showSlide(activeIndex + 1);
+                    restartAutoPlay();
+                }
+            );
+        }
+
+        if (previousButton) {
+            previousButton.addEventListener(
+                'click',
+                function (event) {
+                    event.preventDefault();
+                    event.stopPropagation();
+
+                    showSlide(activeIndex - 1);
+                    restartAutoPlay();
+                }
+            );
+        }
+
+        dots.forEach(function (dot) {
+            dot.addEventListener(
+                'click',
+                function () {
+                    showSlide(
+                        Number(dot.dataset.storeDot)
+                    );
+
+                    restartAutoPlay();
+                }
+            );
+        });
+
+        slider.addEventListener(
+            'mouseenter',
+            stopAutoPlay
+        );
+
+        slider.addEventListener(
+            'mouseleave',
+            startAutoPlay
+        );
+
+        slider.addEventListener(
+            'focusin',
+            stopAutoPlay
+        );
+
+        slider.addEventListener(
+            'focusout',
+            startAutoPlay
+        );
+
+        slider.addEventListener(
+            'touchstart',
+            function (event) {
+                touchStartX = (
+                    event.changedTouches[0].clientX
+                );
+            },
+            {
+                passive: true
+            }
+        );
+
+        slider.addEventListener(
+            'touchend',
+            function (event) {
+                const touchEndX = (
+                    event.changedTouches[0].clientX
+                );
+
+                const difference = (
+                    touchEndX - touchStartX
+                );
+
+                if (Math.abs(difference) < 45) {
+                    return;
+                }
+
+                if (difference > 0) {
+                    showSlide(activeIndex - 1);
+                } else {
+                    showSlide(activeIndex + 1);
+                }
+
+                restartAutoPlay();
+            },
+            {
+                passive: true
+            }
+        );
+
+        document.addEventListener(
+            'visibilitychange',
+            function () {
+                if (document.hidden) {
+                    stopAutoPlay();
+                } else {
+                    startAutoPlay();
+                }
+            }
+        );
+
+        showSlide(0);
+        startAutoPlay();
+    })();
+
+    /*
+     * شمارش معکوس تخفیف‌ها تا پایان روز
+     */
+    (function () {
+        const hoursElement = document.getElementById(
+            'dealHours'
+        );
+
+        const minutesElement = document.getElementById(
+            'dealMinutes'
+        );
+
+        const secondsElement = document.getElementById(
+            'dealSeconds'
+        );
+
+        if (
+            !hoursElement ||
+            !minutesElement ||
+            !secondsElement
+        ) {
+            return;
+        }
+
+        const persianDigits = '۰۱۲۳۴۵۶۷۸۹';
+
+        function localizeNumber(value) {
+            return String(value)
+                .padStart(2, '0')
+                .replace(
+                    /\d/g,
+                    function (digit) {
+                        return persianDigits[Number(digit)];
+                    }
+                );
+        }
+
+        function updateTimer() {
+            const now = new Date();
+            const endOfDay = new Date(now);
+
+            endOfDay.setHours(
+                23,
+                59,
+                59,
+                999
+            );
+
+            const remaining = Math.max(
+                0,
+                endOfDay.getTime() - now.getTime()
+            );
+
+            const hours = Math.floor(
+                remaining / 3600000
+            );
+
+            const minutes = Math.floor(
+                (remaining % 3600000) / 60000
+            );
+
+            const seconds = Math.floor(
+                (remaining % 60000) / 1000
+            );
+
+            hoursElement.textContent = localizeNumber(
+                hours
+            );
+
+            minutesElement.textContent = localizeNumber(
+                minutes
+            );
+
+            secondsElement.textContent = localizeNumber(
+                seconds
+            );
+        }
+
+        updateTimer();
+
+        window.setInterval(
+            updateTimer,
+            1000
+        );
+    })();
+</script>
+{% endblock %}

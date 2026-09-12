@@ -1,0 +1,2427 @@
+{% extends 'base.html' %}
+{% load custom_filters %}
+
+{% block title %}
+مرکز آمار و گزارش‌های مدیریتی
+{% endblock %}
+
+
+{% block extra_css %}
+<style>
+    /* ==========================================================
+       تنظیمات اصلی
+       ========================================================== */
+
+    .an-page,
+    .an-page * {
+        box-sizing: border-box;
+    }
+
+    .an-page {
+        width: 100%;
+        max-width: 1440px;
+        min-width: 0;
+        margin: 0 auto;
+    }
+
+    .an-card {
+        min-width: 0;
+        background: rgba(255, 255, 255, 0.93);
+        border: 1px solid rgba(236, 64, 122, 0.1);
+        border-radius: 20px;
+        box-shadow: 0 16px 45px rgba(76, 24, 61, 0.07);
+    }
+
+
+    /* ==========================================================
+       سربرگ صفحه
+       ========================================================== */
+
+    .an-header {
+        width: 100%;
+        min-width: 0;
+        margin-bottom: 20px;
+        display: flex;
+        flex-wrap: wrap;
+        align-items: flex-start;
+        justify-content: space-between;
+        gap: 18px;
+    }
+
+    .an-header-content {
+        min-width: 260px;
+        flex: 1 1 420px;
+    }
+
+    .an-title {
+        margin: 0;
+        color: #2f2c34;
+        font-size: clamp(24px, 3vw, 36px);
+        font-weight: 950;
+        line-height: 1.5;
+    }
+
+    .an-title i {
+        margin-left: 8px;
+        color: #ec407a;
+    }
+
+    .an-subtitle {
+        margin: 5px 0 0;
+        color: #85818a;
+        font-size: 13px;
+        line-height: 1.9;
+    }
+
+
+    /* ==========================================================
+       دکمه‌ها
+       ========================================================== */
+
+    .an-actions {
+        min-width: 0;
+        flex: 0 1 auto;
+        display: grid;
+        grid-template-columns: repeat(3, max-content);
+        align-items: stretch;
+        gap: 9px;
+    }
+
+    .an-page .an-btn {
+        appearance: none;
+        -webkit-appearance: none;
+        min-width: 0;
+        min-height: 44px;
+        height: 44px;
+        margin: 0;
+        padding: 0 17px;
+        border: 0;
+        border-radius: 12px;
+        display: inline-flex !important;
+        flex-direction: row;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+        cursor: pointer;
+        overflow: hidden;
+        white-space: nowrap;
+        text-decoration: none !important;
+        font-family: Vazir, Tahoma, sans-serif;
+        font-size: 12px;
+        font-weight: 900;
+        line-height: 1;
+        transition:
+            transform 0.2s,
+            box-shadow 0.2s,
+            opacity 0.2s;
+    }
+
+    .an-page .an-btn i {
+        flex: 0 0 auto;
+        margin: 0;
+        font-size: 13px;
+    }
+
+    .an-page .an-btn:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 10px 25px rgba(0, 0, 0, 0.14);
+    }
+
+    .an-page .an-btn:active {
+        transform: translateY(0);
+    }
+
+    .an-page .an-btn-pdf,
+    .an-page a.an-btn-pdf,
+    .an-page button.an-btn-pdf {
+        color: #ffffff !important;
+        background: linear-gradient(
+            135deg,
+            #ec407a,
+            #ad1457
+        ) !important;
+    }
+
+    .an-page .an-btn-csv,
+    .an-page a.an-btn-csv {
+        color: #ffffff !important;
+        background: linear-gradient(
+            135deg,
+            #16a36a,
+            #078359
+        ) !important;
+    }
+
+    .an-page .an-btn-back,
+    .an-page a.an-btn-back {
+        color: #55515a !important;
+        background: #ffffff !important;
+        border: 1px solid #e5dde2 !important;
+    }
+
+
+    /* ==========================================================
+       فیلترها
+       ========================================================== */
+
+    .an-filter {
+        margin-bottom: 18px;
+        padding: 16px;
+    }
+
+    .an-filter-form {
+        width: 100%;
+        display: grid;
+        grid-template-columns:
+            repeat(3, minmax(115px, 1fr))
+            repeat(2, minmax(140px, 1fr))
+            minmax(210px, 1.15fr);
+        align-items: end;
+        gap: 10px;
+    }
+
+    .an-field {
+        min-width: 0;
+    }
+
+    .an-field label {
+        display: block;
+        margin-bottom: 6px;
+        color: #77727b;
+        font-size: 11px;
+        font-weight: 800;
+    }
+
+    .an-input {
+        appearance: none;
+        width: 100%;
+        height: 43px;
+        margin: 0;
+        padding: 0 11px;
+        border: 1px solid #ddd7dc;
+        border-radius: 11px;
+        outline: 0;
+        color: #39353b;
+        background: #ffffff;
+        font-family: Vazir, Tahoma, sans-serif;
+        font-size: 12px;
+        transition:
+            border-color 0.2s,
+            box-shadow 0.2s;
+    }
+
+    .an-input:focus {
+        border-color: var(--primary-color, #ec407a);
+        box-shadow: 0 0 0 3px rgba(236, 64, 122, 0.12);
+    }
+
+    .an-filter-buttons {
+        width: 100%;
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 7px;
+    }
+
+    .an-filter-buttons .an-btn {
+        width: 100%;
+        padding-right: 10px;
+        padding-left: 10px;
+    }
+
+    .custom-date {
+        display: none;
+    }
+
+
+    /* ==========================================================
+       کارت‌های شاخص کلیدی
+       ========================================================== */
+
+    .an-kpis {
+        margin-bottom: 16px;
+        display: grid;
+        grid-template-columns: repeat(4, minmax(0, 1fr));
+        gap: 13px;
+    }
+
+    .an-kpi {
+        position: relative;
+        min-width: 0;
+        overflow: hidden;
+        padding: 18px;
+    }
+
+    .an-kpi::before {
+        content: "";
+        position: absolute;
+        top: 0;
+        right: 0;
+        width: 5px;
+        height: 100%;
+        background: var(--kpi-color, #ec407a);
+    }
+
+    .an-kpi-top {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 8px;
+    }
+
+    .an-kpi-icon {
+        width: 39px;
+        height: 39px;
+        flex: 0 0 39px;
+        display: grid;
+        place-items: center;
+        border-radius: 12px;
+        color: var(--kpi-color, #ec407a);
+        background: color-mix(
+            in srgb,
+            var(--kpi-color, #ec407a) 12%,
+            white
+        );
+    }
+
+    .an-kpi-label {
+        color: #7c7780;
+        font-size: 11px;
+        font-weight: 800;
+    }
+
+    .an-kpi-value {
+        max-width: 100%;
+        margin-top: 8px;
+        overflow: hidden;
+        color: #312e35;
+        font-size: clamp(19px, 2vw, 24px);
+        font-weight: 950;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+    }
+
+    .an-kpi-value small {
+        font-size: 10px;
+    }
+
+    .an-kpi-note {
+        min-height: 18px;
+        margin-top: 5px;
+        display: flex;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: 5px;
+        color: #98939a;
+        font-size: 10px;
+        line-height: 1.7;
+    }
+
+    .trend-up {
+        color: #159762 !important;
+    }
+
+    .trend-down {
+        color: #e0445e !important;
+    }
+
+    .trend-flat {
+        color: #d88a0b !important;
+    }
+
+
+    /* ==========================================================
+       خلاصه مالی
+       ========================================================== */
+
+    .an-finance {
+        margin-bottom: 16px;
+        display: grid;
+        grid-template-columns: repeat(6, minmax(0, 1fr));
+        gap: 1px;
+        overflow: hidden;
+    }
+
+    .an-finance-item {
+        min-width: 0;
+        padding: 15px 10px;
+        text-align: center;
+        background: rgba(255, 255, 255, 0.93);
+    }
+
+    .an-finance-label {
+        display: block;
+        color: #87828a;
+        font-size: 10px;
+        line-height: 1.8;
+    }
+
+    .an-finance-value {
+        display: block;
+        max-width: 100%;
+        margin-top: 5px;
+        overflow: hidden;
+        color: #3b3740;
+        font-size: 14px;
+        font-weight: 900;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+    }
+
+
+    /* ==========================================================
+       بخش‌ها و نمودارها
+       ========================================================== */
+
+    .an-section {
+        min-width: 0;
+        margin-bottom: 16px;
+        padding: 19px;
+    }
+
+    .an-section-head {
+        margin-bottom: 14px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        flex-wrap: wrap;
+        gap: 10px;
+    }
+
+    .an-section-title {
+        margin: 0;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        color: #35323a;
+        font-size: 16px;
+        font-weight: 950;
+    }
+
+    .an-section-title i {
+        color: var(--primary-color, #ec407a);
+    }
+
+    .an-period {
+        padding: 5px 10px;
+        border-radius: 999px;
+        color: #b62668;
+        background: #fbe9f2;
+        font-size: 10px;
+        font-weight: 900;
+    }
+
+    .an-chart-grid {
+        margin-bottom: 16px;
+        display: grid;
+        grid-template-columns: minmax(0, 2fr) minmax(0, 1fr);
+        gap: 16px;
+    }
+
+    .an-chart-pair {
+        margin-bottom: 16px;
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 16px;
+    }
+
+    .an-chart {
+        position: relative;
+        width: 100%;
+        height: 315px;
+        min-width: 0;
+    }
+
+    .an-chart-sm {
+        position: relative;
+        width: 100%;
+        height: 280px;
+        min-width: 0;
+    }
+
+    .an-chart canvas,
+    .an-chart-sm canvas {
+        width: 100% !important;
+        max-width: 100%;
+        max-height: 100%;
+    }
+
+    .an-chart-error {
+        width: 100%;
+        height: 100%;
+        padding: 20px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: #a43a59;
+        background: #fff4f7;
+        border-radius: 14px;
+        text-align: center;
+        font-size: 12px;
+        line-height: 2;
+    }
+
+
+    /* ==========================================================
+       هشدارها
+       ========================================================== */
+
+    .an-alerts {
+        display: grid;
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        gap: 10px;
+    }
+
+    .an-alert {
+        min-width: 0;
+        padding: 13px;
+        display: flex;
+        align-items: flex-start;
+        gap: 10px;
+        border-radius: 13px;
+        font-size: 11px;
+        line-height: 1.9;
+    }
+
+    .an-alert i {
+        margin-top: 4px;
+    }
+
+    .an-alert strong {
+        display: block;
+        margin-bottom: 3px;
+    }
+
+    .an-alert-danger {
+        color: #aa2545;
+        background: #fff0f3;
+    }
+
+    .an-alert-warning {
+        color: #9d6810;
+        background: #fff8e7;
+    }
+
+    .an-alert-info {
+        color: #286da8;
+        background: #edf6ff;
+    }
+
+
+    /* ==========================================================
+       جدول‌ها
+       ========================================================== */
+
+    .an-table-wrap {
+        width: 100%;
+        max-height: 440px;
+        overflow: auto;
+        border: 1px solid #eee7eb;
+        border-radius: 14px;
+    }
+
+    .an-table {
+        width: 100%;
+        border-collapse: collapse;
+        font-size: 11px;
+        white-space: nowrap;
+    }
+
+    .an-table th {
+        position: sticky;
+        top: 0;
+        z-index: 1;
+        padding: 11px 10px;
+        color: #71314f;
+        background: #fbecf4;
+        text-align: right;
+        font-weight: 900;
+    }
+
+    .an-table td {
+        padding: 10px;
+        color: #57525b;
+        border-top: 1px solid #f0e9ed;
+    }
+
+    .an-table tbody tr:hover {
+        background: #fff8fb;
+    }
+
+    .an-rank {
+        width: 25px;
+        height: 25px;
+        display: grid;
+        place-items: center;
+        border-radius: 50%;
+        background: #eee8ec;
+        font-weight: 900;
+    }
+
+    .an-rank-1 {
+        color: #ffffff;
+        background: #f0a91f;
+    }
+
+    .an-rank-2 {
+        color: #ffffff;
+        background: #8b95a4;
+    }
+
+    .an-rank-3 {
+        color: #ffffff;
+        background: #b66b3e;
+    }
+
+    .an-product {
+        min-width: 180px;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+
+    .an-product img {
+        width: 38px;
+        height: 38px;
+        flex: 0 0 38px;
+        object-fit: contain;
+        border-radius: 8px;
+        background: #ffffff;
+    }
+
+    .an-status {
+        display: inline-flex;
+        padding: 4px 8px;
+        border-radius: 999px;
+        font-size: 9px;
+        font-weight: 900;
+    }
+
+    .status-out {
+        color: #ba294b;
+        background: #ffe7ec;
+    }
+
+    .status-low {
+        color: #a36a00;
+        background: #fff4d8;
+    }
+
+    .status-stagnant {
+        color: #3971a7;
+        background: #edf5ff;
+    }
+
+
+    /* ==========================================================
+       کارت‌های اطلاعاتی
+       ========================================================== */
+
+    .an-three {
+        margin-bottom: 16px;
+        display: grid;
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        gap: 16px;
+    }
+
+    .an-mini-list {
+        display: grid;
+        gap: 8px;
+    }
+
+    .an-mini {
+        min-width: 0;
+        padding: 10px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 10px;
+        border-radius: 11px;
+        background: #faf7f9;
+        font-size: 11px;
+    }
+
+    .an-mini span {
+        min-width: 0;
+    }
+
+    .an-mini b {
+        flex: 0 0 auto;
+        color: #3c3840;
+    }
+
+    .an-empty {
+        padding: 35px 15px;
+        color: #99949b;
+        text-align: center;
+        font-size: 12px;
+        line-height: 2;
+    }
+
+
+    /* ==========================================================
+       حالت تاریک
+       ========================================================== */
+
+    [data-theme="dark"] .an-card,
+    [data-theme="dark"] .an-finance-item,
+    [data-theme="dark"] .an-input {
+        color: #f5f1f4;
+        background: #34343c;
+        border-color: #4c4850;
+    }
+
+    [data-theme="dark"] .an-page .an-btn-back {
+        color: #f5f1f4 !important;
+        background: #34343c !important;
+        border-color: #514b51 !important;
+    }
+
+    [data-theme="dark"] .an-title,
+    [data-theme="dark"] .an-kpi-value,
+    [data-theme="dark"] .an-finance-value,
+    [data-theme="dark"] .an-section-title {
+        color: #f6f2f5;
+    }
+
+    [data-theme="dark"] .an-mini {
+        background: #2d2d35;
+    }
+
+    [data-theme="dark"] .an-mini b {
+        color: #f5f1f4;
+    }
+
+    [data-theme="dark"] .an-table th {
+        color: #ffdbea;
+        background: #4b3040;
+    }
+
+    [data-theme="dark"] .an-table td {
+        color: #ddd7dc;
+        border-color: #47444b;
+    }
+
+    [data-theme="dark"] .an-table tbody tr:hover {
+        background: #3c3339;
+    }
+
+
+    /* ==========================================================
+       ریسپانسیو
+       ========================================================== */
+
+    @media (max-width: 1200px) {
+        .an-filter-form {
+            grid-template-columns: repeat(3, minmax(0, 1fr));
+        }
+
+        .an-kpis {
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+        }
+
+        .an-finance {
+            grid-template-columns: repeat(3, minmax(0, 1fr));
+        }
+    }
+
+    @media (max-width: 950px) {
+        .an-header {
+            flex-direction: column;
+        }
+
+        .an-header-content {
+            width: 100%;
+            min-width: 0;
+            flex: none;
+        }
+
+        .an-actions {
+            width: 100%;
+            grid-template-columns: repeat(3, minmax(0, 1fr));
+        }
+
+        .an-actions .an-btn {
+            width: 100%;
+            padding-right: 10px;
+            padding-left: 10px;
+        }
+
+        .an-chart-grid,
+        .an-chart-pair {
+            grid-template-columns: 1fr;
+        }
+
+        .an-three {
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+        }
+    }
+
+    @media (max-width: 760px) {
+        .an-filter-form {
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+        }
+
+        .an-filter-buttons {
+            grid-column: 1 / -1;
+        }
+
+        .an-alerts {
+            grid-template-columns: 1fr;
+        }
+
+        .an-three {
+            grid-template-columns: 1fr;
+        }
+
+        .an-chart {
+            height: 280px;
+        }
+
+        .an-chart-sm {
+            height: 260px;
+        }
+    }
+
+    @media (max-width: 620px) {
+        .an-actions {
+            grid-template-columns: 1fr;
+        }
+
+        .an-actions .an-btn {
+            width: 100%;
+        }
+
+        .an-title {
+            font-size: 23px;
+        }
+    }
+
+    @media (max-width: 480px) {
+        .an-filter-form,
+        .an-kpis,
+        .an-finance {
+            grid-template-columns: 1fr;
+        }
+
+        .an-filter-buttons {
+            grid-template-columns: 1fr;
+        }
+
+        .an-section {
+            padding: 14px;
+        }
+
+        .an-kpi-value {
+            font-size: 21px;
+        }
+    }
+</style>
+{% endblock %}
+
+
+{% block content %}
+<div class="an-page">
+
+    <!-- ======================================================
+         سربرگ
+         ====================================================== -->
+
+    <header class="an-header">
+        <div class="an-header-content">
+            <h1 class="an-title">
+                <i class="fas fa-chart-pie"></i>
+                مرکز آمار و گزارش‌ها
+            </h1>
+
+            <p class="an-subtitle">
+                تصویر دقیق فروش، سفارش‌ها، مشتریان، محصولات،
+                موجودی و رضایت کاربران
+            </p>
+        </div>
+
+        <div class="an-actions">
+            <a
+                class="an-btn an-btn-pdf"
+                target="_blank"
+                rel="noopener noreferrer"
+                href="{% url 'first:analytics_pdf_preview' %}?{{ request.GET.urlencode }}{% if request.GET %}&{% endif %}return_to={{ request.get_full_path|urlencode }}"
+            >
+                <i class="fas fa-file-pdf"></i>
+                گزارش کامل PDF
+            </a>
+
+            <a
+                class="an-btn an-btn-csv"
+                href="{% url 'first:analytics_export_csv' %}{% if request.GET %}?{{ request.GET.urlencode }}{% endif %}"
+            >
+                <i class="fas fa-file-csv"></i>
+                خروجی CSV
+            </a>
+
+            <a
+                class="an-btn an-btn-back"
+                href="{% url 'first:owner_panel' %}"
+            >
+                <i class="fas fa-arrow-right"></i>
+                بازگشت
+            </a>
+        </div>
+    </header>
+
+
+    <!-- ======================================================
+         فیلتر گزارش
+         ====================================================== -->
+
+    <section class="an-card an-filter">
+        <form
+            class="an-filter-form"
+            method="get"
+            id="analyticsFilter"
+        >
+            <div class="an-field">
+                <label for="periodSelect">نوع بازه</label>
+
+                <select
+                    class="an-input"
+                    name="period"
+                    id="periodSelect"
+                >
+                    <option
+                        value="day"
+                        {% if selected_period == 'day' %}selected{% endif %}
+                    >
+                        امروز
+                    </option>
+
+                    <option
+                        value="month"
+                        {% if selected_period == 'month' %}selected{% endif %}
+                    >
+                        ماهانه
+                    </option>
+
+                    <option
+                        value="year"
+                        {% if selected_period == 'year' %}selected{% endif %}
+                    >
+                        سالانه
+                    </option>
+
+                    <option
+                        value="custom"
+                        {% if selected_period == 'custom' %}selected{% endif %}
+                    >
+                        بازه دلخواه
+                    </option>
+                </select>
+            </div>
+
+            <div class="an-field field-year">
+                <label for="yearSelect">سال</label>
+
+                <select
+                    class="an-input"
+                    name="year"
+                    id="yearSelect"
+                >
+                    {% for year in years %}
+                        <option
+                            value="{{ year }}"
+                            {% if year == selected_year %}selected{% endif %}
+                        >
+                            {{ year|format_number }}
+                        </option>
+                    {% endfor %}
+                </select>
+            </div>
+
+            <div class="an-field field-month">
+                <label for="monthSelect">ماه</label>
+
+                <select
+                    class="an-input"
+                    name="month"
+                    id="monthSelect"
+                >
+                    {% for month in months %}
+                        <option
+                            value="{{ month.value }}"
+                            {% if month.value == selected_month %}selected{% endif %}
+                        >
+                            {{ month.name }}
+                        </option>
+                    {% endfor %}
+                </select>
+            </div>
+
+            <div class="an-field custom-date">
+                <label for="dateFrom">از تاریخ</label>
+
+                <input
+                    class="an-input"
+                    id="dateFrom"
+                    type="date"
+                    name="date_from"
+                    value="{{ selected_date_from }}"
+                >
+            </div>
+
+            <div class="an-field custom-date">
+                <label for="dateTo">تا تاریخ</label>
+
+                <input
+                    class="an-input"
+                    id="dateTo"
+                    type="date"
+                    name="date_to"
+                    value="{{ selected_date_to }}"
+                >
+            </div>
+
+            <div class="an-filter-buttons">
+                <button
+                    class="an-btn an-btn-pdf"
+                    type="submit"
+                >
+                    <i class="fas fa-filter"></i>
+                    اعمال
+                </button>
+
+                <a
+                    class="an-btn an-btn-back"
+                    href="{% url 'first:analytics_dashboard' %}"
+                >
+                    <i class="fas fa-rotate-left"></i>
+                    پاک‌کردن
+                </a>
+            </div>
+        </form>
+    </section>
+
+
+    <!-- ======================================================
+         شاخص‌های کلیدی
+         ====================================================== -->
+
+    <section class="an-kpis">
+
+        <article
+            class="an-card an-kpi"
+            style="--kpi-color:#ec407a"
+        >
+            <div class="an-kpi-top">
+                <span class="an-kpi-label">درآمد نهایی</span>
+
+                <span class="an-kpi-icon">
+                    <i class="fas fa-money-bill-trend-up"></i>
+                </span>
+            </div>
+
+            <div class="an-kpi-value">
+                {{ kpis.revenue|price_format }}
+                <small>تومان</small>
+            </div>
+
+            <div class="an-kpi-note
+                {% if kpis.revenue_change > 0 %}
+                    trend-up
+                {% elif kpis.revenue_change < 0 %}
+                    trend-down
+                {% else %}
+                    trend-flat
+                {% endif %}
+            ">
+                <i class="fas fa-
+                    {% if kpis.revenue_change > 0 %}
+                        arrow-up
+                    {% elif kpis.revenue_change < 0 %}
+                        arrow-down
+                    {% else %}
+                        minus
+                    {% endif %}
+                "></i>
+
+                {{ kpis.revenue_change|format_number }}٪
+                نسبت به دوره قبل
+            </div>
+        </article>
+
+        <article
+            class="an-card an-kpi"
+            style="--kpi-color:#3b82f6"
+        >
+            <div class="an-kpi-top">
+                <span class="an-kpi-label">کل سفارش‌ها</span>
+
+                <span class="an-kpi-icon">
+                    <i class="fas fa-bag-shopping"></i>
+                </span>
+            </div>
+
+            <div class="an-kpi-value">
+                {{ kpis.orders|format_number }}
+            </div>
+
+            <div class="an-kpi-note">
+                <span class="trend-up">
+                    {{ kpis.paid_orders|format_number }}
+                    پرداخت‌شده
+                </span>
+
+                <span>
+                    {{ kpis.orders_change|format_number }}٪ تغییر
+                </span>
+            </div>
+        </article>
+
+        <article
+            class="an-card an-kpi"
+            style="--kpi-color:#16a36a"
+        >
+            <div class="an-kpi-top">
+                <span class="an-kpi-label">
+                    میانگین ارزش سفارش
+                </span>
+
+                <span class="an-kpi-icon">
+                    <i class="fas fa-receipt"></i>
+                </span>
+            </div>
+
+            <div class="an-kpi-value">
+                {{ kpis.average_order|price_format }}
+                <small>تومان</small>
+            </div>
+
+            <div class="an-kpi-note">
+                {{ kpis.average_order_change|format_number }}٪
+                نسبت به دوره قبل
+            </div>
+        </article>
+
+        <article
+            class="an-card an-kpi"
+            style="--kpi-color:#7e57c2"
+        >
+            <div class="an-kpi-top">
+                <span class="an-kpi-label">
+                    نرخ پرداخت موفق
+                </span>
+
+                <span class="an-kpi-icon">
+                    <i class="fas fa-circle-check"></i>
+                </span>
+            </div>
+
+            <div class="an-kpi-value">
+                {{ kpis.payment_success_rate|format_number }}٪
+            </div>
+
+            <div class="an-kpi-note">
+                از کل سفارش‌های ثبت‌شده این دوره
+            </div>
+        </article>
+
+        <article
+            class="an-card an-kpi"
+            style="--kpi-color:#f59e0b"
+        >
+            <div class="an-kpi-top">
+                <span class="an-kpi-label">
+                    کالای فروخته‌شده
+                </span>
+
+                <span class="an-kpi-icon">
+                    <i class="fas fa-boxes-stacked"></i>
+                </span>
+            </div>
+
+            <div class="an-kpi-value">
+                {{ kpis.sold_items|format_number }}
+            </div>
+
+            <div class="an-kpi-note">
+                {{ kpis.unique_buyers|format_number }}
+                خریدار یکتا
+            </div>
+        </article>
+
+        <article
+            class="an-card an-kpi"
+            style="--kpi-color:#14b8a6"
+        >
+            <div class="an-kpi-top">
+                <span class="an-kpi-label">مشتری جدید</span>
+
+                <span class="an-kpi-icon">
+                    <i class="fas fa-user-plus"></i>
+                </span>
+            </div>
+
+            <div class="an-kpi-value">
+                {{ kpis.new_customers|format_number }}
+            </div>
+
+            <div class="an-kpi-note">
+                {{ kpis.new_customers_change|format_number }}٪
+                نسبت به دوره قبل
+            </div>
+        </article>
+
+        <article
+            class="an-card an-kpi"
+            style="--kpi-color:#8b5cf6"
+        >
+            <div class="an-kpi-top">
+                <span class="an-kpi-label">
+                    مشتری بازگشتی
+                </span>
+
+                <span class="an-kpi-icon">
+                    <i class="fas fa-user-check"></i>
+                </span>
+            </div>
+
+            <div class="an-kpi-value">
+                {{ kpis.returning_customers|format_number }}
+            </div>
+
+            <div class="an-kpi-note">
+                نرخ بازگشت
+                {{ kpis.return_rate|format_number }}٪
+            </div>
+        </article>
+
+        <article
+            class="an-card an-kpi"
+            style="--kpi-color:#ef4444"
+        >
+            <div class="an-kpi-top">
+                <span class="an-kpi-label">
+                    نرخ لغو سفارش
+                </span>
+
+                <span class="an-kpi-icon">
+                    <i class="fas fa-ban"></i>
+                </span>
+            </div>
+
+            <div class="an-kpi-value">
+                {{ kpis.cancel_rate|format_number }}٪
+            </div>
+
+            <div class="an-kpi-note">
+                هرچه کمتر باشد بهتر است
+            </div>
+        </article>
+
+    </section>
+
+
+    <!-- ======================================================
+         خلاصه مالی
+         ====================================================== -->
+
+    <section class="an-card an-finance">
+        <div class="an-finance-item">
+            <span class="an-finance-label">
+                فروش ناخالص
+            </span>
+
+            <b class="an-finance-value">
+                {{ finance.gross|price_format }}
+            </b>
+        </div>
+
+        <div class="an-finance-item">
+            <span class="an-finance-label">
+                کل تخفیف
+            </span>
+
+            <b class="an-finance-value trend-down">
+                {{ finance.discounts|price_format }}
+            </b>
+        </div>
+
+        <div class="an-finance-item">
+            <span class="an-finance-label">
+                هزینه ارسال دریافتی
+            </span>
+
+            <b class="an-finance-value">
+                {{ finance.shipping|price_format }}
+            </b>
+        </div>
+
+        <div class="an-finance-item">
+            <span class="an-finance-label">
+                میانگین درآمد روزانه
+            </span>
+
+            <b class="an-finance-value">
+                {{ daily_average|price_format }}
+            </b>
+        </div>
+
+        <div class="an-finance-item">
+            <span class="an-finance-label">
+                پیش‌بینی ۳۰ روزه
+            </span>
+
+            <b class="an-finance-value" style="color:#7e57c2">
+                {{ forecast_30_days|price_format }}
+            </b>
+        </div>
+
+        <div class="an-finance-item">
+            <span class="an-finance-label">
+                روز/ماه اوج: {{ peak.label }}
+            </span>
+
+            <b class="an-finance-value">
+                {{ peak.revenue|price_format }}
+            </b>
+        </div>
+    </section>
+
+
+    <!-- ======================================================
+         هشدارهای مدیریتی
+         ====================================================== -->
+
+    {% if alerts %}
+        <section class="an-card an-section">
+            <div class="an-section-head">
+                <h2 class="an-section-title">
+                    <i class="fas fa-bell"></i>
+                    هشدارهای مدیریتی
+                </h2>
+
+                <span class="an-period">
+                    {{ alerts|length|format_number }} هشدار
+                </span>
+            </div>
+
+            <div class="an-alerts">
+                {% for alert in alerts %}
+                    <div class="an-alert an-alert-{{ alert.level }}">
+                        <i class="fas {{ alert.icon }}"></i>
+
+                        <div>
+                            <strong>{{ alert.title }}</strong>
+                            <span>{{ alert.message }}</span>
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+        </section>
+    {% endif %}
+
+
+    <!-- ======================================================
+         نمودارهای اصلی
+         ====================================================== -->
+
+    <div class="an-chart-grid">
+        <section class="an-card an-section">
+            <div class="an-section-head">
+                <h2 class="an-section-title">
+                    <i class="fas fa-chart-line"></i>
+                    روند درآمد و سفارش
+                </h2>
+
+                <span class="an-period">
+                    {{ period_label }}
+                </span>
+            </div>
+
+            <div class="an-chart">
+                <canvas id="timelineChart"></canvas>
+            </div>
+        </section>
+
+        <section class="an-card an-section">
+            <div class="an-section-head">
+                <h2 class="an-section-title">
+                    <i class="fas fa-chart-pie"></i>
+                    وضعیت سفارش‌ها
+                </h2>
+            </div>
+
+            <div class="an-chart">
+                <canvas id="statusChart"></canvas>
+            </div>
+        </section>
+    </div>
+
+
+    <div class="an-chart-pair">
+        <section class="an-card an-section">
+            <div class="an-section-head">
+                <h2 class="an-section-title">
+                    <i class="fas fa-layer-group"></i>
+                    درآمد دسته‌بندی‌ها
+                </h2>
+            </div>
+
+            <div class="an-chart-sm">
+                <canvas id="categoryChart"></canvas>
+            </div>
+        </section>
+
+        <section class="an-card an-section">
+            <div class="an-section-head">
+                <h2 class="an-section-title">
+                    <i class="fas fa-credit-card"></i>
+                    روش‌های پرداخت
+                </h2>
+            </div>
+
+            <div class="an-chart-sm">
+                <canvas id="paymentChart"></canvas>
+            </div>
+        </section>
+    </div>
+
+
+    <div class="an-chart-pair">
+        <section class="an-card an-section">
+            <div class="an-section-head">
+                <h2 class="an-section-title">
+                    <i class="fas fa-trophy"></i>
+                    محصولات پرفروش
+                </h2>
+            </div>
+
+            <div class="an-chart-sm">
+                <canvas id="productChart"></canvas>
+            </div>
+        </section>
+
+        <section class="an-card an-section">
+            <div class="an-section-head">
+                <h2 class="an-section-title">
+                    <i class="fas fa-star"></i>
+                    توزیع امتیاز نظرات
+                </h2>
+
+                <span class="an-period">
+                    میانگین
+                    {{ review_average|format_number }}
+                    از ۵
+                </span>
+            </div>
+
+            <div class="an-chart-sm">
+                <canvas id="ratingChart"></canvas>
+            </div>
+        </section>
+    </div>
+
+
+    <!-- ======================================================
+         جدول محصولات
+         ====================================================== -->
+
+    <section class="an-card an-section">
+        <div class="an-section-head">
+            <h2 class="an-section-title">
+                <i class="fas fa-ranking-star"></i>
+                جدول عملکرد محصولات
+            </h2>
+
+            <span class="an-period">
+                فقط سفارش‌های پرداخت‌شده
+            </span>
+        </div>
+
+        {% if top_products %}
+            <div class="an-table-wrap">
+                <table class="an-table">
+                    <thead>
+                        <tr>
+                            <th>رتبه</th>
+                            <th>محصول</th>
+                            <th>تعداد فروش</th>
+                            <th>سفارش</th>
+                            <th>درآمد</th>
+                            <th>دوره قبل</th>
+                            <th>تغییر</th>
+                        </tr>
+                    </thead>
+
+                    <tbody>
+                        {% for product in top_products %}
+                            <tr>
+                                <td>
+                                    <span class="an-rank
+                                        {% if forloop.counter <= 3 %}
+                                            an-rank-{{ forloop.counter }}
+                                        {% endif %}
+                                    ">
+                                        {{ forloop.counter|format_number }}
+                                    </span>
+                                </td>
+
+                                <td>
+                                    <div class="an-product">
+                                        {% if product.image_url %}
+                                            <img
+                                                src="{{ product.image_url }}"
+                                                alt="{{ product.name }}"
+                                            >
+                                        {% endif %}
+
+                                        <b>{{ product.name }}</b>
+                                    </div>
+                                </td>
+
+                                <td>
+                                    {{ product.quantity|format_number }}
+                                </td>
+
+                                <td>
+                                    {{ product.orders|format_number }}
+                                </td>
+
+                                <td>
+                                    {{ product.revenue|price_format }}
+                                    تومان
+                                </td>
+
+                                <td>
+                                    {{ product.previous_quantity|format_number }}
+                                </td>
+
+                                <td class="
+                                    {% if product.change > 0 %}
+                                        trend-up
+                                    {% elif product.change < 0 %}
+                                        trend-down
+                                    {% else %}
+                                        trend-flat
+                                    {% endif %}
+                                ">
+                                    {{ product.change|format_number }}٪
+                                </td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        {% else %}
+            <div class="an-empty">
+                در این دوره فروش پرداخت‌شده‌ای ثبت نشده است.
+            </div>
+        {% endif %}
+    </section>
+
+
+    <!-- ======================================================
+         تحلیل مشتری، انبار و تعامل
+         ====================================================== -->
+
+    <div class="an-three">
+        <section class="an-card an-section">
+            <div class="an-section-head">
+                <h2 class="an-section-title">
+                    <i class="fas fa-users"></i>
+                    تحلیل مشتری
+                </h2>
+            </div>
+
+            <div class="an-mini-list">
+                <div class="an-mini">
+                    <span>کل مشتریان</span>
+                    <b>{{ total_customers|format_number }}</b>
+                </div>
+
+                <div class="an-mini">
+                    <span>خریداران این دوره</span>
+                    <b>{{ buying_customers|format_number }}</b>
+                </div>
+
+                <div class="an-mini">
+                    <span>مشتریان بازگشتی</span>
+                    <b>{{ returning_customers|format_number }}</b>
+                </div>
+
+                <div class="an-mini">
+                    <span>کاربران بدون خرید</span>
+                    <b>{{ no_purchase_customers|format_number }}</b>
+                </div>
+
+                <div class="an-mini">
+                    <span>نرخ کاربران خریدار</span>
+                    <b>
+                        {{ kpis.customer_purchase_rate|format_number }}٪
+                    </b>
+                </div>
+            </div>
+        </section>
+
+        <section class="an-card an-section">
+            <div class="an-section-head">
+                <h2 class="an-section-title">
+                    <i class="fas fa-warehouse"></i>
+                    وضعیت انبار
+                </h2>
+            </div>
+
+            <div class="an-mini-list">
+                <div class="an-mini">
+                    <span>محصول فعال</span>
+                    <b>{{ active_products|format_number }}</b>
+                </div>
+
+                <div class="an-mini">
+                    <span>واحد موجودی</span>
+                    <b>{{ inventory_units|format_number }}</b>
+                </div>
+
+                <div class="an-mini">
+                    <span>ارزش فروش موجودی</span>
+                    <b>{{ inventory_value|price_format }}</b>
+                </div>
+
+                <div class="an-mini">
+                    <span>محصول ناموجود</span>
+                    <b class="trend-down">
+                        {{ out_of_stock|format_number }}
+                    </b>
+                </div>
+
+                <div class="an-mini">
+                    <span>موجودی کم</span>
+                    <b class="trend-flat">
+                        {{ low_stock|format_number }}
+                    </b>
+                </div>
+            </div>
+        </section>
+
+        <section class="an-card an-section">
+            <div class="an-section-head">
+                <h2 class="an-section-title">
+                    <i class="fas fa-heart"></i>
+                    تعامل کاربران
+                </h2>
+            </div>
+
+            <div class="an-mini-list">
+                <div class="an-mini">
+                    <span>علاقه‌مندی جدید</span>
+                    <b>{{ wishlist_count|format_number }}</b>
+                </div>
+
+                <div class="an-mini">
+                    <span>نظر ثبت‌شده</span>
+                    <b>{{ review_total|format_number }}</b>
+                </div>
+
+                <div class="an-mini">
+                    <span>نظر تأییدشده</span>
+                    <b>{{ verified_review_count|format_number }}</b>
+                </div>
+
+                <div class="an-mini">
+                    <span>میانگین امتیاز</span>
+                    <b>{{ review_average|format_number }} از ۵</b>
+                </div>
+
+                <div class="an-mini">
+                    <span>سبد خرید رهاشده</span>
+                    <b>{{ abandoned_carts|format_number }}</b>
+                </div>
+            </div>
+        </section>
+    </div>
+
+
+    <!-- ======================================================
+         مشتریان برتر و وضعیت موجودی
+         ====================================================== -->
+
+    <div class="an-chart-pair">
+        <section class="an-card an-section">
+            <div class="an-section-head">
+                <h2 class="an-section-title">
+                    <i class="fas fa-gem"></i>
+                    مشتریان برتر
+                </h2>
+            </div>
+
+            {% if top_customers %}
+                <div class="an-table-wrap">
+                    <table class="an-table">
+                        <thead>
+                            <tr>
+                                <th>کاربر</th>
+                                <th>سفارش</th>
+                                <th>جمع خرید</th>
+                                <th>میانگین</th>
+                            </tr>
+                        </thead>
+
+                        <tbody>
+                            {% for customer in top_customers %}
+                                <tr>
+                                    <td>
+                                        <b>{{ customer.username }}</b>
+                                        <br>
+                                        <small>
+                                            {{ customer.phone|default:"-" }}
+                                        </small>
+                                    </td>
+
+                                    <td>
+                                        {{ customer.orders|format_number }}
+                                    </td>
+
+                                    <td>
+                                        {{ customer.spent|price_format }}
+                                    </td>
+
+                                    <td>
+                                        {{ customer.average|price_format }}
+                                    </td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            {% else %}
+                <div class="an-empty">
+                    اطلاعاتی از مشتریان این دوره وجود ندارد.
+                </div>
+            {% endif %}
+        </section>
+
+        <section class="an-card an-section">
+            <div class="an-section-head">
+                <h2 class="an-section-title">
+                    <i class="fas fa-box-open"></i>
+                    محصولات نیازمند توجه
+                </h2>
+            </div>
+
+            {% if inventory_rows %}
+                <div class="an-table-wrap">
+                    <table class="an-table">
+                        <thead>
+                            <tr>
+                                <th>محصول</th>
+                                <th>موجودی</th>
+                                <th>ارزش موجودی</th>
+                                <th>وضعیت</th>
+                            </tr>
+                        </thead>
+
+                        <tbody>
+                            {% for product in inventory_rows %}
+                                <tr>
+                                    <td>
+                                        <a
+                                            class="font-bold hover:text-pink-500"
+                                            href="{% url 'first:admin_edit_product' product.id %}"
+                                        >
+                                            {{ product.name|truncatechars:36 }}
+                                        </a>
+                                    </td>
+
+                                    <td>
+                                        {{ product.stock|format_number }}
+                                    </td>
+
+                                    <td>
+                                        {{ product.value|price_format }}
+                                    </td>
+
+                                    <td>
+                                        <span class="an-status status-{{ product.status }}">
+                                            {% if product.status == 'out' %}
+                                                ناموجود
+                                            {% elif product.status == 'low' %}
+                                                موجودی کم
+                                            {% else %}
+                                                بدون فروش دوره
+                                            {% endif %}
+                                        </span>
+                                    </td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            {% else %}
+                <div class="an-empty">
+                    همه محصولات وضعیت مناسبی دارند.
+                </div>
+            {% endif %}
+        </section>
+    </div>
+
+
+    <!-- ======================================================
+         کوپن‌ها و سفارش‌های اخیر
+         ====================================================== -->
+
+    <div class="an-chart-pair">
+        <section class="an-card an-section">
+            <div class="an-section-head">
+                <h2 class="an-section-title">
+                    <i class="fas fa-tags"></i>
+                    عملکرد کوپن‌ها
+                </h2>
+            </div>
+
+            {% if coupons %}
+                <div class="an-table-wrap">
+                    <table class="an-table">
+                        <thead>
+                            <tr>
+                                <th>کد</th>
+                                <th>استفاده</th>
+                                <th>درآمد</th>
+                                <th>تخفیف</th>
+                            </tr>
+                        </thead>
+
+                        <tbody>
+                            {% for coupon in coupons %}
+                                <tr>
+                                    <td><b>{{ coupon.code }}</b></td>
+
+                                    <td>
+                                        {{ coupon.uses|format_number }}
+                                    </td>
+
+                                    <td>
+                                        {{ coupon.revenue|price_format }}
+                                    </td>
+
+                                    <td>
+                                        {{ coupon.discount|price_format }}
+                                    </td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            {% else %}
+                <div class="an-empty">
+                    در این دوره کوپنی استفاده نشده است.
+                </div>
+            {% endif %}
+        </section>
+
+        <section class="an-card an-section">
+            <div class="an-section-head">
+                <h2 class="an-section-title">
+                    <i class="fas fa-clock-rotate-left"></i>
+                    آخرین سفارش‌ها
+                </h2>
+            </div>
+
+            {% if recent_orders %}
+                <div class="an-table-wrap">
+                    <table class="an-table">
+                        <thead>
+                            <tr>
+                                <th>شماره</th>
+                                <th>مشتری</th>
+                                <th>مبلغ</th>
+                                <th>وضعیت</th>
+                                <th>تاریخ</th>
+                            </tr>
+                        </thead>
+
+                        <tbody>
+                            {% for order in recent_orders %}
+                                <tr>
+                                    <td>#{{ order.number }}</td>
+                                    <td>{{ order.username }}</td>
+
+                                    <td>
+                                        {{ order.total|price_format }}
+                                    </td>
+
+                                    <td>{{ order.status }}</td>
+
+                                    <td>
+                                        {{ order.date|format_number }}
+                                    </td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            {% else %}
+                <div class="an-empty">
+                    سفارشی در این بازه ثبت نشده است.
+                </div>
+            {% endif %}
+        </section>
+    </div>
+
+</div>
+
+{{ chart_data|json_script:"analytics-chart-data" }}
+{% endblock %}
+
+
+{% block extra_js %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.7/dist/chart.umd.min.js"></script>
+
+<script>
+    (() => {
+        "use strict";
+
+        /* ======================================================
+           مدیریت نمایش فیلترهای تاریخ
+           ====================================================== */
+
+        const periodSelect =
+            document.getElementById("periodSelect");
+
+        const yearField =
+            document.querySelector(".field-year");
+
+        const monthField =
+            document.querySelector(".field-month");
+
+        const customDateFields =
+            document.querySelectorAll(".custom-date");
+
+        function setFieldDisplay(element, visible) {
+            if (!element) {
+                return;
+            }
+
+            element.style.display = visible ? "block" : "none";
+        }
+
+        function updateDateFields() {
+            if (!periodSelect) {
+                return;
+            }
+
+            const period = periodSelect.value;
+
+            setFieldDisplay(yearField, false);
+            setFieldDisplay(monthField, false);
+
+            customDateFields.forEach((element) => {
+                setFieldDisplay(element, false);
+            });
+
+            if (period === "month") {
+                setFieldDisplay(yearField, true);
+                setFieldDisplay(monthField, true);
+            }
+
+            if (period === "year") {
+                setFieldDisplay(yearField, true);
+            }
+
+            if (period === "custom") {
+                customDateFields.forEach((element) => {
+                    setFieldDisplay(element, true);
+                });
+            }
+        }
+
+        if (periodSelect) {
+            periodSelect.addEventListener(
+                "change",
+                updateDateFields
+            );
+
+            updateDateFields();
+        }
+
+
+        /* ======================================================
+           بررسی داده نمودار
+           ====================================================== */
+
+        const chartDataElement =
+            document.getElementById("analytics-chart-data");
+
+        if (!chartDataElement) {
+            console.error(
+                "analytics-chart-data was not found."
+            );
+            return;
+        }
+
+        let data = {};
+
+        try {
+            data = JSON.parse(chartDataElement.textContent);
+        } catch (error) {
+            console.error(
+                "Invalid analytics chart data:",
+                error
+            );
+            return;
+        }
+
+        if (typeof window.Chart === "undefined") {
+            document
+                .querySelectorAll(".an-chart, .an-chart-sm")
+                .forEach((element) => {
+                    element.innerHTML = `
+                        <div class="an-chart-error">
+                            کتابخانه نمودار بارگذاری نشد.
+                            اتصال اینترنت را بررسی و صفحه را تازه کن.
+                        </div>
+                    `;
+                });
+
+            return;
+        }
+
+
+        /* ======================================================
+           تنظیمات عمومی نمودارها
+           ====================================================== */
+
+        const asArray = (value) => {
+            return Array.isArray(value) ? value : [];
+        };
+
+        const colors = [
+            "#ec407a",
+            "#3b82f6",
+            "#16a36a",
+            "#f59e0b",
+            "#7e57c2",
+            "#ef4444",
+            "#14b8a6",
+            "#64748b"
+        ];
+
+        const money = (value) => {
+            return Number(value || 0).toLocaleString("fa-IR") +
+                " تومان";
+        };
+
+        const number = (value) => {
+            return Number(value || 0).toLocaleString("fa-IR");
+        };
+
+        Chart.defaults.font.family =
+            "Vazir, Tahoma, sans-serif";
+
+        Chart.defaults.color = "#77727b";
+
+        const commonOptions = {
+            responsive: true,
+            maintainAspectRatio: false,
+            interaction: {
+                intersect: false
+            },
+            plugins: {
+                legend: {
+                    labels: {
+                        usePointStyle: true,
+                        boxWidth: 8,
+                        padding: 14
+                    }
+                }
+            }
+        };
+
+
+        /* ======================================================
+           نمودار روند درآمد و سفارش
+           ====================================================== */
+
+        const timeline = asArray(data.timeline);
+        const timelineCanvas =
+            document.getElementById("timelineChart");
+
+        if (timelineCanvas) {
+            new Chart(timelineCanvas, {
+                type: "bar",
+
+                data: {
+                    labels: timeline.map((row) => row.label),
+
+                    datasets: [
+                        {
+                            label: "درآمد",
+                            data: timeline.map(
+                                (row) => Number(row.revenue || 0)
+                            ),
+                            backgroundColor:
+                                "rgba(236,64,122,0.72)",
+                            borderRadius: 7,
+                            yAxisID: "money"
+                        },
+                        {
+                            type: "line",
+                            label: "تعداد سفارش",
+                            data: timeline.map(
+                                (row) => Number(row.orders || 0)
+                            ),
+                            borderColor: "#16a36a",
+                            backgroundColor: "#16a36a",
+                            tension: 0.35,
+                            pointRadius: 3,
+                            pointHoverRadius: 5,
+                            yAxisID: "count"
+                        }
+                    ]
+                },
+
+                options: {
+                    ...commonOptions,
+
+                    interaction: {
+                        mode: "index",
+                        intersect: false
+                    },
+
+                    scales: {
+                        money: {
+                            position: "right",
+                            beginAtZero: true,
+                            ticks: {
+                                callback: (value) => number(value)
+                            }
+                        },
+
+                        count: {
+                            position: "left",
+                            beginAtZero: true,
+                            grid: {
+                                drawOnChartArea: false
+                            },
+                            ticks: {
+                                precision: 0
+                            }
+                        },
+
+                        x: {
+                            grid: {
+                                display: false
+                            }
+                        }
+                    },
+
+                    plugins: {
+                        ...commonOptions.plugins,
+
+                        tooltip: {
+                            callbacks: {
+                                label: (context) => {
+                                    if (
+                                        context.dataset.yAxisID ===
+                                        "money"
+                                    ) {
+                                        return (
+                                            context.dataset.label +
+                                            ": " +
+                                            money(context.parsed.y)
+                                        );
+                                    }
+
+                                    return (
+                                        context.dataset.label +
+                                        ": " +
+                                        number(context.parsed.y)
+                                    );
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+
+        /* ======================================================
+           نمودارهای دایره‌ای
+           ====================================================== */
+
+        function createDoughnutChart(
+            elementId,
+            rows,
+            labelKey = "label",
+            valueKey = "count"
+        ) {
+            const canvas =
+                document.getElementById(elementId);
+
+            if (!canvas) {
+                return;
+            }
+
+            const originalRows = asArray(rows);
+
+            const hasValue = originalRows.some((row) => {
+                return Number(row[valueKey] || 0) > 0;
+            });
+
+            const chartRows = hasValue
+                ? originalRows
+                : [{
+                    [labelKey]: "بدون داده",
+                    [valueKey]: 1
+                }];
+
+            new Chart(canvas, {
+                type: "doughnut",
+
+                data: {
+                    labels: chartRows.map(
+                        (row) => row[labelKey]
+                    ),
+
+                    datasets: [{
+                        data: chartRows.map(
+                            (row) => Number(row[valueKey] || 0)
+                        ),
+
+                        backgroundColor: hasValue
+                            ? colors
+                            : ["#e5e7eb"],
+
+                        borderWidth: 3,
+                        borderColor: "#ffffff"
+                    }]
+                },
+
+                options: {
+                    ...commonOptions,
+                    cutout: "64%",
+
+                    plugins: {
+                        ...commonOptions.plugins,
+
+                        legend: {
+                            position: "bottom",
+
+                            labels: {
+                                usePointStyle: true,
+                                boxWidth: 7,
+                                padding: 11
+                            }
+                        },
+
+                        tooltip: {
+                            enabled: hasValue
+                        }
+                    }
+                }
+            });
+        }
+
+        createDoughnutChart(
+            "statusChart",
+            data.statuses
+        );
+
+        createDoughnutChart(
+            "paymentChart",
+            data.payments
+        );
+
+
+        /* ======================================================
+           نمودار دسته‌بندی‌ها
+           ====================================================== */
+
+        const categories = asArray(data.categories);
+        const categoryCanvas =
+            document.getElementById("categoryChart");
+
+        if (categoryCanvas) {
+            new Chart(categoryCanvas, {
+                type: "bar",
+
+                data: {
+                    labels: categories.map(
+                        (row) => row.name
+                    ),
+
+                    datasets: [{
+                        label: "درآمد",
+
+                        data: categories.map(
+                            (row) => Number(row.revenue || 0)
+                        ),
+
+                        backgroundColor: categories.map(
+                            (_, index) =>
+                                colors[index % colors.length]
+                        ),
+
+                        borderRadius: 7
+                    }]
+                },
+
+                options: {
+                    ...commonOptions,
+                    indexAxis: "y",
+
+                    scales: {
+                        x: {
+                            beginAtZero: true,
+
+                            ticks: {
+                                callback: (value) => number(value)
+                            }
+                        },
+
+                        y: {
+                            grid: {
+                                display: false
+                            }
+                        }
+                    },
+
+                    plugins: {
+                        ...commonOptions.plugins,
+
+                        legend: {
+                            display: false
+                        },
+
+                        tooltip: {
+                            callbacks: {
+                                label: (context) => {
+                                    return money(context.parsed.x);
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+
+        /* ======================================================
+           نمودار محصولات پرفروش
+           ====================================================== */
+
+        const topProducts = asArray(data.top_products);
+        const productCanvas =
+            document.getElementById("productChart");
+
+        if (productCanvas) {
+            new Chart(productCanvas, {
+                type: "bar",
+
+                data: {
+                    labels: topProducts.map(
+                        (row) => row.name
+                    ),
+
+                    datasets: [{
+                        label: "تعداد فروش",
+
+                        data: topProducts.map(
+                            (row) => Number(row.quantity || 0)
+                        ),
+
+                        backgroundColor: "#7e57c2",
+                        borderRadius: 7
+                    }]
+                },
+
+                options: {
+                    ...commonOptions,
+                    indexAxis: "y",
+
+                    scales: {
+                        x: {
+                            beginAtZero: true,
+                            ticks: {
+                                precision: 0
+                            }
+                        },
+
+                        y: {
+                            grid: {
+                                display: false
+                            }
+                        }
+                    },
+
+                    plugins: {
+                        ...commonOptions.plugins,
+
+                        legend: {
+                            display: false
+                        }
+                    }
+                }
+            });
+        }
+
+
+        /* ======================================================
+           نمودار امتیاز کاربران
+           ====================================================== */
+
+        const ratings = asArray(data.ratings);
+        const ratingCanvas =
+            document.getElementById("ratingChart");
+
+        if (ratingCanvas) {
+            new Chart(ratingCanvas, {
+                type: "bar",
+
+                data: {
+                    labels: ratings.map(
+                        (row) => row.rating + " ستاره"
+                    ),
+
+                    datasets: [{
+                        label: "تعداد نظر",
+
+                        data: ratings.map(
+                            (row) => Number(row.count || 0)
+                        ),
+
+                        backgroundColor: "#f59e0b",
+                        borderRadius: 8
+                    }]
+                },
+
+                options: {
+                    ...commonOptions,
+
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+
+                            ticks: {
+                                precision: 0
+                            }
+                        },
+
+                        x: {
+                            grid: {
+                                display: false
+                            }
+                        }
+                    },
+
+                    plugins: {
+                        ...commonOptions.plugins,
+
+                        legend: {
+                            display: false
+                        }
+                    }
+                }
+            });
+        }
+    })();
+</script>
+{% endblock %}

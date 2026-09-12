@@ -1,0 +1,27 @@
+{% extends 'perfume_base.html' %}
+{% block title %}{{ ticket.reference }}{% endblock %}
+{% block content %}
+<div class="max-w-4xl mx-auto px-4 py-10">
+  <div class="bg-white rounded-3xl shadow p-6">
+    <div class="border-b pb-4 mb-5">
+      <h1 class="text-xl font-bold">{{ ticket.subject }}</h1>
+      <div class="text-sm text-gray-500 mt-2">{{ ticket.reference }} · {{ ticket.get_status_display }}{% if ticket.order %} · سفارش #{{ ticket.order.order_number }}{% endif %}</div>
+    </div>
+    <div class="space-y-4">
+      {% for message in ticket.messages.all %}
+        <div class="{% if message.is_staff_reply %}bg-purple-50 mr-8{% else %}bg-gray-50 ml-8{% endif %} rounded-2xl p-4">
+          <div class="text-xs text-gray-500 mb-2">{% if message.is_staff_reply %}پشتیبانی{% else %}شما{% endif %} · {{ message.created_at|date:"Y/m/d H:i" }}</div>
+          <div class="whitespace-pre-line">{{ message.body }}</div>
+        </div>
+      {% endfor %}
+    </div>
+    {% if ticket.status != 'closed' %}
+      <form method="post" action="{% url 'customer_care:support_reply' ticket.reference %}" class="mt-6">
+        {% csrf_token %}
+        {{ message_form.as_p }}
+        <button class="bg-pink-600 text-white px-5 py-3 rounded-xl">ارسال پاسخ</button>
+      </form>
+    {% endif %}
+  </div>
+</div>
+{% endblock %}

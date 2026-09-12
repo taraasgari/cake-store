@@ -1,0 +1,436 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load custom_filters %}
+
+{% block title %}🔑 مدیریت دسترسی ادمین‌ها{% endblock %}
+
+{% block extra_css %}
+<style>
+    .permission-card {
+        background: rgba(255,255,255,0.85);
+        backdrop-filter: blur(10px);
+        border: 1px solid rgba(236,64,122,0.08);
+        border-radius: 20px;
+        padding: 24px;
+        transition: all 0.3s ease;
+    }
+    .permission-card:hover {
+        border-color: rgba(236,64,122,0.15);
+        box-shadow: 0 8px 30px rgba(236,64,122,0.05);
+    }
+    .admin-selector {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+        margin-bottom: 24px;
+    }
+    .admin-btn {
+        padding: 12px 24px;
+        border-radius: 14px;
+        border: 2px solid #e5e7eb;
+        background: white;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        font-weight: 500;
+        font-size: 0.95rem;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+    .admin-btn:hover {
+        border-color: #ec407a;
+        background: #fdf2f8;
+        transform: translateY(-2px);
+    }
+    .admin-btn.active {
+        border-color: #ec407a;
+        background: linear-gradient(135deg, #ec407a, #d81b60);
+        color: white;
+        box-shadow: 0 8px 30px rgba(236,64,122,0.25);
+    }
+    .admin-btn .badge {
+        background: rgba(255,255,255,0.2);
+        padding: 2px 10px;
+        border-radius: 10px;
+        font-size: 0.7rem;
+        font-weight: 600;
+    }
+    .admin-btn.active .badge {
+        background: rgba(255,255,255,0.2);
+    }
+    
+    .permission-group {
+        margin-bottom: 20px;
+    }
+    .permission-group-title {
+        font-weight: 600;
+        color: #374151;
+        padding: 8px 0;
+        border-bottom: 2px solid #f3e5f5;
+        margin-bottom: 12px;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+    .permission-group-title .count {
+        font-size: 0.7rem;
+        background: #f3e5f5;
+        color: #7c3aed;
+        padding: 1px 10px;
+        border-radius: 10px;
+    }
+    
+    .permission-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+        gap: 8px;
+    }
+    .permission-item {
+        padding: 8px 14px;
+        border-radius: 10px;
+        transition: all 0.2s ease;
+        cursor: pointer;
+        background: #f9fafb;
+        border: 2px solid transparent;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        font-size: 0.85rem;
+    }
+    .permission-item:hover {
+        background: #fdf2f8;
+        border-color: #fce4ec;
+    }
+    .permission-item input[type="checkbox"] {
+        width: 18px;
+        height: 18px;
+        accent-color: #ec407a;
+        cursor: pointer;
+        flex-shrink: 0;
+    }
+    .permission-item.active {
+        background: #fce4ec;
+        border-color: #ec407a;
+    }
+    .permission-item .label {
+        color: #1f2937;
+        font-weight: 500;
+    }
+    
+    .role-selector {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+        margin-bottom: 16px;
+        padding: 12px;
+        background: #f8f4f8;
+        border-radius: 12px;
+        border: 1px solid #e5e7eb;
+    }
+    .role-chip {
+        padding: 6px 16px;
+        border-radius: 20px;
+        border: 2px solid #e5e7eb;
+        background: white;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        font-size: 0.85rem;
+        display: flex;
+        align-items: center;
+        gap: 6px;
+    }
+    .role-chip:hover {
+        border-color: #ec407a;
+        background: #fdf2f8;
+    }
+    .role-chip input[type="checkbox"] {
+        width: 16px;
+        height: 16px;
+        accent-color: #ec407a;
+        cursor: pointer;
+    }
+    .role-chip.selected {
+        border-color: #ec407a;
+        background: #fce4ec;
+    }
+    .role-chip .role-badge {
+        font-size: 0.6rem;
+        background: #e5e7eb;
+        padding: 1px 8px;
+        border-radius: 10px;
+        color: #6b7280;
+    }
+    
+    .save-btn {
+        padding: 12px 40px;
+        background: linear-gradient(135deg, #ec407a, #d81b60);
+        color: white;
+        border: none;
+        border-radius: 14px;
+        font-weight: 600;
+        font-size: 1rem;
+        cursor: pointer;
+        transition: all 0.3s ease;
+    }
+    .save-btn:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 12px 40px rgba(236,64,122,0.3);
+    }
+    
+    .owner-only-badge {
+        background: #fef3c7;
+        color: #d97706;
+        padding: 2px 10px;
+        border-radius: 10px;
+        font-size: 0.6rem;
+        font-weight: 600;
+    }
+    
+    .hidden {
+        display: none !important;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="max-w-7xl mx-auto px-4">
+    <!-- ===== هدر ===== -->
+    <div class="flex flex-wrap justify-between items-center mb-8">
+        <div>
+            <h1 class="text-3xl font-bold pink-gradient-text">🔑 مدیریت دسترسی ادمین‌ها</h1>
+            <p class="text-gray-500 mt-1">به هر ادمین دسترسی‌های مشخصی بدهید</p>
+        </div>
+        <a href="{% url 'first:manage_admins' %}" class="px-4 py-2 border-2 border-gray-200 rounded-xl hover:bg-gray-50 transition-all">
+            <i class="fas fa-arrow-right ml-2"></i> بازگشت
+        </a>
+    </div>
+
+    <!-- ===== انتخاب ادمین ===== -->
+    <div class="admin-selector">
+        {% for admin in admins %}
+        <button class="admin-btn {% if forloop.first %}active{% endif %}" onclick="selectAdmin('{{ admin.id }}', this)">
+            <i class="fas fa-user-cog"></i>
+            {{ admin.get_full_name|default:admin.username }}
+            <span class="badge">{{ admin.admin_roles.count }} نقش</span>
+        </button>
+        {% empty %}
+        <p class="text-gray-500">هیچ ادمینی یافت نشد. ابتدا کاربری را به ادمین تبدیل کنید.</p>
+        {% endfor %}
+    </div>
+
+    {% for admin in admins %}
+    <div id="admin-{{ admin.id }}" class="permission-card {% if not forloop.first %}hidden{% endif %}">
+        <!-- ===== هدر ادمین ===== -->
+        <div class="flex flex-wrap justify-between items-center mb-6">
+            <div>
+                <h3 class="text-xl font-bold flex items-center gap-2">
+                    {{ admin.get_full_name|default:admin.username }}
+                    <span class="text-sm font-normal text-gray-500">({{ admin.username }})</span>
+                </h3>
+                <p class="text-sm text-gray-500">{{ admin.email }}</p>
+                <div class="flex flex-wrap gap-2 mt-2">
+                    {% for role in admin.admin_roles.all %}
+                    <span class="px-2 py-1 bg-blue-100 text-blue-600 rounded-full text-xs font-medium">
+                        {{ role.display_name }}
+                    </span>
+                    {% empty %}
+                    <span class="px-2 py-1 bg-gray-100 text-gray-400 rounded-full text-xs">
+                        بدون نقش
+                    </span>
+                    {% endfor %}
+                </div>
+            </div>
+            <div class="flex items-center gap-3">
+                <span class="px-3 py-1 bg-blue-100 text-blue-600 rounded-full text-sm">
+                    <i class="fas fa-user-tag ml-1"></i> ادمین
+                </span>
+                <span class="px-3 py-1 bg-green-100 text-green-600 rounded-full text-sm">
+                    <i class="fas fa-check-circle ml-1"></i> {{ admin.admin_roles.count }} نقش
+                </span>
+            </div>
+        </div>
+
+        <form method="POST" id="permission-form-{{ admin.id }}">
+            {% csrf_token %}
+            <input type="hidden" name="admin_id" value="{{ admin.id }}">
+            
+            <!-- ===== انتخاب نقش‌ها ===== -->
+            <div class="role-selector">
+                <span class="text-sm font-bold text-gray-600 ml-4">نقش‌های ادمین:</span>
+                {% for role in roles %}
+                <label class="role-chip {% if role.id in admin_permissions|get_item:admin.id|get_item:'roles' %}selected{% endif %}">
+                    <input type="checkbox" name="roles" value="{{ role.id }}"
+                           {% if role.id in admin_permissions|get_item:admin.id|get_item:'roles' %}checked{% endif %}>
+                    {{ role.display_name }}
+                    <span class="role-badge">{{ role.permissions.count }}</span>
+                </label>
+                {% endfor %}
+            </div>
+            
+            <!-- ===== دسترسی‌ها ===== -->
+            {% for category, perms in grouped_permissions.items %}
+            <div class="permission-group">
+                <div class="permission-group-title">
+                    {% if category == 'داشبورد' %}
+                    <i class="fas fa-chart-pie text-pink-500"></i>
+                    {% elif category == 'محصولات' %}
+                    <i class="fas fa-box text-blue-500"></i>
+                    {% elif category == 'سفارشات' %}
+                    <i class="fas fa-shopping-bag text-green-500"></i>
+                    {% elif category == 'پشتیبانی' %}
+                    <i class="fas fa-headset text-cyan-500"></i>
+                    {% elif category == 'لغو و مرجوعی' %}
+                    <i class="fas fa-rotate-left text-orange-500"></i>
+                    {% elif category == 'نظرات' %}
+                    <i class="fas fa-comments text-yellow-500"></i>
+                    {% elif category == 'کاربران' %}
+                    <i class="fas fa-users text-purple-500"></i>
+                    {% elif category == 'ادمین‌ها' %}
+                    <i class="fas fa-user-shield text-red-500"></i>
+                    {% elif category == 'انبار' %}
+                    <i class="fas fa-warehouse text-indigo-500"></i>
+                    {% elif category == 'تنظیمات' %}
+                    <i class="fas fa-cog text-gray-500"></i>
+                    {% elif category == 'گزارشات' %}
+                    <i class="fas fa-chart-bar text-orange-500"></i>
+                    {% else %}
+                    <i class="fas fa-folder text-gray-400"></i>
+                    {% endif %}
+                    
+                    {{ category }}
+                    <span class="count">{{ perms|length }}</span>
+                </div>
+                
+                <div class="permission-grid">
+                    {% for perm in perms %}
+                    {% if perm.name in owner_only_permissions and not user.is_owner %}
+                    <!-- دسترسی‌های مالک را نشان نده -->
+                    {% else %}
+                    <label class="permission-item {% if perm.name in admin_permissions|get_item:admin.id|get_item:'all' %}active{% endif %}">
+                        <input type="checkbox" name="permissions" value="{{ perm.name }}"
+                               {% if perm.name in admin_permissions|get_item:admin.id|get_item:'all' %}checked{% endif %}>
+                        <div>
+                            <div class="label">{{ perm.label }}</div>
+                            {% if perm.description %}
+                            <div class="text-xs text-gray-400">{{ perm.description }}</div>
+                            {% endif %}
+                        </div>
+                        {% if perm.name in owner_only_permissions %}
+                        <span class="owner-only-badge">👑 مالک</span>
+                        {% endif %}
+                    </label>
+                    {% endif %}
+                    {% endfor %}
+                </div>
+            </div>
+            {% endfor %}
+            
+            <!-- ===== دکمه ذخیره ===== -->
+            <div class="mt-6 flex gap-4">
+                <button type="submit" class="save-btn">
+                    <i class="fas fa-save ml-2"></i> ذخیره دسترسی‌ها و نقش‌ها
+                </button>
+                <button type="button" onclick="selectAllPermissions('{{ admin.id }}')" 
+                        class="px-6 py-3 border-2 border-gray-200 rounded-xl hover:bg-gray-50 transition-all">
+                    <i class="fas fa-check-double ml-2"></i> انتخاب همه
+                </button>
+                <button type="button" onclick="deselectAllPermissions('{{ admin.id }}')" 
+                        class="px-6 py-3 border-2 border-gray-200 rounded-xl hover:bg-gray-50 transition-all">
+                    <i class="fas fa-times ml-2"></i> لغو همه
+                </button>
+            </div>
+        </form>
+    </div>
+    {% endfor %}
+
+    <!-- ===== راهنمای دسترسی‌ها ===== -->
+    <div class="mt-8 bg-gradient-to-r from-pink-50 to-purple-50 rounded-2xl p-6 border border-pink-100">
+        <h3 class="font-bold text-gray-800 mb-3 flex items-center gap-2">
+            <i class="fas fa-info-circle text-pink-500"></i> راهنمای دسترسی‌ها
+        </h3>
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm">
+            <div class="flex items-start gap-2">
+                <span class="text-green-500">✅</span>
+                <div>
+                    <span class="font-bold">دسترسی تیک خورده</span>
+                    <p class="text-gray-500">ادمین به این بخش دسترسی دارد</p>
+                </div>
+            </div>
+            <div class="flex items-start gap-2">
+                <span class="text-gray-400">⬜</span>
+                <div>
+                    <span class="font-bold">دسترسی بدون تیک</span>
+                    <p class="text-gray-500">ادمین به این بخش دسترسی ندارد</p>
+                </div>
+            </div>
+            <div class="flex items-start gap-2">
+                <span class="text-yellow-500">👑</span>
+                <div>
+                    <span class="font-bold">دسترسی مالک</span>
+                    <p class="text-gray-500">فقط مالک می‌تواند این دسترسی را بدهد</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+// ============================================
+// انتخاب ادمین
+// ============================================
+function selectAdmin(adminId, btn) {
+    document.querySelectorAll('.permission-card').forEach(card => {
+        card.classList.add('hidden');
+    });
+    document.getElementById('admin-' + adminId).classList.remove('hidden');
+    
+    document.querySelectorAll('.admin-btn').forEach(b => {
+        b.classList.remove('active');
+    });
+    btn.classList.add('active');
+}
+
+// ============================================
+// انتخاب/لغو همه
+// ============================================
+function selectAllPermissions(adminId) {
+    const card = document.getElementById('admin-' + adminId);
+    card.querySelectorAll('input[type="checkbox"]').forEach(cb => {
+        cb.checked = true;
+        cb.closest('.permission-item').classList.add('active');
+    });
+}
+
+function deselectAllPermissions(adminId) {
+    const card = document.getElementById('admin-' + adminId);
+    card.querySelectorAll('input[type="checkbox"]').forEach(cb => {
+        cb.checked = false;
+        cb.closest('.permission-item').classList.remove('active');
+    });
+}
+
+// ============================================
+// تغییر وضعیت چک‌باکس
+// ============================================
+document.addEventListener('DOMContentLoaded', function() {
+    document.querySelectorAll('.permission-item input[type="checkbox"]').forEach(cb => {
+        cb.addEventListener('change', function() {
+            this.closest('.permission-item').classList.toggle('active');
+        });
+    });
+    
+    // اولین ادمین رو فعال کن
+    const firstAdmin = document.querySelector('.admin-btn');
+    if (firstAdmin) {
+        firstAdmin.click();
+    }
+    
+    // رویداد برای چک‌باکس‌های نقش
+    document.querySelectorAll('.role-chip input[type="checkbox"]').forEach(cb => {
+        cb.addEventListener('change', function() {
+            this.closest('.role-chip').classList.toggle('selected');
+        });
+    });
+});
+</script>
+{% endblock %}

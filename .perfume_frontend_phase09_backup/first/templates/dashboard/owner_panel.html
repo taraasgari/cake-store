@@ -1,0 +1,262 @@
+{% extends 'base.html' %}
+{% load static custom_filters %}
+
+{% block title %}👑 پنل مدیریت - مالک{% endblock %}
+
+{% block extra_css %}
+<style>
+    .stat-card {
+        transition: all 0.3s ease;
+        border-radius: 20px;
+        padding: 24px;
+        position: relative;
+        overflow: hidden;
+    }
+    .stat-card:hover {
+        transform: translateY(-4px);
+        box-shadow: 0 20px 60px rgba(0,0,0,0.08);
+    }
+    .stat-card .icon {
+        position: absolute;
+        right: 20px;
+        bottom: 20px;
+        font-size: 4rem;
+        opacity: 0.08;
+    }
+    .stat-number {
+        font-size: 2rem;
+        font-weight: 700;
+        line-height: 1.2;
+    }
+    .activity-item {
+        transition: all 0.2s ease;
+        padding: 12px 16px;
+        border-radius: 12px;
+    }
+    .activity-item:hover {
+        background: rgba(236, 64, 122, 0.05);
+    }
+    .glass-pink {
+        background: rgba(255,255,255,0.85);
+        backdrop-filter: blur(12px);
+        -webkit-backdrop-filter: blur(12px);
+        border: 1px solid rgba(236,64,122,0.12);
+        border-radius: 16px;
+        transition: all 0.3s ease;
+    }
+    .glass-pink:hover {
+        border-color: rgba(236,64,122,0.25);
+        box-shadow: 0 8px 32px rgba(236,64,122,0.08);
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="max-w-7xl mx-auto px-4">
+    <!-- ===== هدر ===== -->
+    <div class="flex flex-wrap justify-between items-center mb-8">
+        <div>
+            <h1 class="text-3xl font-bold pink-gradient-text">👑 پنل مدیریت</h1>
+            <p class="text-gray-500 mt-1">خوش آمدید {{ user.get_full_name|default:user.username }}!</p>
+        </div>
+        <div class="flex gap-3">
+            <a href="{% url 'first:owner_profile_edit' %}" class="btn-pink px-5 py-2.5 rounded-xl text-sm">
+                <i class="fas fa-user-edit ml-2"></i> ویرایش پروفایل
+            </a>
+            <a href="{% url 'first:admin_dashboard' %}" class="px-5 py-2.5 border-2 border-gray-200 rounded-xl text-sm hover:bg-gray-50 transition-all">
+                <i class="fas fa-cog ml-2"></i> مدیریت
+            </a>
+            <a href="{% url 'first:home' %}" class="px-5 py-2.5 border-2 border-gray-200 rounded-xl text-sm hover:bg-gray-50 transition-all">
+                <i class="fas fa-home ml-2"></i> سایت
+            </a>
+        </div>
+    </div>
+    
+    <!-- ===== پروفایل کاربری ===== -->
+    <div class="bg-white/80 backdrop-blur-lg rounded-3xl p-6 shadow-lg mb-8">
+        <div class="flex flex-col md:flex-row items-center gap-6">
+            <div class="relative">
+                <div class="w-24 h-24 rounded-full bg-gradient-to-r from-pink-500 to-purple-600 p-1">
+                    {% if user.profile_image %}
+                    <img src="{{ user.profile_image.url }}" alt="{{ user.username }}" 
+                         class="w-full h-full rounded-full object-cover">
+                    {% else %}
+                    <div class="w-full h-full rounded-full bg-white flex items-center justify-center text-4xl text-pink-500">
+                        <i class="fas fa-user"></i>
+                    </div>
+                    {% endif %}
+                </div>
+                <div class="absolute bottom-0 right-0 bg-green-500 w-4 h-4 rounded-full border-2 border-white"></div>
+            </div>
+            <div class="flex-1 text-center md:text-right">
+                <h2 class="text-2xl font-bold">{{ user.get_full_name|default:user.username }}</h2>
+                <p class="text-gray-500 text-sm">{{ user.email }}</p>
+                <div class="flex flex-wrap gap-3 mt-2 justify-center md:justify-start">
+                    <span class="badge-pink text-xs">👑 مالک</span>
+                    <span class="px-3 py-1 bg-green-100 text-green-600 rounded-full text-xs">
+                        <i class="fas fa-check-circle"></i> تایید شده
+                    </span>
+                    <span class="px-3 py-1 bg-blue-100 text-blue-600 rounded-full text-xs">
+                        <i class="fas fa-calendar"></i> عضو از {{ user.date_joined|date:"Y/m/d" }}
+                    </span>
+                </div>
+            </div>
+            <div class="flex gap-2">
+                <a href="{% url 'first:owner_profile_edit' %}" class="btn-pink px-4 py-2 rounded-xl text-sm">
+                    <i class="fas fa-edit ml-1"></i> ویرایش
+                </a>
+            </div>
+        </div>
+    </div>
+    
+    <!-- ===== آمار کلی ===== -->
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+        <div class="stat-card glass-pink border border-pink-100/30">
+            <div class="icon"><i class="fas fa-box"></i></div>
+            <div class="stat-number pink-gradient-text">{{ total_products }}</div>
+            <div class="text-gray-500 text-sm">محصولات</div>
+        </div>
+        <div class="stat-card glass-pink border border-pink-100/30">
+            <div class="icon"><i class="fas fa-users"></i></div>
+            <div class="stat-number pink-gradient-text">{{ total_users }}</div>
+            <div class="text-gray-500 text-sm">کاربران</div>
+        </div>
+        <div class="stat-card glass-pink border border-pink-100/30">
+            <div class="icon"><i class="fas fa-shopping-bag"></i></div>
+            <div class="stat-number pink-gradient-text">{{ total_orders|format_number }}</div>
+            <div class="text-gray-500 text-sm">سفارشات</div>
+        </div>
+        <div class="stat-card glass-pink border border-pink-100/30">
+            <div class="icon"><i class="fas fa-toman-sign"></i></div>
+            <div class="stat-number pink-gradient-text">{{ total_revenue|floatformat:0 }}</div>
+            <div class="text-gray-500 text-sm">درآمد کل (تومان)</div>
+        </div>
+    </div>
+    
+    <!-- ===== آمار جزئی ===== -->
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 mb-8">
+        <div class="glass-pink rounded-2xl p-5 border border-pink-100/30 flex items-center justify-between">
+            <div>
+                <div class="text-2xl font-bold text-yellow-600">{{ pending_orders }}</div>
+                <div class="text-gray-500 text-sm">سفارشات در انتظار</div>
+            </div>
+            <i class="fas fa-clock text-3xl text-yellow-400/50"></i>
+        </div>
+        <div class="glass-pink rounded-2xl p-5 border border-pink-100/30 flex items-center justify-between">
+            <div>
+                <div class="text-2xl font-bold text-purple-600">{{ total_reviews }}</div>
+                <div class="text-gray-500 text-sm">نظرات ثبت شده</div>
+            </div>
+            <i class="fas fa-comments text-3xl text-purple-400/50"></i>
+        </div>
+        <div class="glass-pink rounded-2xl p-5 border border-pink-100/30 flex items-center justify-between">
+            <div>
+                <div class="text-2xl font-bold text-pink-600">{{ total_wishlist }}</div>
+                <div class="text-gray-500 text-sm">علاقه‌مندی‌ها</div>
+            </div>
+            <i class="fas fa-heart text-3xl text-pink-400/50"></i>
+        </div>
+    </div>
+    
+    <!-- ===== دو ستون ===== -->
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <!-- ===== پرفروش‌ترین محصولات ===== -->
+        <div class="bg-white/80 backdrop-blur-lg rounded-3xl p-6 shadow-lg">
+            <h3 class="font-bold text-lg mb-4 flex items-center gap-2">
+                <i class="fas fa-crown text-yellow-500"></i> پرفروش‌ترین محصولات
+            </h3>
+            <div class="space-y-3">
+                {% for product in best_products %}
+                <div class="activity-item flex items-center justify-between">
+                    <div class="flex items-center gap-3">
+                        <span class="w-7 h-7 rounded-full bg-pink-100 text-pink-600 text-xs font-bold flex items-center justify-center">
+                            {{ forloop.counter }}
+                        </span>
+                        <span class="font-medium">{{ product.name }}</span>
+                    </div>
+                    <div class="flex items-center gap-4">
+                        <span class="text-sm text-gray-500">{{ product.sales_count }} فروش</span>
+                        <span class="font-bold text-pink-500">{{ product.price|floatformat:0 }}</span>
+                    </div>
+                </div>
+                {% empty %}
+                <p class="text-center text-gray-400 py-4">هیچ محصولی فروخته نشده است</p>
+                {% endfor %}
+            </div>
+            <a href="{% url 'first:admin_products' %}" class="mt-4 block text-center text-pink-500 hover:text-pink-700 text-sm font-bold">
+                مشاهده همه محصولات <i class="fas fa-arrow-left mr-1"></i>
+            </a>
+        </div>
+        
+        <!-- ===== فعالیت‌های اخیر ===== -->
+        <div class="bg-white/80 backdrop-blur-lg rounded-3xl p-6 shadow-lg">
+            <h3 class="font-bold text-lg mb-4 flex items-center gap-2">
+                <i class="fas fa-clock text-pink-500"></i> فعالیت‌های اخیر
+            </h3>
+            
+            <!-- آخرین کاربران -->
+            <div class="mb-4">
+                <h4 class="text-sm font-bold text-gray-500 mb-2">👤 آخرین کاربران ثبت‌نامی</h4>
+                <div class="space-y-2">
+                    {% for user in recent_users|slice:":5" %}
+                    <div class="activity-item flex items-center justify-between text-sm">
+                        <span class="font-medium">{{ user.username }}</span>
+                        <span class="text-gray-400 text-xs">{{ user.date_joined|date:"Y/m/d H:i" }}</span>
+                    </div>
+                    {% empty %}
+                    <p class="text-gray-400 text-sm">هیچ کاربری ثبت‌نام نکرده است</p>
+                    {% endfor %}
+                </div>
+            </div>
+            
+            <!-- آخرین سفارشات -->
+            <div>
+                <h4 class="text-sm font-bold text-gray-500 mb-2">📦 آخرین سفارشات</h4>
+                <div class="space-y-2">
+                    {% for order in recent_orders|slice:":5" %}
+                    <div class="activity-item flex items-center justify-between text-sm">
+                        <span class="font-medium">#{{ order.order_number }}</span>
+                        <span class="text-gray-400 text-xs">{{ order.created_at|date:"Y/m/d H:i" }}</span>
+                    </div>
+                    {% empty %}
+                    <p class="text-gray-400 text-sm">هیچ سفارشی ثبت نشده است</p>
+                    {% endfor %}
+                </div>
+            </div>
+            
+            <a href="{% url 'first:admin_orders' %}" class="mt-4 block text-center text-pink-500 hover:text-pink-700 text-sm font-bold">
+                مشاهده همه سفارشات <i class="fas fa-arrow-left mr-1"></i>
+            </a>
+        </div>
+    </div>
+    
+    <!-- ===== لینک‌های سریع (شامل آمار) ===== -->
+    <div class="mt-8 grid grid-cols-2 md:grid-cols-5 gap-4">
+        <a href="{% url 'first:admin_products' %}" class="glass-pink rounded-2xl p-4 text-center hover:shadow-xl transition-all hover:-translate-y-1">
+            <i class="fas fa-box text-2xl text-pink-500 mb-2"></i>
+            <p class="text-sm font-medium">مدیریت محصولات</p>
+        </a>
+        <a href="{% url 'first:admin_orders' %}" class="glass-pink rounded-2xl p-4 text-center hover:shadow-xl transition-all hover:-translate-y-1">
+            <i class="fas fa-shopping-bag text-2xl text-green-500 mb-2"></i>
+            <p class="text-sm font-medium">مدیریت سفارشات</p>
+        </a>
+        <a href="{% url 'first:admin_users' %}" class="glass-pink rounded-2xl p-4 text-center hover:shadow-xl transition-all hover:-translate-y-1">
+            <i class="fas fa-users text-2xl text-purple-500 mb-2"></i>
+            <p class="text-sm font-medium">مدیریت کاربران</p>
+        </a>
+        <a href="{% url 'first:site_settings' %}" class="glass-pink rounded-2xl p-4 text-center hover:shadow-xl transition-all hover:-translate-y-1">
+            <i class="fas fa-palette text-2xl text-yellow-500 mb-2"></i>
+            <p class="text-sm font-medium">مدیریت ظاهر</p>
+        </a>
+        <!-- ===== لینک آمار و گزارش‌ها ===== -->
+        <a href="{% url 'first:analytics_dashboard' %}" class="glass-pink rounded-2xl p-4 text-center hover:shadow-xl transition-all hover:-translate-y-1 border-2 border-pink-300">
+            <i class="fas fa-chart-line text-2xl text-pink-500 mb-2"></i>
+            <p class="text-sm font-medium">📊 آمار و گزارش‌ها</p>
+        </a>
+        <a href="{% url 'first:number_format_settings' %}" class="glass-pink rounded-2xl p-4 text-center hover:shadow-xl transition-all hover:-translate-y-1">
+            <i class="fas fa-calculator text-2xl text-pink-500 mb-2"></i>
+            <p class="text-sm font-medium">⚙️ تنظیمات اعداد</p>
+        </a>
+    </div>
+</div>
+{% endblock %}

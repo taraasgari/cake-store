@@ -1,0 +1,66 @@
+{% extends 'dashboard/perfume_admin_base.html' %}
+{% load custom_filters %}
+{% block admin_title %}پنل مالک{% endblock %}
+{% block admin_heading %}پنل مالک{% endblock %}
+{% block admin_content %}
+<div class="pa-owner-dashboard">
+  <section class="pa-dashboard-hero">
+    <div><span class="pa-eyebrow">OWNER OVERVIEW</span><h1>سلام {{ user.username }}،</h1><p>وضعیت فروشگاه عطر، سفارش‌ها، مشتریان و ظاهر سایت را از اینجا مدیریت کنید.</p></div>
+    <div class="pa-owner-seal"><i class="fa-solid fa-crown"></i><span>OWNER</span></div>
+  </section>
+
+  <section class="pa-metrics">
+    <article><span><i class="fa-solid fa-box-open"></i></span><small>محصولات</small><strong>{{ total_products|default:0 }}</strong></article>
+    <article><span><i class="fa-solid fa-users"></i></span><small>کاربران</small><strong>{{ total_users|default:0 }}</strong></article>
+    <article><span><i class="fa-solid fa-receipt"></i></span><small>سفارش‌ها</small><strong>{{ total_orders|default:0 }}</strong></article>
+    <article class="gold"><span><i class="fa-solid fa-coins"></i></span><small>درآمد تاییدشده</small><strong>{{ total_revenue|default_if_none:0|price_format }}</strong><em>تومان</em></article>
+  </section>
+
+  <section class="pa-secondary-metrics">
+    <div><i class="fa-regular fa-clock"></i><span><small>سفارش در انتظار</small><strong>{{ pending_orders|default:0 }}</strong></span></div>
+    <div><i class="fa-regular fa-star"></i><span><small>نظر ثبت‌شده</small><strong>{{ total_reviews|default:0 }}</strong></span></div>
+    <div><i class="fa-regular fa-heart"></i><span><small>علاقه‌مندی‌ها</small><strong>{{ total_wishlist|default:0 }}</strong></span></div>
+  </section>
+
+  <section class="pa-panel-section">
+    <div class="pa-section-title"><div><span class="pa-eyebrow">MANAGEMENT</span><h2>مدیریت فروشگاه</h2></div><p>همه ابزارهای مدیریت در یکجا.</p></div>
+    <div class="pa-action-grid"><a class="pa-action-card gold" href="{% url 'first:customizer' %}"><span class="pa-action-icon"><i class="fa-solid fa-wand-magic-sparkles"></i></span><span class="pa-action-copy"><strong>طراحی بصری سایت</strong><small>ظاهر فروشگاه را با پیش‌نمایش زنده ویرایش کنید</small></span><i class="fa-solid fa-arrow-left pa-action-arrow"></i></a>
+<a class="pa-action-card " href="{% url 'first:admin_products' %}"><span class="pa-action-icon"><i class="fa-solid fa-box-open"></i></span><span class="pa-action-copy"><strong>مدیریت محصولات</strong><small>محصولات، قیمت‌ها و کالکشن‌های فروشگاه</small></span><i class="fa-solid fa-arrow-left pa-action-arrow"></i></a>
+<a class="pa-action-card " href="{% url 'first:admin_orders' %}"><span class="pa-action-icon"><i class="fa-solid fa-receipt"></i></span><span class="pa-action-copy"><strong>سفارش‌ها</strong><small>بررسی سفارش‌های جدید و وضعیت ارسال</small></span><i class="fa-solid fa-arrow-left pa-action-arrow"></i></a>
+<a class="pa-action-card " href="{% url 'first:warehouse' %}"><span class="pa-action-icon"><i class="fa-solid fa-warehouse"></i></span><span class="pa-action-copy"><strong>انبار</strong><small>کنترل موجودی و کالاهای رو به اتمام</small></span><i class="fa-solid fa-arrow-left pa-action-arrow"></i></a>
+<a class="pa-action-card " href="{% url 'first:site_settings' %}"><span class="pa-action-icon"><i class="fa-solid fa-sliders"></i></span><span class="pa-action-copy"><strong>تنظیمات فروشگاه</strong><small>لوگو، اسلایدر، تماس و تنظیمات عمومی</small></span><i class="fa-solid fa-arrow-left pa-action-arrow"></i></a>
+<a class="pa-action-card " href="{% url 'first:analytics_dashboard' %}"><span class="pa-action-icon"><i class="fa-solid fa-chart-line"></i></span><span class="pa-action-copy"><strong>آمار فروش</strong><small>گزارش‌ها و عملکرد فروشگاه</small></span><i class="fa-solid fa-arrow-left pa-action-arrow"></i></a>
+<a class="pa-action-card " href="{% url 'first:admin_users' %}"><span class="pa-action-icon"><i class="fa-solid fa-users"></i></span><span class="pa-action-copy"><strong>کاربران</strong><small>مشتریان و حساب‌های مدیریتی</small></span><i class="fa-solid fa-arrow-left pa-action-arrow"></i></a>
+<a class="pa-action-card " href="{% url 'first:admin_reviews' %}"><span class="pa-action-icon"><i class="fa-solid fa-star"></i></span><span class="pa-action-copy"><strong>نظرات</strong><small>مدیریت بازخورد و امتیاز محصولات</small></span><i class="fa-solid fa-arrow-left pa-action-arrow"></i></a></div>
+  </section>
+
+  <div class="pa-dashboard-columns">
+    <section class="pa-panel-card">
+      <div class="pa-card-head"><div><span class="pa-eyebrow">RECENT ORDERS</span><h2>آخرین سفارش‌ها</h2></div><a href="{% url 'first:admin_orders' %}">مشاهده همه ←</a></div>
+      <div class="pa-list">
+        {% for order in recent_orders %}
+        <article class="pa-list-row"><span class="pa-list-icon"><i class="fa-solid fa-bag-shopping"></i></span><span class="pa-list-copy"><strong>#{{ order.order_number }}</strong><small>{{ order.created_at|date:'Y/m/d H:i' }} · {{ order.get_status_display }}</small></span><strong class="pa-row-value">{{ order.total|price_format }} <small>تومان</small></strong></article>
+        {% empty %}<div class="pa-empty"><i class="fa-solid fa-bag-shopping"></i><p>هنوز سفارشی ثبت نشده است.</p></div>{% endfor %}
+      </div>
+    </section>
+
+    <section class="pa-panel-card">
+      <div class="pa-card-head"><div><span class="pa-eyebrow">BEST SELLERS</span><h2>پرفروش‌ترین محصولات</h2></div><a href="{% url 'first:admin_products' %}">مدیریت محصولات ←</a></div>
+      <div class="pa-list">
+        {% for product in best_products %}
+        <article class="pa-list-row"><span class="pa-product-thumb">{% if product.main_image %}<img src="{{ product.main_image.url }}" alt="{{ product.name }}">{% else %}<i class="fa-solid fa-spray-can-sparkles"></i>{% endif %}</span><span class="pa-list-copy"><strong>{{ product.name }}</strong><small>{{ product.sales_count|default:0 }} فروش</small></span><strong class="pa-row-value">{{ product.final_price|price_format }} <small>تومان</small></strong></article>
+        {% empty %}<div class="pa-empty"><i class="fa-solid fa-box-open"></i><p>هنوز فروش محصولی ثبت نشده است.</p></div>{% endfor %}
+      </div>
+    </section>
+  </div>
+
+  <section class="pa-panel-card">
+    <div class="pa-card-head"><div><span class="pa-eyebrow">NEW MEMBERS</span><h2>آخرین کاربران</h2></div><a href="{% url 'first:admin_users' %}">همه کاربران ←</a></div>
+    <div class="pa-user-grid">
+      {% for member in recent_users %}
+      <article><span class="pa-user-avatar">{{ member.username|first|upper }}</span><span><strong>{{ member.username }}</strong><small>{{ member.email|default:'بدون ایمیل' }}</small></span><time>{{ member.date_joined|date:'Y/m/d' }}</time></article>
+      {% empty %}<div class="pa-empty"><p>کاربری وجود ندارد.</p></div>{% endfor %}
+    </div>
+  </section>
+</div>
+{% endblock %}

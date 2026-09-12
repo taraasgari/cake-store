@@ -1,0 +1,276 @@
+{% extends 'dashboard/perfume_admin_base.html' %}
+{% load static %}
+{% load custom_filters %}
+
+{% block title %}📊 داشبورد مدیریت{% endblock %}
+
+{% block admin_content %}
+<div class="max-w-7xl mx-auto px-4">
+    <div class="flex justify-between items-center mb-8">
+        <div>
+            <h1 class="text-3xl font-bold gradient-text">📊 داشبورد مدیریت</h1>
+            <p class="text-gray-500 mt-1">خوش آمدید {{ user.username }}!</p>
+            {% if not user.is_owner %}
+            <div class="mt-2 flex flex-wrap gap-2">
+                <span class="text-xs text-gray-400">دسترسی‌های شما:</span>
+                {% for perm in user_permissions %}
+                <span class="px-2 py-0.5 bg-green-100 text-green-600 rounded-full text-xs">
+                    {{ perm }}
+                </span>
+                {% empty %}
+                <span class="px-2 py-0.5 bg-red-100 text-red-600 rounded-full text-xs">
+                    بدون دسترسی
+                </span>
+                {% endfor %}
+            </div>
+            {% endif %}
+        </div>
+        <div class="flex gap-3">
+            {% if user.is_owner %}
+            <a href="{% url 'first:manage_admins' %}" class="px-4 py-2 bg-purple-500 text-white rounded-xl hover:shadow-lg transition-all">
+                <i class="fas fa-user-shield ml-2"></i> مدیریت ادمین‌ها
+            </a>
+            {% endif %}
+            <a href="{% url 'first:home' %}" class="px-4 py-2 border-2 border-gray-200 rounded-xl hover:bg-gray-50 transition-all">
+                <i class="fas fa-home ml-2"></i> بازگشت به سایت
+            </a>
+        </div>
+    </div>
+    
+    <!-- ===== کارت‌های آمار ===== -->
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+        <div class="bg-gradient-to-br from-blue-500 to-blue-600 text-white rounded-2xl p-6 shadow-lg hover:shadow-xl transition-all hover:-translate-y-1">
+            <div class="flex items-center justify-between">
+                <div>
+                    <p class="text-sm opacity-80">کل محصولات</p>
+                    <p class="text-3xl font-bold">{{ total_products }}</p>
+                </div>
+                <i class="fas fa-box text-4xl opacity-50"></i>
+            </div>
+            {% if user.is_owner or 'products_view' in user_permissions %}
+            <a href="{% url 'first:admin_products' %}" class="text-sm opacity-80 hover:opacity-100 transition-all inline-block mt-2">
+                مشاهده همه <i class="fas fa-arrow-left mr-1"></i>
+            </a>
+            {% endif %}
+        </div>
+        
+        <div class="bg-gradient-to-br from-green-500 to-green-600 text-white rounded-2xl p-6 shadow-lg hover:shadow-xl transition-all hover:-translate-y-1">
+            <div class="flex items-center justify-between">
+                <div>
+                    <p class="text-sm opacity-80">کل سفارشات</p>
+                    <p class="text-3xl font-bold">{{ total_orders|format_number }}</p>
+                </div>
+                <i class="fas fa-shopping-bag text-4xl opacity-50"></i>
+            </div>
+            {% if user.is_owner or 'orders_view' in user_permissions %}
+            <a href="{% url 'first:admin_orders' %}" class="text-sm opacity-80 hover:opacity-100 transition-all inline-block mt-2">
+                مشاهده همه <i class="fas fa-arrow-left mr-1"></i>
+            </a>
+            {% endif %}
+        </div>
+        
+        {% if user.is_owner or 'users_view' in user_permissions %}
+        <div class="bg-gradient-to-br from-purple-500 to-purple-600 text-white rounded-2xl p-6 shadow-lg hover:shadow-xl transition-all hover:-translate-y-1">
+            <div class="flex items-center justify-between">
+                <div>
+                    <p class="text-sm opacity-80">کل کاربران</p>
+                    <p class="text-3xl font-bold">{{ total_users }}</p>
+                </div>
+                <i class="fas fa-users text-4xl opacity-50"></i>
+            </div>
+            <a href="{% url 'first:admin_users' %}" class="text-sm opacity-80 hover:opacity-100 transition-all inline-block mt-2">
+                مشاهده همه <i class="fas fa-arrow-left mr-1"></i>
+            </a>
+        </div>
+        {% endif %}
+        
+        {% if user.is_owner or 'orders_view' in user_permissions %}
+        <div class="bg-gradient-to-br from-yellow-500 to-yellow-600 text-white rounded-2xl p-6 shadow-lg hover:shadow-xl transition-all hover:-translate-y-1">
+            <div class="flex items-center justify-between">
+                <div>
+                    <p class="text-sm opacity-80">سفارشات در انتظار</p>
+                    <p class="text-3xl font-bold">{{ pending_orders }}</p>
+                </div>
+                <i class="fas fa-clock text-4xl opacity-50"></i>
+            </div>
+            <a href="{% url 'first:admin_orders' %}" class="text-sm opacity-80 hover:opacity-100 transition-all inline-block mt-2">
+                مشاهده همه <i class="fas fa-arrow-left mr-1"></i>
+            </a>
+        </div>
+        {% endif %}
+    </div>
+    
+    <!-- ===== لینک‌های سریع (فقط بخش‌هایی که دسترسی داره) ===== -->
+    <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
+        <!-- مدیریت محصولات -->
+        {% if user.is_owner or 'products_view' in user_permissions %}
+        <a href="{% url 'first:admin_products' %}" class="group bg-white/80 backdrop-blur-lg rounded-2xl p-6 shadow-lg hover:shadow-2xl transition-all hover:-translate-y-1 text-center">
+            <div class="w-16 h-16 bg-gradient-to-br from-pink-500 to-pink-600 rounded-2xl flex items-center justify-center mx-auto mb-3 group-hover:scale-110 transition-all">
+                <i class="fas fa-box text-3xl text-white"></i>
+            </div>
+            <h3 class="font-bold text-lg">مدیریت محصولات</h3>
+            <p class="text-sm text-gray-500">افزودن و ویرایش محصولات</p>
+        </a>
+        {% endif %}
+        
+        <!-- مدیریت سفارشات -->
+        {% if user.is_owner or 'orders_view' in user_permissions %}
+        <a href="{% url 'first:admin_orders' %}" class="group bg-white/80 backdrop-blur-lg rounded-2xl p-6 shadow-lg hover:shadow-2xl transition-all hover:-translate-y-1 text-center">
+            <div class="w-16 h-16 bg-gradient-to-br from-green-500 to-green-600 rounded-2xl flex items-center justify-center mx-auto mb-3 group-hover:scale-110 transition-all">
+                <i class="fas fa-shopping-bag text-3xl text-white"></i>
+            </div>
+            <h3 class="font-bold text-lg">مدیریت سفارشات</h3>
+            <p class="text-sm text-gray-500">مشاهده و تغییر وضعیت</p>
+        </a>
+        {% endif %}
+        
+        <!-- مدیریت نظرات -->
+        {% if user.is_owner or 'reviews_view' in user_permissions %}
+        <a href="{% url 'first:admin_reviews' %}" class="group bg-white/80 backdrop-blur-lg rounded-2xl p-6 shadow-lg hover:shadow-2xl transition-all hover:-translate-y-1 text-center">
+            <div class="w-16 h-16 bg-gradient-to-br from-yellow-500 to-orange-500 rounded-2xl flex items-center justify-center mx-auto mb-3 group-hover:scale-110 transition-all">
+                <i class="fas fa-comments text-3xl text-white"></i>
+            </div>
+            <h3 class="font-bold text-lg">مدیریت نظرات</h3>
+            <p class="text-sm text-gray-500">تایید و مدیریت نظرات</p>
+        </a>
+        {% endif %}
+        
+        <!-- مدیریت کاربران - فقط مالک یا کسی که دسترسی users_view داره -->
+        {% if user.is_owner or 'users_view' in user_permissions %}
+        <a href="{% url 'first:admin_users' %}" class="group bg-white/80 backdrop-blur-lg rounded-2xl p-6 shadow-lg hover:shadow-2xl transition-all hover:-translate-y-1 text-center">
+            <div class="w-16 h-16 bg-gradient-to-br from-purple-500 to-purple-600 rounded-2xl flex items-center justify-center mx-auto mb-3 group-hover:scale-110 transition-all">
+                <i class="fas fa-users-cog text-3xl text-white"></i>
+            </div>
+            <h3 class="font-bold text-lg">مدیریت کاربران</h3>
+            <p class="text-sm text-gray-500">مشاهده همه کاربران</p>
+        </a>
+        {% endif %}
+        
+        <!-- مدیریت ادمین‌ها - فقط مالک -->
+        {% if user.is_owner %}
+        <a href="{% url 'first:manage_admins' %}" class="group bg-white/80 backdrop-blur-lg rounded-2xl p-6 shadow-lg hover:shadow-2xl transition-all hover:-translate-y-1 text-center">
+            <div class="w-16 h-16 bg-gradient-to-br from-red-500 to-red-600 rounded-2xl flex items-center justify-center mx-auto mb-3 group-hover:scale-110 transition-all">
+                <i class="fas fa-user-shield text-3xl text-white"></i>
+            </div>
+            <h3 class="font-bold text-lg">مدیریت ادمین‌ها</h3>
+            <p class="text-sm text-gray-500">افزودن و حذف ادمین</p>
+        </a>
+        {% endif %}
+        
+        <!-- مدیریت دسترسی - فقط مالک -->
+        {% if user.is_owner %}
+        <a href="{% url 'first:manage_admin_permissions' %}" class="group bg-white/80 backdrop-blur-lg rounded-2xl p-6 shadow-lg hover:shadow-2xl transition-all hover:-translate-y-1 text-center border-2 border-purple-300">
+            <div class="w-16 h-16 bg-gradient-to-br from-purple-500 to-purple-600 rounded-2xl flex items-center justify-center mx-auto mb-3 group-hover:scale-110 transition-all">
+                <i class="fas fa-key text-3xl text-white"></i>
+            </div>
+            <h3 class="font-bold text-lg">🔑 دسترسی ادمین‌ها</h3>
+            <p class="text-sm text-gray-500">مدیریت دسترسی‌ها</p>
+        </a>
+        {% endif %}
+        
+        <!-- مدیریت انبار - فقط مالک -->
+        {% if user.is_owner or 'warehouse_view' in user_permissions %}
+        <a href="{% url 'first:warehouse' %}" class="group bg-white/80 backdrop-blur-lg rounded-2xl p-6 shadow-lg hover:shadow-2xl transition-all hover:-translate-y-1 text-center">
+            <div class="w-16 h-16 bg-gradient-to-br from-indigo-500 to-indigo-600 rounded-2xl flex items-center justify-center mx-auto mb-3 group-hover:scale-110 transition-all">
+                <i class="fas fa-warehouse text-3xl text-white"></i>
+            </div>
+            <h3 class="font-bold text-lg">مدیریت انبار</h3>
+            <p class="text-sm text-gray-500">مدیریت موجودی</p>
+        </a>
+        {% endif %}
+        
+        <!-- تنظیمات ظاهر - فقط مالک -->
+        {% if user.is_owner or 'site_settings' in user_permissions %}
+        <a href="{% url 'first:site_settings' %}" class="group bg-white/80 backdrop-blur-lg rounded-2xl p-6 shadow-lg hover:shadow-2xl transition-all hover:-translate-y-1 text-center">
+            <div class="w-16 h-16 bg-gradient-to-br from-pink-400 to-purple-500 rounded-2xl flex items-center justify-center mx-auto mb-3 group-hover:scale-110 transition-all">
+                <i class="fas fa-palette text-3xl text-white"></i>
+            </div>
+            <h3 class="font-bold text-lg">مدیریت ظاهر</h3>
+            <p class="text-sm text-gray-500">سفارشی‌سازی رنگ و لوگو</p>
+        </a>
+        {% endif %}
+        
+        <!-- ===== لینک آمار و گزارش‌ها ===== -->
+        <a href="{% url 'first:analytics_dashboard' %}" class="group bg-white/80 backdrop-blur-lg rounded-2xl p-6 shadow-lg hover:shadow-2xl transition-all hover:-translate-y-1 text-center">
+            <div class="w-16 h-16 bg-gradient-to-br from-purple-500 to-purple-600 rounded-2xl flex items-center justify-center mx-auto mb-3 group-hover:scale-110 transition-all">
+                <i class="fas fa-chart-line text-3xl text-white"></i>
+            </div>
+            <h3 class="font-bold text-lg">📊 آمار و گزارش‌ها</h3>
+            <p class="text-sm text-gray-500">تحلیل فروش و عملکرد</p>
+        </a>
+
+<!-- customer-care-v3-cards -->
+        {% if user.is_owner or 'support_view' in user_permissions %}
+        <a href="{% url 'customer_care:admin_support_list' %}" class="group bg-white/80 backdrop-blur-lg rounded-2xl p-6 shadow-lg hover:shadow-2xl transition-all hover:-translate-y-1 text-center">
+            <div class="w-16 h-16 bg-gradient-to-br from-cyan-500 to-blue-600 rounded-2xl flex items-center justify-center mx-auto mb-3 group-hover:scale-110 transition-all">
+                <i class="fas fa-headset text-3xl text-white"></i>
+            </div>
+            <h3 class="font-bold text-lg">پاسخگویی پشتیبانی</h3>
+            <p class="text-sm text-gray-500">مشاهده و پاسخ به تیکت‌های کاربران</p>
+        </a>
+        {% endif %}
+
+        {% if user.is_owner or 'returns_manage' in user_permissions %}
+        <a href="{% url 'customer_care:admin_order_actions_list' %}" class="group bg-white/80 backdrop-blur-lg rounded-2xl p-6 shadow-lg hover:shadow-2xl transition-all hover:-translate-y-1 text-center">
+            <div class="w-16 h-16 bg-gradient-to-br from-orange-500 to-red-500 rounded-2xl flex items-center justify-center mx-auto mb-3 group-hover:scale-110 transition-all">
+                <i class="fas fa-undo-alt text-3xl text-white"></i>
+            </div>
+            <h3 class="font-bold text-lg">لغو و مرجوعی سفارش‌ها</h3>
+            <p class="text-sm text-gray-500">بررسی درخواست‌ها و بازگشت وجه</p>
+        </a>
+        {% endif %}
+    </div>
+    
+    <!-- ===== سفارشات اخیر (فقط در صورت دسترسی) ===== -->
+    {% if user.is_owner or 'orders_view' in user_permissions %}
+    <div class="bg-white/80 backdrop-blur-lg rounded-2xl p-6 shadow-lg">
+        <div class="flex justify-between items-center mb-4">
+            <h3 class="font-bold text-xl">📋 آخرین سفارشات</h3>
+            <a href="{% url 'first:admin_orders' %}" class="text-pink-500 hover:text-pink-700 text-sm font-bold">
+                مشاهده همه <i class="fas fa-arrow-left mr-1"></i>
+            </a>
+        </div>
+        
+        {% if recent_orders %}
+        <div class="overflow-x-auto">
+            <table class="w-full">
+                <thead class="border-b border-gray-200">
+                    <tr class="text-right text-sm text-gray-500">
+                        <th class="py-2 px-4">شماره سفارش</th>
+                        <th class="py-2 px-4">کاربر</th>
+                        <th class="py-2 px-4">مبلغ</th>
+                        <th class="py-2 px-4">وضعیت</th>
+                        <th class="py-2 px-4">تاریخ</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for order in recent_orders %}
+                    <tr class="border-b border-gray-100 hover:bg-pink-50 transition-all">
+                        <td class="py-3 px-4 font-bold">#{{ order.order_number }}</td>
+                        <td class="py-3 px-4">{{ order.user.username }}</td>
+                        <td class="py-3 px-4 text-pink-500 font-bold">{{ order.total|floatformat:0 }}</td>
+                        <td class="py-3 px-4">
+                            <span class="px-3 py-1 rounded-full text-xs font-bold
+                                {% if order.status == 'pending' %}bg-yellow-100 text-yellow-600
+                                {% elif order.status == 'paid' %}bg-green-100 text-green-600
+                                {% elif order.status == 'processing' %}bg-blue-100 text-blue-600
+                                {% elif order.status == 'shipped' %}bg-purple-100 text-purple-600
+                                {% elif order.status == 'delivered' %}bg-green-100 text-green-700
+                                {% elif order.status == 'cancelled' %}bg-red-100 text-red-600
+                                {% endif %}">
+                                {{ order.get_status_display }}
+                            </span>
+                        </td>
+                        <td class="py-3 px-4 text-sm text-gray-500">{{ order.created_at|date:"Y/m/d H:i" }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% else %}
+        <p class="text-center text-gray-500 py-8">هیچ سفارشی ثبت نشده است</p>
+        {% endif %}
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

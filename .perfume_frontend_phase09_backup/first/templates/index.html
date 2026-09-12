@@ -1,0 +1,265 @@
+{% extends 'perfume_base.html' %}
+{% load custom_filters %}
+{% block title %}{{ settings.site_title|default:"VÉLORA — رایحه‌ای فراتر از زمان" }}{% endblock %}
+{% block content %}
+
+<section class="home-lux-slider" data-home-slider>
+  <div class="home-lux-slider-shell">
+
+    <article class="home-lux-slide is-active" data-home-slide="0">
+      <div class="home-lux-slide-bg slide-bg-one"></div>
+      <div class="home-lux-slide-copy">
+        <span class="phase-kicker">THE SIGNATURE EDIT</span>
+        <h1>رایحه‌ای برای<br><em>حضورهای ماندگار</em></h1>
+        <p>عطرهایی با شخصیت مشخص؛ از رایحه‌های روشن روزانه تا نت‌های عمیق و گرم برای شب.</p>
+        <div class="home-lux-slide-actions">
+          <a class="slider-primary" href="{% url 'first:product_list' %}">کشف کالکشن <i class="fa-solid fa-arrow-left"></i></a>
+          <a class="slider-secondary" href="#home-shop-products">مشاهده محصولات</a>
+        </div>
+      </div>
+      <div class="home-lux-slide-stage">
+        {% firstof featured_products.0 best_sellers.0 new_products.0 as slide_product_one %}
+        {% if slide_product_one and slide_product_one.main_image %}
+        <a href="{% url 'first:product_detail' slide_product_one.slug %}">
+          <img src="{{ slide_product_one.main_image.url }}" alt="{{ slide_product_one.name }}">
+        </a>
+        {% else %}
+        <div class="slider-css-bottle slider-bottle-gold">
+          <div class="slider-bottle-cap"></div><span>VÉLORA</span><small>ÉCLAT</small>
+        </div>
+        {% endif %}
+      </div>
+    </article>
+
+    <article class="home-lux-slide" data-home-slide="1">
+      <div class="home-lux-slide-bg slide-bg-two"></div>
+      <div class="home-lux-slide-copy">
+        <span class="phase-kicker">DAYLIGHT COLLECTION</span>
+        <h1>روشن، نرم و<br><em>بی‌زحمت لوکس</em></h1>
+        <p>انتخابی برای روز؛ تمیز، ظریف و حرفه‌ای بدون اینکه بیش‌ازحد سنگین باشد.</p>
+        <div class="home-lux-slide-actions">
+          <a class="slider-primary" href="{% url 'first:product_list' %}?sort=-created_at">تازه‌رسیده‌ها <i class="fa-solid fa-arrow-left"></i></a>
+          <a class="slider-secondary" href="{% url 'first:best_sellers' %}">پرفروش‌ها</a>
+        </div>
+      </div>
+      <div class="home-lux-slide-stage">
+        {% firstof new_products.0 featured_products.1 best_sellers.1 as slide_product_two %}
+        {% if slide_product_two and slide_product_two.main_image %}
+        <a href="{% url 'first:product_detail' slide_product_two.slug %}">
+          <img src="{{ slide_product_two.main_image.url }}" alt="{{ slide_product_two.name }}">
+        </a>
+        {% else %}
+        <div class="slider-css-bottle slider-bottle-cream">
+          <div class="slider-bottle-cap"></div><span>LUNÉA</span><small>SOLEIL</small>
+        </div>
+        {% endif %}
+      </div>
+    </article>
+
+    <article class="home-lux-slide" data-home-slide="2">
+      <div class="home-lux-slide-bg slide-bg-three"></div>
+      <div class="home-lux-slide-copy">
+        <span class="phase-kicker">NIGHT COLLECTION</span>
+        <h1>تیره، گرم و<br><em>ساخته‌شده برای شب</em></h1>
+        <p>کهربا، چوب و ادویه؛ برای وقتی که رایحه باید بیشتر از یک جزئیات باشد.</p>
+        <div class="home-lux-slide-actions">
+          <a class="slider-primary" href="{% url 'first:best_sellers' %}">انتخاب شب <i class="fa-solid fa-arrow-left"></i></a>
+          <a class="slider-secondary" href="{% url 'first:discounts' %}">پیشنهاد ویژه</a>
+        </div>
+      </div>
+      <div class="home-lux-slide-stage">
+        {% firstof best_sellers.0 featured_products.2 new_products.1 as slide_product_three %}
+        {% if slide_product_three and slide_product_three.main_image %}
+        <a href="{% url 'first:product_detail' slide_product_three.slug %}">
+          <img src="{{ slide_product_three.main_image.url }}" alt="{{ slide_product_three.name }}">
+        </a>
+        {% else %}
+        <div class="slider-css-bottle slider-bottle-noir">
+          <div class="slider-bottle-cap"></div><span>NOIR</span><small>ATELIER</small>
+        </div>
+        {% endif %}
+      </div>
+    </article>
+
+    <div class="home-lux-slider-ui">
+      <div class="home-lux-slider-count"><strong data-slider-current>01</strong><span>/ 03</span></div>
+      <div class="home-lux-slider-dots">
+        <button class="is-active" type="button" data-home-slider-dot="0"></button>
+        <button type="button" data-home-slider-dot="1"></button>
+        <button type="button" data-home-slider-dot="2"></button>
+      </div>
+    </div>
+
+    <div class="home-lux-slider-trust">
+      <div><i class="fa-solid fa-shield-halved"></i><span><b>تضمین اصالت</b><small>خرید مطمئن</small></span></div>
+      <div><i class="fa-solid fa-truck-fast"></i><span><b>ارسال حرفه‌ای</b><small>بسته‌بندی ایمن</small></span></div>
+      <div><i class="fa-regular fa-gem"></i><span><b>انتخاب لوکس</b><small>کالکشن منتخب</small></span></div>
+    </div>
+
+  </div>
+</section>
+
+{% firstof featured_products.0 best_sellers.0 new_products.0 as hero_product %}
+
+<section class="lux-home-hero">
+  {% for slider in sliders %}{% if forloop.first %}<img class="hero-bg" src="{{ slider.image.url }}" alt="">{% endif %}{% endfor %}
+  <div class="hero-shade"></div><div class="hero-grid"></div><div class="hero-arch"></div>
+
+  <div class="hero-copy">
+    <div class="hero-kicker"><span>01</span><i></i><small>THE NEW OLFACTIVE EDIT</small></div>
+    <h1><span>رایحه‌ای برای</span><em>حضورهای ماندگار</em></h1>
+    <p>مجموعه‌ای از عطرهای انتخاب‌شده برای کسانی که عطر را آخرین جزئیات استایل نمی‌دانند؛ اولین نشانه حضور می‌دانند.</p>
+    <div class="hero-actions">
+      <a class="gold-btn-x" href="{% url 'first:product_list' %}">کشف کالکشن <i class="fa-solid fa-arrow-left"></i></a>
+      <a class="ghost-btn-x" href="#finder"><span><i class="fa-solid fa-play"></i></span> پیدا کردن رایحه من</a>
+    </div>
+    <div class="hero-note"><small>CURATED</small><b>برای انتخاب‌های شخصی‌تر</b><span>FRESH · WOODY · FLORAL · AMBER</span></div>
+  </div>
+
+  <div class="hero-object">
+    <div class="orbit oa"></div><div class="orbit ob"></div><div class="hero-glow"></div>
+    {% if hero_product %}
+      <a href="{% url 'first:product_detail' hero_product.slug %}" class="hero-product">
+        {% if hero_product.main_image %}<img src="{{ hero_product.main_image.url }}" alt="{{ hero_product.name }}">{% else %}<div class="css-bottle"><b>VÉLORA</b><small>EXTRAIT DE PARFUM</small></div>{% endif %}
+      </a>
+      <div class="hero-product-info"><small>FEATURED SCENT</small><b>{{ hero_product.name }}</b><span>{{ hero_product.final_price|price_format }} تومان</span></div>
+    {% else %}
+      <div class="css-bottle"><b>VÉLORA</b><small>EXTRAIT DE PARFUM</small></div>
+    {% endif %}
+  </div>
+
+  <aside class="hero-side">
+    <div><span>01</span><i class="fa-regular fa-gem"></i><p><b>اصالت تضمین‌شده</b><small>انتخاب مطمئن و معتبر</small></p></div>
+    <div><span>02</span><i class="fa-regular fa-clock"></i><p><b>رایحه ماندگار</b><small>برای حضور طولانی‌تر</small></p></div>
+    <div><span>03</span><i class="fa-regular fa-heart"></i><p><b>انتخاب شخصی</b><small>متناسب با حال‌وهوای شما</small></p></div>
+  </aside>
+</section>
+
+<section class="trust-rail">
+  <div><i class="fa-solid fa-shield-halved"></i><p><b>تضمین اصالت</b><span>خرید مطمئن</span></p></div>
+  <div><i class="fa-solid fa-truck-fast"></i><p><b>ارسال حرفه‌ای</b><span>بسته‌بندی ایمن</span></p></div>
+  <div><i class="fa-solid fa-gift"></i><p><b>هدیه لوکس</b><span>برای لحظه‌های خاص</span></p></div>
+  <div><i class="fa-solid fa-headset"></i><p><b>مشاوره رایحه</b><span>انتخاب دقیق‌تر</span></p></div>
+</section>
+
+<section class="signature-home">
+  <div class="section-head-x reveal">
+    <div><span class="eyebrow-x">SIGNATURE SELECTION</span><h2>عطرهایی که<br>امضا می‌شوند.</h2></div>
+    <div><p>از رایحه‌های روشن و تمیز برای روز تا نت‌های عمیق، چوبی و گرم برای شب.</p><a href="{% url 'first:product_list' %}">مشاهده همه کالکشن ←</a></div>
+  </div>
+
+  <div class="home-product-grid">
+    {% for product in best_sellers|slice:":4" %}
+    <article class="home-product reveal">
+      <a class="home-product-media" href="{% url 'first:product_detail' product.slug %}">
+        <span class="seq">0{{ forloop.counter }}</span>
+        {% if product.is_best_seller %}<small class="badge-x">ICON</small>{% endif %}
+        {% if product.main_image %}<img src="{{ product.main_image.url }}" alt="{{ product.name }}" loading="lazy">{% else %}<div class="mini-bottle">V</div>{% endif %}
+      </a>
+      <div class="home-product-copy">
+        <div><small>{{ product.brand.name|default:"VÉLORA" }}</small><a href="{% url 'first:product_detail' product.slug %}">{{ product.name }}</a></div>
+        <div><strong>{{ product.final_price|price_format }}</strong><span>تومان</span></div>
+      </div>
+    </article>
+    {% empty %}
+      {% for product in featured_products|slice:":4" %}
+      <article class="home-product reveal">
+        <a class="home-product-media" href="{% url 'first:product_detail' product.slug %}"><span class="seq">0{{ forloop.counter }}</span>{% if product.main_image %}<img src="{{ product.main_image.url }}" alt="{{ product.name }}">{% else %}<div class="mini-bottle">V</div>{% endif %}</a>
+        <div class="home-product-copy"><div><small>{{ product.brand.name|default:"VÉLORA" }}</small><a href="{% url 'first:product_detail' product.slug %}">{{ product.name }}</a></div><div><strong>{{ product.final_price|price_format }}</strong><span>تومان</span></div></div>
+      </article>
+      {% endfor %}
+    {% endfor %}
+  </div>
+</section>
+
+<section class="scent-finder" id="finder">
+  <div class="finder-art reveal"><div class="face-art"></div><span>FIND<br>YOUR<br>SIGNATURE</span><small>02 / SCENT PROFILE</small></div>
+  <div class="finder-copy reveal">
+    <span class="eyebrow-x">PERFUME FINDER</span><h2>عطر مناسب تو،<br>از حس شروع می‌شود.</h2><p>به‌جای گشتن بین صدها محصول، از خانواده رایحه‌ای که دوست داری شروع کن.</p>
+    <div class="finder-links">
+      <a href="{% url 'first:search_products' %}?q=خنک"><span>01</span><b>FRESH</b><small>مرکباتی / تمیز / روزانه</small><i>↗</i></a>
+      <a href="{% url 'first:search_products' %}?q=چوبی"><span>02</span><b>WOODY</b><small>چوبی / خشک / عمیق</small><i>↗</i></a>
+      <a href="{% url 'first:search_products' %}?q=گلی"><span>03</span><b>FLORAL</b><small>گلی / نرم / روشن</small><i>↗</i></a>
+      <a href="{% url 'first:search_products' %}?q=گرم"><span>04</span><b>AMBER</b><small>گرم / شبانه / ماندگار</small><i>↗</i></a>
+    </div>
+  </div>
+</section>
+
+<section class="editorial-grid-x">
+  <a class="panel-x panel-new reveal" href="{% url 'first:product_list' %}?sort=-created_at"><span>03 / NEW ARRIVALS</span><h3>تازه وارد<br>آرشیو</h3><p>رایحه‌هایی که همین حالا وارد کالکشن شده‌اند.</p><b>DISCOVER ↗</b><div class="panel-bottle"></div></a>
+  <a class="panel-x panel-icons reveal" href="{% url 'first:best_sellers' %}"><span>04 / ICONS</span><h3>محبوب‌ترین<br>انتخاب‌ها</h3><b>VIEW ICONS ↗</b><div class="panel-rings"></div></a>
+  <a class="panel-x panel-gift reveal" href="{% url 'first:product_list' %}"><span>05 / GIFTING</span><h3>هنر<br>هدیه دادن</h3><p>انتخابی ماندگار برای یک لحظه خاص.</p><b>SELECT A GIFT ↗</b><div class="gift-box-x"></div></a>
+</section>
+
+{% if categories %}
+<section class="category-home">
+  <div class="section-head-x reveal"><div><span class="eyebrow-x">SHOP BY MOOD</span><h2>از حس انتخاب کن.</h2></div><a href="{% url 'first:product_list' %}">همه دسته‌ها ←</a></div>
+  <div class="category-grid-x">
+    {% for category in categories|slice:":6" %}{% if category.slug %}
+    <a class="category-card-x reveal" href="{% url 'first:category_products' category.slug %}">
+      <span>0{{ forloop.counter }}</span>
+      <div>{% if category.image %}<img src="{{ category.image.url }}" alt="{{ category.name }}">{% else %}<i class="fa-solid fa-spray-can-sparkles"></i>{% endif %}</div>
+      <b>{{ category.name }}</b><small>DISCOVER</small>
+    </a>
+    {% endif %}{% endfor %}
+  </div>
+</section>
+{% endif %}
+
+<section class="craft-home reveal">
+  <div><span class="eyebrow-x">THE ART OF PERFUMERY</span><h2>یک عطر خوب<br>فقط خوشبو نیست.</h2><p>شروع، قلب و پایه هر رایحه باید مثل یک داستان کنار هم قرار بگیرند؛ چیزی که حس می‌شود و در حافظه می‌ماند.</p><a class="outline-btn-x" href="{% url 'first:customer_service' 'shopping-guide' %}">راهنمای انتخاب عطر ←</a></div>
+  <aside><i class="craft-ring cr1"></i><i class="craft-ring cr2"></i><i class="petal pet1"></i><i class="petal pet2"></i><i class="petal pet3"></i><span>NATURE<br>TO MEMORY</span></aside>
+</section>
+
+{% if brands %}<section class="brand-rail-x"><span>CURATED HOUSES</span><div>{% for brand in brands %}{% if brand.slug %}<a href="{% url 'first:brand_products' brand.slug %}">{{ brand.name }}</a>{% endif %}{% endfor %}</div></section>{% endif %}
+<section class="quote-home"><span>06</span><blockquote>“Perfume is the most intense form of memory.”</blockquote><small>JEAN-PAUL GUERLAIN</small></section>
+
+<!-- PHASE02_HOME_PRODUCTS -->
+<section class="home-shop-section" id="home-shop-products">
+  <div class="home-shop-head reveal">
+    <div>
+      <span class="phase-kicker">SHOP THE COLLECTION</span>
+      <h2>محصولات فروشگاه</h2>
+      <p>محصولات واقعی فروشگاه حالا مستقیم در صفحه اصلی دیده می‌شوند.</p>
+    </div>
+    <a href="{% url 'first:product_list' %}">مشاهده همه محصولات <i class="fa-solid fa-arrow-left"></i></a>
+  </div>
+
+  <div class="home-shop-grid">
+    {% for product in new_products|slice:":8" %}
+    <article class="home-shop-card reveal">
+      <a class="home-shop-media" href="{% url 'first:product_detail' product.slug %}">
+        <div class="home-shop-badges">
+          {% if product.is_new %}<span>NEW</span>{% endif %}
+          {% if product.is_best_seller %}<span>ICON</span>{% endif %}
+        </div>
+        {% if product.main_image %}<img src="{{ product.main_image.url }}" alt="{{ product.name }}" loading="lazy">{% else %}<div class="mini-css-bottle">V</div>{% endif %}
+      </a>
+      <div class="home-shop-body">
+        <small>{{ product.brand.name|default:'VÉLORA' }}</small>
+        <h3><a href="{% url 'first:product_detail' product.slug %}">{{ product.name }}</a></h3>
+        <div class="home-shop-bottom">
+          <div class="home-shop-price"><strong>{{ product.final_price|price_format }}</strong><span> تومان</span>{% if product.discount_percent %}<del>{{ product.price|price_format }}</del>{% endif %}</div>
+          {% if product.has_variants %}
+          <a class="home-shop-action" href="{% url 'first:product_detail' product.slug %}"><i class="fa-solid fa-arrow-left"></i></a>
+          {% else %}
+          <form method="post" action="{% url 'first:add_to_cart' product.id %}">{% csrf_token %}<button class="home-shop-action" type="submit"><i class="fa-solid fa-bag-shopping"></i></button></form>
+          {% endif %}
+        </div>
+      </div>
+    </article>
+    {% empty %}
+      {% for product in featured_products|slice:":8" %}
+      <article class="home-shop-card reveal">
+        <a class="home-shop-media" href="{% url 'first:product_detail' product.slug %}">{% if product.main_image %}<img src="{{ product.main_image.url }}" alt="{{ product.name }}" loading="lazy">{% else %}<div class="mini-css-bottle">V</div>{% endif %}</a>
+        <div class="home-shop-body"><small>{{ product.brand.name|default:'VÉLORA' }}</small><h3><a href="{% url 'first:product_detail' product.slug %}">{{ product.name }}</a></h3><div class="home-shop-bottom"><div class="home-shop-price"><strong>{{ product.final_price|price_format }}</strong><span> تومان</span></div><a class="home-shop-action" href="{% url 'first:product_detail' product.slug %}"><i class="fa-solid fa-arrow-left"></i></a></div></div>
+      </article>
+      {% empty %}<div class="home-shop-empty">هنوز محصولی برای نمایش وجود ندارد.</div>{% endfor %}
+    {% endfor %}
+  </div>
+
+  <div class="home-shop-more"><a href="{% url 'first:product_list' %}">ورود به فروشگاه <i class="fa-solid fa-arrow-left"></i></a></div>
+</section>
+
+
+{% endblock %}

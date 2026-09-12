@@ -1,4 +1,4 @@
-{% extends 'base.html' %}
+{% extends 'dashboard/perfume_admin_base.html' %}
 {% load static %}
 {% load custom_filters %}
 
@@ -44,7 +44,7 @@
     }
     .admin-btn.active {
         border-color: #ec407a;
-        background: linear-gradient(135deg, #ec407a, #d81b60);
+        background: linear-gradient(135deg, #ec407a, #a87332);
         color: white;
         box-shadow: 0 8px 30px rgba(236,64,122,0.25);
     }
@@ -75,7 +75,7 @@
     .permission-group-title .count {
         font-size: 0.7rem;
         background: #f3e5f5;
-        color: #7c3aed;
+        color: #6c5339;
         padding: 1px 10px;
         border-radius: 10px;
     }
@@ -163,7 +163,7 @@
     
     .save-btn {
         padding: 12px 40px;
-        background: linear-gradient(135deg, #ec407a, #d81b60);
+        background: linear-gradient(135deg, #ec407a, #a87332);
         color: white;
         border: none;
         border-radius: 14px;
@@ -192,7 +192,7 @@
 </style>
 {% endblock %}
 
-{% block content %}
+{% block admin_content %}
 <div class="max-w-7xl mx-auto px-4">
     <!-- ===== هدر ===== -->
     <div class="flex flex-wrap justify-between items-center mb-8">
@@ -272,7 +272,7 @@
             <div class="permission-group">
                 <div class="permission-group-title">
                     {% if category == 'داشبورد' %}
-                    <i class="fas fa-chart-pie text-pink-500"></i>
+                    <i class="fas fa-chart-pie text-amber-700"></i>
                     {% elif category == 'محصولات' %}
                     <i class="fas fa-box text-blue-500"></i>
                     {% elif category == 'سفارشات' %}
@@ -344,9 +344,9 @@
     {% endfor %}
 
     <!-- ===== راهنمای دسترسی‌ها ===== -->
-    <div class="mt-8 bg-gradient-to-r from-pink-50 to-purple-50 rounded-2xl p-6 border border-pink-100">
+    <div class="mt-8 bg-gradient-to-r from-pink-50 to-purple-50 rounded-2xl p-6 border border-stone-200">
         <h3 class="font-bold text-gray-800 mb-3 flex items-center gap-2">
-            <i class="fas fa-info-circle text-pink-500"></i> راهنمای دسترسی‌ها
+            <i class="fas fa-info-circle text-amber-700"></i> راهنمای دسترسی‌ها
         </h3>
         <div class="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm">
             <div class="flex items-start gap-2">

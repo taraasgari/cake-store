@@ -1,0 +1,129 @@
+{% load static %}
+<!doctype html>
+<html lang="fa" dir="rtl" data-perfume-theme="night">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+  <title>{% block admin_title %}مدیریت فروشگاه{% endblock %} | {{ settings.site_name|default:'فروشگاه عطر' }}</title>
+  <script>
+  try{
+    const t=localStorage.getItem("velora-theme")||localStorage.getItem("perfume-theme")||"night";
+    document.documentElement.dataset.perfumeTheme=(t==="day"||t==="night")?t:"night";
+  }catch(e){}
+  </script>
+  <link rel="stylesheet" href="{% static 'vendor/vazir/font-face.css' %}">
+  <link rel="stylesheet" href="{% static 'vendor/fontawesome/css/all.min.css' %}">
+  <link rel="stylesheet" href="{% static 'css/tailwind.min.css' %}">
+  <link rel="stylesheet" href="{% static 'css/perfume-admin-v1.css' %}">
+  <link rel="stylesheet" href="{% static 'css/perfume-admin-v2.css' %}">
+  {% block extra_css %}{% endblock %}
+</head>
+<body class="pa-body">
+<section class="pa-shell">
+  <aside class="pa-sidebar" data-pa-sidebar>
+    <div class="pa-sidebar-brand">
+      <span class="pa-monogram">V</span>
+      <span><strong>{{ settings.site_name|default:'فروشگاه عطر' }}</strong><small>OWNER CONSOLE</small></span>
+    </div>
+    <button class="pa-sidebar-close" type="button" data-pa-close><i class="fa-solid fa-xmark"></i></button>
+    <nav class="pa-nav"><a class="pa-nav-link {% if request.resolver_match.url_name == 'owner_panel' %}active{% endif %}" href="{% url 'first:owner_panel' %}"><i class="fa-solid fa-gauge-high"></i><span>نمای کلی</span></a>
+
+<a class="pa-nav-link {% if request.resolver_match.url_name == 'admin_products' %}active{% endif %}" href="{% url 'first:admin_products' %}"><i class="fa-solid fa-box-open"></i><span>محصولات</span></a>
+<a class="pa-nav-link {% if request.resolver_match.url_name == 'admin_orders' %}active{% endif %}" href="{% url 'first:admin_orders' %}"><i class="fa-solid fa-receipt"></i><span>سفارش‌ها</span></a>
+<a class="pa-nav-link {% if request.resolver_match.url_name == 'admin_users' %}active{% endif %}" href="{% url 'first:admin_users' %}"><i class="fa-solid fa-users"></i><span>کاربران</span></a>
+<a class="pa-nav-link {% if request.resolver_match.url_name == 'admin_reviews' %}active{% endif %}" href="{% url 'first:admin_reviews' %}"><i class="fa-solid fa-star"></i><span>نظرات</span></a>
+<a class="pa-nav-link {% if request.resolver_match.url_name == 'warehouse' %}active{% endif %}" href="{% url 'first:warehouse' %}"><i class="fa-solid fa-warehouse"></i><span>انبار</span></a>
+<a class="pa-nav-link {% if request.resolver_match.url_name == 'warehouse_products' %}active{% endif %}" href="{% url 'first:warehouse_products' %}"><i class="fa-solid fa-boxes-stacked"></i><span>موجودی محصولات</span></a>
+<a class="pa-nav-link {% if request.resolver_match.url_name == 'analytics_dashboard' %}active{% endif %}" href="{% url 'first:analytics_dashboard' %}"><i class="fa-solid fa-chart-line"></i><span>آمار و گزارش</span></a>
+<a class="pa-nav-link {% if request.resolver_match.url_name == 'site_settings' %}active{% endif %}" href="{% url 'first:site_settings' %}"><i class="fa-solid fa-sliders"></i><span>تنظیمات سایت</span></a>
+<a class="pa-nav-link {% if request.resolver_match.url_name == 'number_format_settings' %}active{% endif %}" href="{% url 'first:number_format_settings' %}"><i class="fa-solid fa-hashtag"></i><span>فرمت اعداد</span></a>
+<a class="pa-nav-link {% if request.resolver_match.url_name == 'customizer' %}active{% endif %}" href="{% url 'first:customizer' %}"><i class="fa-solid fa-wand-magic-sparkles"></i><span>طراحی بصری</span></a></nav>
+    <div class="pa-sidebar-foot">
+      <a href="{% url 'first:home' %}"><i class="fa-solid fa-arrow-up-right-from-square"></i><span>مشاهده فروشگاه</span></a>
+      <div class="pa-owner-mini">
+        <span class="pa-owner-avatar">{{ user.username|first|upper }}</span>
+        <span><strong>{{ user.username }}</strong><small>{% if user.is_superuser %}مالک فروشگاه{% else %}مدیر{% endif %}</small></span>
+      </div>
+    </div>
+  </aside>
+
+  <div class="pa-main">
+    <header class="pa-topbar">
+      <div class="pa-topbar-start">
+        <button class="pa-menu-button" type="button" data-pa-open><i class="fa-solid fa-bars"></i></button>
+        <div><span>MAISON DE PARFUM</span><strong>{% block admin_heading %}مدیریت فروشگاه{% endblock %}</strong></div>
+      </div>
+      <div class="pa-topbar-actions">
+<details class="pa-account" data-pa-account>
+  <summary class="pa-account-trigger" aria-label="منوی حساب مالک">
+    <span class="pa-account-avatar">{{ user.username|first|upper }}</span>
+    <span class="pa-account-copy">
+      <strong>{{ user.username }}</strong>
+      <small>{% if user.is_superuser %}مالک فروشگاه{% else %}مدیر فروشگاه{% endif %}</small>
+    </span>
+    <i class="fa-solid fa-chevron-down pa-account-chevron"></i>
+  </summary>
+
+  <div class="pa-account-dropdown">
+    <div class="pa-account-head">
+      <span class="pa-account-avatar large">{{ user.username|first|upper }}</span>
+      <span>
+        <strong>{{ user.username }}</strong>
+        <small>{{ user.email|default:'حساب مدیریت' }}</small>
+      </span>
+    </div>
+
+    <div class="pa-account-links">
+      <a href="{% url 'first:owner_panel' %}">
+        <i class="fa-solid fa-crown"></i>
+        <span>پنل مالک</span>
+      </a>
+
+      <a href="{% url 'first:profile' %}">
+        <i class="fa-regular fa-user"></i>
+        <span>حساب کاربری</span>
+      </a>
+
+      <a href="{% url 'first:customizer' %}">
+        <i class="fa-solid fa-wand-magic-sparkles"></i>
+        <span>طراحی بصری سایت</span>
+      </a>
+
+      <a href="{% url 'first:home' %}" target="_blank" rel="noopener">
+        <i class="fa-solid fa-arrow-up-right-from-square"></i>
+        <span>مشاهده فروشگاه</span>
+      </a>
+    </div>
+
+    <form class="pa-account-logout" method="post" action="{% url 'first:logout' %}">
+      {% csrf_token %}
+      <button type="submit">
+        <i class="fa-solid fa-arrow-right-from-bracket"></i>
+        <span>خروج از حساب</span>
+      </button>
+    </form>
+  </div>
+</details>
+        <a class="pa-studio-link" href="{% url 'first:customizer' %}"><i class="fa-solid fa-wand-magic-sparkles"></i><span>طراحی بصری</span></a>
+        <button class="pa-icon-button" type="button" data-pa-theme title="حالت روز/شب"><i class="fa-solid fa-circle-half-stroke"></i></button>
+        <a class="pa-icon-button" href="{% url 'first:home' %}" title="فروشگاه"><i class="fa-solid fa-store"></i></a>
+      </div>
+    </header>
+
+    {% if messages %}
+    <div class="pa-messages">
+      {% for message in messages %}
+      <div class="pa-message {{ message.tags|default:'info' }}"><i class="fa-solid fa-circle-info"></i><span>{{ message }}</span><button type="button" data-pa-message-close><i class="fa-solid fa-xmark"></i></button></div>
+      {% endfor %}
+    </div>
+    {% endif %}
+
+    <main class="pa-content">{% block admin_content %}{% endblock %}</main>
+  </div>
+</section>
+<div class="pa-overlay" data-pa-overlay></div>
+<script src="{% static 'js/perfume-admin-v1.js' %}"></script>
+{% block extra_js %}{% endblock %}
+  <script src="{% static 'js/perfume-admin-v2.js' %}"></script>
+</body>
+</html>

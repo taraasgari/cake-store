@@ -1,120 +1,105 @@
-{% extends 'base.html' %}
-{% load static %}
-
-{% block title %}🛒 سبد خرید{% endblock %}
-
+{% extends 'perfume_base.html' %}
+{% load custom_filters %}
+{% block title %}سبد خرید | {{ settings.site_name|default:'فروشگاه عطر' }}{% endblock %}
 {% block content %}
-<div class="max-w-6xl mx-auto">
-    <h1 class="text-3xl font-bold gradient-text mb-8">🛒 سبد خرید</h1>
-    
+<section class="p8-page">
+  <div class="p8-wrap">
+
+    <header class="p8-page-head">
+      <div>
+        <span class="p8-kicker">YOUR SELECTION</span>
+        <h1>سبد خرید</h1>
+        <p>رایحه‌های انتخاب‌شده را مرور کنید و برای ثبت سفارش ادامه دهید.</p>
+      </div>
+      <div class="p8-head-mark"><i class="fa-solid fa-bag-shopping"></i></div>
+    </header>
+
     {% if items %}
-        <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
-            <!-- لیست آیتم‌ها -->
-            <div class="lg:col-span-2 space-y-4">
-                {% for item in items %}
-                <div class="bg-white/80 backdrop-blur-lg rounded-2xl p-4 shadow-lg flex flex-col sm:flex-row items-center gap-4 hover:shadow-xl transition-all">
-                    <!-- تصویر -->
-                    <div class="w-32 h-32 rounded-xl overflow-hidden flex-shrink-0">
-                        <img src="{{ item.product.main_image.url }}" alt="{{ item.product.name }}" 
-                             class="w-full h-full object-cover">
-                    </div>
-                    
-                    <!-- اطلاعات -->
-                    <div class="flex-1 w-full">
-                        <h3 class="font-bold text-lg">{{ item.product.name }}</h3>
-                        <p class="text-sm text-gray-500">{{ item.product.category.name }}</p>
-                        <div class="flex items-center gap-2 mt-1">
-                            <span class="text-xl font-bold text-pink-500">{{ item.final_price|floatformat:0 }}</span>
-                            {% if item.product.discount_price %}
-                            <span class="text-sm text-gray-400 line-through">{{ item.total_price|floatformat:0 }}</span>
-                            <span class="text-sm text-green-500">{{ item.product.discount_percent }}% تخفیف</span>
-                            {% endif %}
-                        </div>
-                    </div>
-                    
-                    <!-- تعداد و دکمه‌ها -->
-                    <div class="flex items-center gap-3">
-                        <form method="POST" action="{% url 'first:update_cart_item' item.id %}" class="flex items-center gap-2">
-                            {% csrf_token %}
-                            <button type="submit" name="quantity" value="{{ item.quantity|add:'-1' }}" 
-                                    class="w-8 h-8 rounded-full bg-gray-100 hover:bg-pink-500 hover:text-white transition-all">
-                                <i class="fas fa-minus"></i>
-                            </button>
-                            <span class="w-8 text-center font-bold">{{ item.quantity }}</span>
-                            <button type="submit" name="quantity" value="{{ item.quantity|add:'1' }}" 
-                                    class="w-8 h-8 rounded-full bg-gray-100 hover:bg-pink-500 hover:text-white transition-all">
-                                <i class="fas fa-plus"></i>
-                            </button>
-                        </form>
-                        
-                        <form method="POST" action="{% url 'first:remove_from_cart' item.id %}" class="inline-block">
-    {% csrf_token %}
-    <button type="submit" class="text-red-500 hover:text-red-700 transition-colors p-2 hover:bg-red-50 rounded-full"
-                           onclick="return confirm('آیا از حذف این محصول مطمئن هستید؟')">
-                            <i class="fas fa-trash"></i>
-                        </button>
-</form>
-                    </div>
-                </div>
-                {% endfor %}
-                
-                <form method="POST" action="{% url 'first:clear_cart' %}" class="inline-block">
-    {% csrf_token %}
-    <button type="submit" class="text-red-500 hover:text-red-700 text-sm font-bold"
-                   onclick="return confirm('آیا از پاک کردن کل سبد خرید مطمئن هستید؟')">
-                    <i class="fas fa-trash"></i> پاک کردن سبد خرید
-                </button>
-</form>
+    <div class="p8-cart-layout">
+
+      <div class="p8-cart-list">
+        {% for item in items %}
+        <article class="p8-cart-item">
+          <a class="p8-cart-image" href="{% url 'first:product_detail' item.product.slug %}">
+            {% if item.product.main_image %}
+            <img src="{{ item.product.main_image.url }}" alt="{{ item.item_name }}">
+            {% else %}
+            <i class="fa-solid fa-spray-can-sparkles"></i>
+            {% endif %}
+          </a>
+
+          <div class="p8-cart-copy">
+            <small>{{ item.product.brand.name|default:'PERFUME HOUSE' }}</small>
+            <h3>{{ item.item_name }}</h3>
+            {% if item.variant %}<span>{{ item.variant }}</span>{% endif %}
+            <strong>{{ item.final_price|price_format }} <em>تومان</em></strong>
+          </div>
+
+          <form class="p8-cart-qty" method="post" action="{% url 'first:update_cart_item' item.id %}">
+            {% csrf_token %}
+            <label>تعداد</label>
+            <div>
+              <input type="number" name="quantity" min="0" value="{{ item.quantity }}">
+              <button type="submit">به‌روزرسانی</button>
             </div>
-            
-            <!-- خلاصه سبد -->
-            <div class="lg:col-span-1">
-                <div class="bg-white/80 backdrop-blur-lg rounded-2xl p-6 shadow-lg sticky top-24">
-                    <h3 class="font-bold text-xl mb-4">خلاصه سبد خرید</h3>
-                    
-                    <div class="space-y-2 text-sm border-b border-gray-200 pb-4">
-                        <div class="flex justify-between">
-                            <span class="text-gray-600">جمع کل ({{ total_items }} مورد)</span>
-                            <span class="font-bold">{{ total_price|floatformat:0 }}</span>
-                        </div>
-                        <div class="flex justify-between text-green-500">
-                            <span>تخفیف</span>
-                            <span class="font-bold">-{{ total_discount|floatformat:0 }}</span>
-                        </div>
-                        <div class="flex justify-between text-gray-600">
-                            <span>هزینه ارسال</span>
-                            <span>رایگان</span>
-                        </div>
-                    </div>
-                    
-                    <div class="flex justify-between items-center mt-4 pb-4 border-b border-gray-200">
-                        <span class="text-lg font-bold">مبلغ قابل پرداخت</span>
-                        <span class="text-2xl font-bold gradient-text">{{ final_price|floatformat:0 }}</span>
-                    </div>
-                    
-                    <a href="{% url 'first:checkout' %}" 
-                       class="w-full mt-4 py-3 bg-gradient-to-r from-pink-500 to-purple-600 text-white rounded-xl font-bold text-center block hover:shadow-xl transition-all hover:scale-105">
-                        <i class="fas fa-credit-card ml-2"></i> ادامه فرآیند خرید
-                    </a>
-                    
-                    <a href="{% url 'first:product_list' %}" 
-                       class="w-full mt-2 py-2 border-2 border-pink-500 text-pink-500 rounded-xl font-bold text-center block hover:bg-pink-500 hover:text-white transition-all">
-                        <i class="fas fa-shopping-bag ml-2"></i> ادامه خرید
-                    </a>
-                </div>
-            </div>
+          </form>
+
+          <form method="post" action="{% url 'first:remove_from_cart' item.id %}">
+            {% csrf_token %}
+            <button class="p8-remove" type="submit" aria-label="حذف">
+              <i class="fa-regular fa-trash-can"></i>
+            </button>
+          </form>
+        </article>
+        {% endfor %}
+      </div>
+
+      <aside class="p8-summary">
+        <span class="p8-kicker">ORDER SUMMARY</span>
+        <h2>خلاصه سفارش</h2>
+
+        <div class="p8-summary-row">
+          <span>تعداد کالا</span>
+          <b>{{ total_items|default:cart.total_items|default:0 }}</b>
         </div>
+
+        <div class="p8-summary-row">
+          <span>جمع محصولات</span>
+          <b>{{ total_price|default:cart.total_price|price_format }} تومان</b>
+        </div>
+
+        <div class="p8-summary-row">
+          <span>تخفیف</span>
+          <b>{{ total_discount|default:cart.total_discount|price_format }} تومان</b>
+        </div>
+
+        <div class="p8-summary-total">
+          <span>مبلغ نهایی</span>
+          <strong>{{ final_price|default:cart.final_price|price_format }} <em>تومان</em></strong>
+        </div>
+
+        <a class="p8-primary full" href="{% url 'first:checkout' %}">
+          ادامه و ثبت سفارش
+          <i class="fa-solid fa-arrow-left"></i>
+        </a>
+
+        <a class="p8-secondary full" href="{% url 'first:product_list' %}">ادامه خرید</a>
+      </aside>
+
+    </div>
     {% else %}
-        <!-- سبد خرید خالی -->
-        <div class="text-center py-16">
-            <i class="fas fa-shopping-cart text-8xl text-gray-300 mb-6"></i>
-            <h3 class="text-2xl font-bold text-gray-600 mb-2">سبد خرید شما خالی است</h3>
-            <p class="text-gray-400 mb-6">برای خرید محصولات به فروشگاه بروید</p>
-            <a href="{% url 'first:product_list' %}" 
-               class="inline-block px-8 py-3 bg-gradient-to-r from-pink-500 to-purple-600 text-white rounded-xl font-bold hover:shadow-xl transition-all">
-                <i class="fas fa-shopping-bag ml-2"></i> مشاهده محصولات
-            </a>
-        </div>
+    <div class="p8-empty-card">
+      <div class="p8-empty-icon"><i class="fa-solid fa-bag-shopping"></i></div>
+      <span class="p8-kicker">YOUR BAG IS EMPTY</span>
+      <h2>سبد خرید شما خالی است.</h2>
+      <p>از کالکشن عطرها، رایحه موردنظرتان را انتخاب کنید.</p>
+      <a class="p8-primary" href="{% url 'first:product_list' %}">
+        مشاهده محصولات
+        <i class="fa-solid fa-arrow-left"></i>
+      </a>
+    </div>
     {% endif %}
-</div>
+
+  </div>
+</section>
 {% endblock %}

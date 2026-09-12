@@ -1,0 +1,95 @@
+{% extends 'perfume_base.html' %}
+{% block title %}ورود | {{ settings.site_name|default:'فروشگاه عطر' }}{% endblock %}
+{% block content %}
+<section class="auth-lux-page">
+  <div class="auth-lux-shell">
+
+    <div class="auth-lux-form-side">
+      <div class="auth-lux-card">
+        <div class="auth-lux-heading">
+          <span>MEMBER ACCESS</span>
+          <h1>خوش آمدید</h1>
+          <p>برای ادامه خرید، مشاهده سفارش‌ها و علاقه‌مندی‌ها وارد حساب خود شوید.</p>
+        </div>
+
+        {% if form.non_field_errors %}
+        <div class="auth-lux-errors">
+          {% for error in form.non_field_errors %}<span>{{ error }}</span>{% endfor %}
+        </div>
+        {% endif %}
+
+        <form method="post" class="auth-lux-form" novalidate>
+          {% csrf_token %}
+
+          <div class="auth-field">
+            <label for="id_phone">شماره تلفن</label>
+            <div class="auth-input">
+              <i class="fa-solid fa-mobile-screen-button"></i>
+              <input type="text" name="phone" id="id_phone" inputmode="tel"
+                     autocomplete="tel" placeholder="09123456789"
+                     value="{{ form.phone.value|default:'' }}" required>
+            </div>
+            {% if form.phone.errors %}<small class="auth-field-error">{{ form.phone.errors.0 }}</small>{% endif %}
+          </div>
+
+          <div class="auth-field">
+            <label for="id_password">رمز عبور</label>
+            <div class="auth-input">
+              <i class="fa-solid fa-lock"></i>
+              <input type="password" name="password" id="id_password"
+                     autocomplete="current-password" placeholder="رمز عبور" required>
+              <button type="button" data-auth-password="id_password" aria-label="نمایش رمز">
+                <i class="fa-regular fa-eye"></i>
+              </button>
+            </div>
+            {% if form.password.errors %}<small class="auth-field-error">{{ form.password.errors.0 }}</small>{% endif %}
+          </div>
+
+          <div class="auth-lux-row">
+            <label class="auth-check">
+              <input type="checkbox" name="remember">
+              <span></span>
+              مرا به خاطر بسپار
+            </label>
+            <a href="{% url 'first:forgot_password' %}">رمز را فراموش کرده‌اید؟</a>
+          </div>
+
+          <button class="auth-submit" type="submit">
+            <span>ورود به حساب</span>
+            <i class="fa-solid fa-arrow-left"></i>
+          </button>
+        </form>
+
+        <div class="auth-switch">
+          <span>حساب ندارید؟</span>
+          <a href="{% url 'first:signup' %}">ثبت‌نام کنید</a>
+        </div>
+      </div>
+    </div>
+
+    <div class="auth-lux-visual-side">
+      <div class="auth-visual-glow"></div>
+      <div class="auth-visual-ring ring-one"></div>
+      <div class="auth-visual-ring ring-two"></div>
+
+      <div class="auth-visual-copy">
+        <span>VÉLORA PRIVATE HOUSE</span>
+        <h2>بازگشت به<br>خانه‌ی رایحه‌ها</h2>
+        <p>تجربه‌ای شخصی‌تر برای انتخاب، ذخیره و پیگیری عطرهای شما.</p>
+      </div>
+
+      <div class="auth-bottle auth-bottle-gold">
+        <div class="auth-bottle-cap"></div>
+        <div class="auth-bottle-label"><strong>VÉLORA</strong><small>PRIVATE EDIT</small></div>
+      </div>
+
+      <div class="auth-visual-notes">
+        <div><span>01</span><b>ORDERS</b><small>سفارش‌های شما</small></div>
+        <div><span>02</span><b>WISHLIST</b><small>علاقه‌مندی‌ها</small></div>
+        <div><span>03</span><b>MEMBER</b><small>تجربه شخصی‌تر</small></div>
+      </div>
+    </div>
+
+  </div>
+</section>
+{% endblock %}

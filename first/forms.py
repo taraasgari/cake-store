@@ -140,29 +140,43 @@ class LoginForm(forms.Form):
     )
 
     def clean_phone(self):
-        phone = (self.cleaned_data.get('phone') or '').strip()
+        # Normal users keep phone login.
+        # Superuser/owner can submit username or email; the view restricts
+        # that fallback to active superusers only.
+        identifier = (self.cleaned_data.get('phone') or '').strip()
+
+        if not identifier:
+            raise ValidationError(
+                'شماره تلفن یا نام کاربری مالک را وارد کنید'
+            )
 
         translation = str.maketrans(
             '۰۱۲۳۴۵۶۷۸۹٠١٢٣٤٥٦٧٨٩',
             '01234567890123456789',
         )
-        phone = phone.translate(translation)
-        phone = re.sub(r'[\s\-()]', '', phone)
 
-        if phone.startswith('+98'):
-            phone = '0' + phone[3:]
-        elif phone.startswith('0098'):
-            phone = '0' + phone[4:]
-        elif phone.startswith('98') and len(phone) == 12:
-            phone = '0' + phone[2:]
+        normalized = identifier.translate(translation)
+        normalized = re.sub(r'[\s\-()]', '', normalized)
 
-        if not re.fullmatch(r'09\d{9}', phone):
-            raise ValidationError(
-                'شماره تلفن باید با ۰۹ شروع شود و ۱۱ رقم باشد'
-            )
+        if normalized.startswith('+98'):
+            normalized = '0' + normalized[3:]
+        elif normalized.startswith('0098'):
+            normalized = '0' + normalized[4:]
+        elif normalized.startswith('98') and len(normalized) == 12:
+            normalized = '0' + normalized[2:]
 
-        return phone
+        if re.fullmatch(r'09\d{9}', normalized):
+            return normalized
 
+        if (
+            len(identifier) <= 254
+            and re.fullmatch(r'[A-Za-z0-9_.@+\-]+', identifier)
+        ):
+            return identifier
+
+        raise ValidationError(
+            'شماره تلفن معتبر یا نام کاربری/ایمیل مالک را وارد کنید'
+        )
 
 # ============================================
 # فرم ویرایش پروفایل

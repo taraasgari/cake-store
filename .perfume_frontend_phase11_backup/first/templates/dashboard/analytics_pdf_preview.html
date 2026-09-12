@@ -1,0 +1,703 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>پیش‌نمایش گزارش PDF</title>
+
+    <link
+        href="https://cdn.jsdelivr.net/gh/rastikerdar/vazir-font@v30.1.0/dist/font-face.css"
+        rel="stylesheet"
+    >
+
+    <link
+        rel="stylesheet"
+        href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"
+    >
+
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        html,
+        body {
+            width: 100%;
+            height: 100%;
+            margin: 0;
+        }
+
+        body {
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            background:
+                radial-gradient(circle at top right, #70113d 0, transparent 35%),
+                linear-gradient(135deg, #211c23, #30252c);
+            color: #ffffff;
+            font-family: Vazir, Tahoma, sans-serif;
+        }
+
+        button,
+        a {
+            font-family: inherit;
+        }
+
+        .pdf-toolbar {
+            min-height: 78px;
+            flex: 0 0 auto;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 18px;
+            padding: 13px 22px;
+            background: linear-gradient(135deg, #70113d, #b41659);
+            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.35);
+            position: relative;
+            z-index: 10;
+        }
+
+        .pdf-title {
+            min-width: 0;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .pdf-title-icon {
+            width: 46px;
+            height: 46px;
+            flex: 0 0 46px;
+            display: grid;
+            place-items: center;
+            border-radius: 14px;
+            background: rgba(255, 255, 255, 0.15);
+            font-size: 21px;
+        }
+
+        .pdf-title h1 {
+            margin: 0;
+            font-size: 17px;
+            font-weight: 900;
+        }
+
+        .pdf-title p {
+            margin: 4px 0 0;
+            color: #ffd8e8;
+            font-size: 11px;
+        }
+
+        .pdf-actions {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            justify-content: flex-end;
+            gap: 8px;
+        }
+
+        .pdf-btn {
+            min-width: 110px;
+            height: 43px;
+            margin: 0;
+            padding: 0 14px;
+            border: 0;
+            border-radius: 11px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 7px;
+            cursor: pointer;
+            text-decoration: none;
+            white-space: nowrap;
+            font-size: 11px;
+            font-weight: 900;
+            line-height: 1;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+
+        .pdf-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 9px 22px rgba(0, 0, 0, 0.25);
+        }
+
+        .pdf-btn:disabled {
+            opacity: 0.6;
+            cursor: wait;
+            transform: none;
+        }
+
+        .pdf-btn-primary {
+            color: #a41450;
+            background: #ffffff;
+        }
+
+        .pdf-btn-green {
+            color: #ffffff;
+            background: #0d9b66;
+        }
+
+        .pdf-btn-blue {
+            color: #ffffff;
+            background: #3275d8;
+        }
+
+        .pdf-btn-dark {
+            color: #ffffff;
+            background: #442d38;
+            border: 1px solid rgba(255, 255, 255, 0.18);
+        }
+
+        .pdf-main {
+            position: relative;
+            flex: 1;
+            min-height: 0;
+            padding: 12px;
+        }
+
+        .pdf-viewer {
+            width: 100%;
+            height: 100%;
+            min-height: 0;
+            overflow: hidden;
+            border-radius: 15px;
+            background: #ffffff;
+            box-shadow: 0 16px 50px rgba(0, 0, 0, 0.45);
+            position: relative;
+        }
+
+        .pdf-frame {
+            display: none;
+            width: 100%;
+            height: 100%;
+            border: 0;
+            background: #ffffff;
+        }
+
+        .pdf-frame.is-visible {
+            display: block;
+        }
+
+        .pdf-state {
+            width: 100%;
+            height: 100%;
+            min-height: 320px;
+            padding: 30px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #494149;
+            background:
+                radial-gradient(circle at top, #fff0f7, transparent 52%),
+                #ffffff;
+            text-align: center;
+        }
+
+        .pdf-state-box {
+            max-width: 500px;
+        }
+
+        .pdf-state-icon {
+            width: 82px;
+            height: 82px;
+            margin: 0 auto 18px;
+            display: grid;
+            place-items: center;
+            border-radius: 24px;
+            color: #ffffff;
+            background: linear-gradient(135deg, #ec407a, #ad1457);
+            box-shadow: 0 15px 35px rgba(173, 20, 87, 0.25);
+            font-size: 34px;
+        }
+
+        .pdf-state h2 {
+            margin: 0 0 10px;
+            color: #302b31;
+            font-size: 19px;
+        }
+
+        .pdf-state p {
+            margin: 0;
+            color: #817981;
+            font-size: 12px;
+            line-height: 2;
+        }
+
+        .pdf-loading-spinner {
+            width: 30px;
+            height: 30px;
+            margin: 18px auto 0;
+            border: 3px solid #f6cadc;
+            border-top-color: #ad1457;
+            border-radius: 50%;
+            animation: pdf-spin 0.8s linear infinite;
+        }
+
+        .pdf-error {
+            display: none;
+            color: #aa2545;
+        }
+
+        .pdf-error.is-visible {
+            display: block;
+        }
+
+        .pdf-error-message {
+            margin-top: 12px;
+            padding: 10px 14px;
+            border-radius: 10px;
+            color: #9b2340;
+            background: #fff0f3;
+            font-size: 11px;
+            line-height: 1.8;
+        }
+
+        @keyframes pdf-spin {
+            to {
+                transform: rotate(360deg);
+            }
+        }
+
+        @media (max-width: 1050px) {
+            body {
+                overflow: auto;
+            }
+
+            .pdf-toolbar {
+                align-items: flex-start;
+                flex-direction: column;
+            }
+
+            .pdf-actions {
+                width: 100%;
+                display: grid;
+                grid-template-columns: repeat(5, minmax(0, 1fr));
+            }
+
+            .pdf-btn {
+                width: 100%;
+                min-width: 0;
+            }
+
+            .pdf-main {
+                min-height: 720px;
+            }
+        }
+
+        @media (max-width: 760px) {
+            .pdf-toolbar {
+                padding: 11px;
+            }
+
+            .pdf-actions {
+                grid-template-columns: repeat(2, minmax(0, 1fr));
+            }
+
+            .pdf-actions .pdf-btn:first-child {
+                grid-column: 1 / -1;
+            }
+
+            .pdf-title h1 {
+                font-size: 14px;
+            }
+
+            .pdf-main {
+                min-height: 650px;
+                padding: 6px;
+            }
+        }
+
+        @media (max-width: 430px) {
+            .pdf-actions {
+                grid-template-columns: 1fr;
+            }
+
+            .pdf-actions .pdf-btn:first-child {
+                grid-column: auto;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+<header class="pdf-toolbar">
+    <div class="pdf-title">
+        <span class="pdf-title-icon">
+            <i class="fas fa-file-pdf"></i>
+        </span>
+
+        <div>
+            <h1>پیش‌نمایش گزارش کامل مدیریتی</h1>
+            <p>دورهٔ گزارش: {{ period_label }}</p>
+        </div>
+    </div>
+
+    <div class="pdf-actions">
+<button
+    type="button"
+    class="pdf-btn pdf-btn-dark"
+    onclick="returnToPreviousPage()"
+>
+    <i class="fas fa-arrow-right"></i>
+    بازگشت
+</button>
+
+        <button
+            type="button"
+            class="pdf-btn pdf-btn-dark"
+            id="copyPdfLink"
+        >
+            <i class="fas fa-link"></i>
+            کپی لینک
+        </button>
+
+        <button
+            type="button"
+            class="pdf-btn pdf-btn-blue"
+            id="openPdf"
+        >
+            <i class="fas fa-up-right-from-square"></i>
+            بازکردن
+        </button>
+
+        <button
+            type="button"
+            class="pdf-btn pdf-btn-primary"
+            id="reloadPdf"
+        >
+            <i class="fas fa-rotate"></i>
+            بارگذاری مجدد
+        </button>
+
+        <button
+            type="button"
+            class="pdf-btn pdf-btn-green"
+            id="downloadPdf"
+        >
+            <i class="fas fa-download"></i>
+            دانلود PDF
+        </button>
+    </div>
+</header>
+
+<main class="pdf-main">
+    <section class="pdf-viewer">
+
+        <div class="pdf-state" id="pdfState">
+            <div class="pdf-state-box">
+                <div class="pdf-state-icon">
+                    <i class="fas fa-file-pdf"></i>
+                </div>
+
+                <h2 id="stateTitle">در حال ساخت گزارش...</h2>
+
+                <p id="stateText">
+                    لطفاً چند لحظه صبر کنید. گزارش آماری در حال آماده‌شدن است.
+                </p>
+
+                <div
+                    class="pdf-loading-spinner"
+                    id="loadingSpinner"
+                ></div>
+
+                <div
+                    class="pdf-error"
+                    id="pdfError"
+                >
+                    <div
+                        class="pdf-error-message"
+                        id="pdfErrorMessage"
+                    ></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- عمداً src ندارد تا IDM فایل را مستقیم دریافت نکند -->
+        <iframe
+            class="pdf-frame"
+            id="pdfFrame"
+            title="گزارش PDF"
+        ></iframe>
+
+    </section>
+</main>
+
+<script>
+    (() => {
+        const pdfUrl = "{{ pdf_url|escapejs }}";
+
+        const reportFilename =
+            "analytics_report_{{ period_label|slugify|default:'report' }}.pdf";
+
+        const pdfFrame = document.getElementById("pdfFrame");
+        const pdfState = document.getElementById("pdfState");
+        const stateTitle = document.getElementById("stateTitle");
+        const stateText = document.getElementById("stateText");
+        const loadingSpinner = document.getElementById("loadingSpinner");
+        const pdfError = document.getElementById("pdfError");
+        const pdfErrorMessage =
+            document.getElementById("pdfErrorMessage");
+
+        const reloadButton = document.getElementById("reloadPdf");
+        const downloadButton = document.getElementById("downloadPdf");
+        const openButton = document.getElementById("openPdf");
+        const copyButton = document.getElementById("copyPdfLink");
+const returnUrl = "{{ return_url|escapejs }}";
+
+function returnToPreviousPage() {
+    if (window.opener && !window.opener.closed) {
+        try {
+            window.opener.location.href = returnUrl;
+            window.opener.focus();
+            window.close();
+            return;
+        } catch (error) {
+            console.error(error);
+        }
+    }
+
+    window.location.href = returnUrl;
+}
+        let pdfBlob = null;
+        let viewerBlobUrl = null;
+        let loadingPromise = null;
+
+        function setButtonsDisabled(disabled) {
+            reloadButton.disabled = disabled;
+            downloadButton.disabled = disabled;
+            openButton.disabled = disabled;
+        }
+
+        function showLoading() {
+            pdfFrame.classList.remove("is-visible");
+            pdfState.style.display = "flex";
+
+            stateTitle.textContent = "در حال ساخت گزارش...";
+            stateText.textContent =
+                "لطفاً چند لحظه صبر کنید. گزارش آماری در حال آماده‌شدن است.";
+
+            loadingSpinner.style.display = "block";
+            pdfError.classList.remove("is-visible");
+
+            setButtonsDisabled(true);
+        }
+
+        function showError(message) {
+            pdfFrame.classList.remove("is-visible");
+            pdfState.style.display = "flex";
+
+            stateTitle.textContent = "ساخت گزارش انجام نشد";
+            stateText.textContent =
+                "سرور نتوانست فایل PDF معتبر ایجاد کند.";
+
+            loadingSpinner.style.display = "none";
+            pdfError.classList.add("is-visible");
+            pdfErrorMessage.textContent = message;
+
+            setButtonsDisabled(false);
+        }
+
+        function showPdf() {
+            pdfState.style.display = "none";
+            pdfFrame.classList.add("is-visible");
+            setButtonsDisabled(false);
+        }
+
+        async function fetchPdf(forceReload = false) {
+            if (pdfBlob && !forceReload) {
+                return pdfBlob;
+            }
+
+            if (loadingPromise && !forceReload) {
+                return loadingPromise;
+            }
+
+            showLoading();
+
+            loadingPromise = (async () => {
+                try {
+                    const response = await fetch(pdfUrl, {
+                        method: "GET",
+                        credentials: "same-origin",
+                        cache: "no-store",
+                        headers: {
+                            "X-Requested-With": "XMLHttpRequest"
+                        }
+                    });
+
+                    if (!response.ok) {
+                        throw new Error(
+                            `خطای سرور با کد ${response.status}`
+                        );
+                    }
+
+                    const contentType = (
+                        response.headers.get("content-type") || ""
+                    ).toLowerCase();
+
+                    if (!contentType.includes("application/pdf")) {
+                        const responseText = await response.text();
+
+                        console.error(
+                            "Invalid PDF response:",
+                            responseText
+                        );
+
+                        throw new Error(
+                            "پاسخ دریافت‌شده PDF نیست. ترمینال جنگو را برای خطای اصلی بررسی کن."
+                        );
+                    }
+
+                    const fileData = await response.arrayBuffer();
+
+                    if (!fileData.byteLength) {
+                        throw new Error(
+                            "فایل ساخته‌شده خالی است."
+                        );
+                    }
+
+                    pdfBlob = new Blob(
+                        [fileData],
+                        {type: "application/pdf"}
+                    );
+
+                    if (viewerBlobUrl) {
+                        URL.revokeObjectURL(viewerBlobUrl);
+                    }
+
+                    viewerBlobUrl = URL.createObjectURL(pdfBlob);
+
+                    pdfFrame.src =
+                        viewerBlobUrl +
+                        "#toolbar=1&navpanes=1&view=FitH";
+
+                    showPdf();
+
+                    return pdfBlob;
+
+                } catch (error) {
+                    console.error(error);
+
+                    showError(
+                        error.message ||
+                        "هنگام دریافت گزارش خطای نامشخصی رخ داد."
+                    );
+
+                    throw error;
+
+                } finally {
+                    loadingPromise = null;
+                }
+            })();
+
+            return loadingPromise;
+        }
+
+        reloadButton.addEventListener("click", async () => {
+            pdfBlob = null;
+
+            try {
+                await fetchPdf(true);
+            } catch (error) {
+                // خطا داخل صفحه نمایش داده می‌شود
+            }
+        });
+
+        downloadButton.addEventListener("click", async () => {
+            try {
+                const blob = await fetchPdf();
+
+                const downloadUrl = URL.createObjectURL(blob);
+                const link = document.createElement("a");
+
+                link.href = downloadUrl;
+                link.download = reportFilename;
+
+                document.body.appendChild(link);
+                link.click();
+                link.remove();
+
+                setTimeout(() => {
+                    URL.revokeObjectURL(downloadUrl);
+                }, 3000);
+
+            } catch (error) {
+                // خطا داخل صفحه نمایش داده می‌شود
+            }
+        });
+
+        openButton.addEventListener("click", async () => {
+            let newWindow = null;
+
+            try {
+                /*
+                 * پنجره را قبل از await باز می‌کنیم تا مرورگر
+                 * آن را به‌عنوان Popup مسدود نکند.
+                 */
+                newWindow = window.open("", "_blank");
+
+                const blob = await fetchPdf();
+                const openUrl = URL.createObjectURL(blob);
+
+                if (newWindow) {
+                    newWindow.location.href = openUrl;
+                } else {
+                    alert(
+                        "اجازه بازشدن پنجره جدید را در مرورگر فعال کن."
+                    );
+                }
+
+                setTimeout(() => {
+                    URL.revokeObjectURL(openUrl);
+                }, 60000);
+
+            } catch (error) {
+                if (newWindow) {
+                    newWindow.close();
+                }
+            }
+        });
+
+        copyButton.addEventListener("click", async function () {
+            const absoluteUrl =
+                new URL(pdfUrl, window.location.origin).href;
+
+            try {
+                await navigator.clipboard.writeText(absoluteUrl);
+
+                const originalContent = this.innerHTML;
+
+                this.innerHTML =
+                    '<i class="fas fa-check"></i> کپی شد';
+
+                setTimeout(() => {
+                    this.innerHTML = originalContent;
+                }, 1700);
+
+            } catch (error) {
+                window.prompt(
+                    "لینک گزارش را کپی کن:",
+                    absoluteUrl
+                );
+            }
+        });
+
+        window.addEventListener("beforeunload", () => {
+            if (viewerBlobUrl) {
+                URL.revokeObjectURL(viewerBlobUrl);
+            }
+        });
+
+        /*
+         * گزارش به‌صورت fetch دریافت می‌شود؛
+         * در نتیجه IDM نباید آن را مستقیم بگیرد.
+         */
+        setTimeout(() => {
+            fetchPdf().catch(() => {});
+        }, 250);
+    })();
+</script>
+
+</body>
+</html>

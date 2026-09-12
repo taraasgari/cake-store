@@ -1,15 +1,61 @@
-{% extends 'base.html' %}
-{% block title %}تیکت جدید{% endblock %}
+{% extends 'perfume_base.html' %}
+{% block title %}تیکت جدید | {{ settings.site_name|default:'فروشگاه عطر' }}{% endblock %}
 {% block content %}
-<div class="max-w-2xl mx-auto px-4 py-10">
-  <div class="bg-white rounded-3xl shadow p-7">
-    <h1 class="text-2xl font-bold mb-6">تیکت پشتیبانی جدید</h1>
-    <form method="post" class="space-y-4">
-      {% csrf_token %}
-      {{ form.as_p }}
-      {{ message_form.as_p }}
-      <button class="w-full bg-pink-600 text-white py-3 rounded-xl font-bold">ارسال تیکت</button>
-    </form>
+<section class="p8-page">
+  <div class="p8-wrap">
+
+    <header class="p8-page-head">
+      <div>
+        <span class="p8-kicker">NEW REQUEST</span>
+        <h1>تیکت پشتیبانی جدید</h1>
+        <p>موضوع و جزئیات درخواست را بنویسید تا پشتیبانی آن را بررسی کند.</p>
+      </div>
+      <div class="p8-head-mark"><i class="fa-regular fa-message"></i></div>
+    </header>
+
+    <div class="p8-form-layout">
+
+      <aside class="p8-form-aside">
+        <span class="p8-kicker">BEFORE YOU SEND</span>
+        <h2>برای پاسخ دقیق‌تر</h2>
+
+        <div class="p8-form-tip">
+          <b>01</b>
+          <span><strong>موضوع واضح</strong><small>خلاصه درخواست را کوتاه و مشخص بنویسید.</small></span>
+        </div>
+
+        <div class="p8-form-tip">
+          <b>02</b>
+          <span><strong>سفارش مرتبط</strong><small>اگر درخواست درباره سفارش است، سفارش را انتخاب کنید.</small></span>
+        </div>
+
+        <div class="p8-form-tip">
+          <b>03</b>
+          <span><strong>توضیح کامل</strong><small>جزئیات کافی باعث پاسخ سریع‌تر می‌شود.</small></span>
+        </div>
+      </aside>
+
+      <div class="p8-form-card">
+        <div class="p8-section-head">
+          <div>
+            <span class="p8-kicker">SUPPORT FORM</span>
+            <h2>اطلاعات درخواست</h2>
+          </div>
+        </div>
+
+        <form method="post" class="p8-form">
+          {% csrf_token %}
+          {{ form.as_p }}
+          {{ message_form.as_p }}
+
+          <button class="p8-primary full" type="submit">
+            ارسال تیکت
+            <i class="fa-solid fa-arrow-left"></i>
+          </button>
+        </form>
+      </div>
+
+    </div>
   </div>
-</div>
+</section>
 {% endblock %}

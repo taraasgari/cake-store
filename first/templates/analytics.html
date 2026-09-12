@@ -1,4 +1,4 @@
-{% extends 'base.html' %}
+{% extends 'perfume_base.html' %}
 {% load static %}
 
 {% block title %}📊 آمار و گزارش‌های پیشرفته{% endblock %}
@@ -27,9 +27,9 @@
         -webkit-text-fill-color: transparent;
         background-clip: text;
     }
-    .trend-up { color: #22c55e; }
-    .trend-down { color: #ef4444; }
-    .trend-stable { color: #f59e0b; }
+    .trend-up { color: #6f775b; }
+    .trend-down { color: #9a5c4f; }
+    .trend-stable { color: #c18c47; }
     
     .alert-card {
         border-right: 4px solid;
@@ -40,9 +40,9 @@
     .alert-card:hover {
         transform: translateX(-4px);
     }
-    .alert-card.warning { border-color: #f59e0b; background: #fffbeb; }
-    .alert-card.danger { border-color: #ef4444; background: #fef2f2; }
-    .alert-card.info { border-color: #3b82f6; background: #eff6ff; }
+    .alert-card.warning { border-color: #c18c47; background: #fffbeb; }
+    .alert-card.danger { border-color: #9a5c4f; background: #fef2f2; }
+    .alert-card.info { border-color: #7b6a54; background: #eff6ff; }
     
     .product-rank {
         width: 28px;
@@ -55,7 +55,7 @@
         font-size: 0.8rem;
         color: white;
     }
-    .rank-1 { background: linear-gradient(135deg, #fbbf24, #f59e0b); }
+    .rank-1 { background: linear-gradient(135deg, #fbbf24, #c18c47); }
     .rank-2 { background: linear-gradient(135deg, #9ca3af, #6b7280); }
     .rank-3 { background: linear-gradient(135deg, #fcd34d, #b45309); }
     .rank-other { background: #e5e7eb; color: #6b7280; }
@@ -102,7 +102,7 @@
     }
     
     .forecast-badge {
-        background: linear-gradient(135deg, #fbbf24, #f59e0b);
+        background: linear-gradient(135deg, #fbbf24, #c18c47);
         color: #1f2937;
         padding: 4px 12px;
         border-radius: 20px;
@@ -135,7 +135,7 @@
         <form method="GET" class="flex flex-wrap gap-4 items-end">
             <div>
                 <label class="block text-xs font-bold text-gray-600 mb-1">دوره</label>
-                <select name="period" class="px-4 py-2 border-2 border-gray-200 rounded-xl focus:border-pink-500 outline-none bg-white/50">
+                <select name="period" class="px-4 py-2 border-2 border-gray-200 rounded-xl focus:border-amber-700 outline-none bg-white/50">
                     <option value="day" {% if selected_period == 'day' %}selected{% endif %}>روز</option>
                     <option value="month" {% if selected_period == 'month' %}selected{% endif %}>ماه</option>
                     <option value="year" {% if selected_period == 'year' %}selected{% endif %}>سال</option>
@@ -143,7 +143,7 @@
             </div>
             <div>
                 <label class="block text-xs font-bold text-gray-600 mb-1">سال</label>
-                <select name="year" class="px-4 py-2 border-2 border-gray-200 rounded-xl focus:border-pink-500 outline-none bg-white/50">
+                <select name="year" class="px-4 py-2 border-2 border-gray-200 rounded-xl focus:border-amber-700 outline-none bg-white/50">
                     {% for y in years %}
                     <option value="{{ y }}" {% if y == selected_year %}selected{% endif %}>{{ y }}</option>
                     {% endfor %}
@@ -151,13 +151,13 @@
             </div>
             <div>
                 <label class="block text-xs font-bold text-gray-600 mb-1">ماه</label>
-                <select name="month" class="px-4 py-2 border-2 border-gray-200 rounded-xl focus:border-pink-500 outline-none bg-white/50">
+                <select name="month" class="px-4 py-2 border-2 border-gray-200 rounded-xl focus:border-amber-700 outline-none bg-white/50">
                     {% for m in months %}
                     <option value="{{ m.value }}" {% if m.value == selected_month %}selected{% endif %}>{{ m.name }}</option>
                     {% endfor %}
                 </select>
             </div>
-            <button type="submit" class="px-6 py-2 bg-pink-500 text-white rounded-xl hover:bg-pink-600 transition-all">
+            <button type="submit" class="px-6 py-2 bg-stone-500 text-white rounded-xl hover:bg-amber-800 transition-all">
                 <i class="fas fa-filter ml-2"></i> اعمال
             </button>
             <a href="{% url 'first:analytics_dashboard' %}" class="px-6 py-2 border-2 border-gray-200 rounded-xl hover:bg-gray-50 transition-all">
@@ -187,7 +187,7 @@
                         <span class="text-gray-400">نسبت به ماه قبل</span>
                     </div>
                 </div>
-                <div class="w-10 h-10 rounded-full bg-pink-100 text-pink-500 flex items-center justify-center">
+                <div class="w-10 h-10 rounded-full bg-amber-50 text-amber-700 flex items-center justify-center">
                     <i class="fas fa-toman-sign"></i>
                 </div>
             </div>
@@ -287,7 +287,7 @@
                         {% for data in monthly_data %}
                         <tr class="border-b border-gray-100">
                             <td class="py-2 px-3 font-medium">{{ data.month }}</td>
-                            <td class="py-2 px-3 text-pink-500">{{ data.revenue|floatformat:0 }}</td>
+                            <td class="py-2 px-3 text-amber-700">{{ data.revenue|floatformat:0 }}</td>
                             <td class="py-2 px-3">{{ data.orders }}</td>
                             <td class="py-2 px-3 text-blue-500">{{ data.avg|floatformat:0 }}</td>
                             <td class="py-2 px-3 text-center">
@@ -323,7 +323,7 @@
             <div class="flex gap-4">
                 <div class="text-center">
                     <p class="text-xs text-gray-400">پیش‌بینی درآمد</p>
-                    <p class="text-xl font-bold text-pink-500">{{ forecast_revenue|floatformat:0 }}</p>
+                    <p class="text-xl font-bold text-amber-700">{{ forecast_revenue|floatformat:0 }}</p>
                 </div>
                 <div class="text-center">
                     <p class="text-xs text-gray-400">پیش‌بینی سفارش</p>
@@ -341,7 +341,7 @@
                 <h3 class="font-bold text-lg flex items-center gap-2">
                     <i class="fas fa-crown text-yellow-500"></i> پرفروش‌ترین‌ها
                 </h3>
-                <a href="{% url 'first:admin_products' %}" class="text-xs text-pink-500 hover:text-pink-700">
+                <a href="{% url 'first:admin_products' %}" class="text-xs text-amber-700 hover:text-amber-800">
                     مشاهده همه <i class="fas fa-arrow-left mr-1"></i>
                 </a>
             </div>
@@ -349,7 +349,7 @@
             {% if top_products %}
             <div class="space-y-3 max-h-80 overflow-y-auto">
                 {% for product in top_products %}
-                <div class="flex items-center justify-between p-3 bg-gray-50 rounded-xl hover:bg-pink-50 transition-all">
+                <div class="flex items-center justify-between p-3 bg-gray-50 rounded-xl hover:bg-stone-50 transition-all">
                     <div class="flex items-center gap-3 flex-1 min-w-0">
                         <div class="product-rank rank-{% if forloop.counter == 1 %}1{% elif forloop.counter == 2 %}2{% elif forloop.counter == 3 %}3{% else %}other{% endif %}">
                             {{ forloop.counter }}
@@ -401,9 +401,9 @@
         <div class="bg-white/80 backdrop-blur-lg rounded-2xl p-6 shadow-lg">
             <div class="flex justify-between items-center mb-4">
                 <h3 class="font-bold text-lg flex items-center gap-2">
-                    <i class="fas fa-heart text-pink-500"></i> محبوب در علاقه‌مندی‌ها
+                    <i class="fas fa-heart text-amber-700"></i> محبوب در علاقه‌مندی‌ها
                 </h3>
-                <a href="{% url 'first:wishlist' %}" class="text-xs text-pink-500 hover:text-pink-700">
+                <a href="{% url 'first:wishlist' %}" class="text-xs text-amber-700 hover:text-amber-800">
                     مشاهده همه <i class="fas fa-arrow-left mr-1"></i>
                 </a>
             </div>
@@ -411,7 +411,7 @@
             {% if popular_wishlist %}
             <div class="space-y-3 max-h-80 overflow-y-auto">
                 {% for item in popular_wishlist %}
-                <div class="flex items-center justify-between p-3 bg-gray-50 rounded-xl hover:bg-pink-50 transition-all">
+                <div class="flex items-center justify-between p-3 bg-gray-50 rounded-xl hover:bg-stone-50 transition-all">
                     <div class="flex items-center gap-3 flex-1 min-w-0">
                         {% if item.image_url %}
                         <img src="{{ item.image_url }}" alt="{{ item.name }}" class="w-10 h-10 rounded-lg object-cover flex-shrink-0">
@@ -423,7 +423,7 @@
                         <div class="min-w-0 flex-1">
                             <p class="font-bold text-sm truncate">{{ item.name }}</p>
                             <div class="flex items-center gap-2 text-xs text-gray-500">
-                                <span class="text-pink-500"><i class="fas fa-heart"></i> {{ item.wishlist_count }}</span>
+                                <span class="text-amber-700"><i class="fas fa-heart"></i> {{ item.wishlist_count }}</span>
                                 <span>•</span>
                                 <span>{{ item.sales_count }} فروش</span>
                                 <span>•</span>
@@ -511,13 +511,13 @@
             </h3>
             <div class="space-y-2 max-h-60 overflow-y-auto">
                 {% for order in recent_orders %}
-                <div class="flex justify-between items-center p-2 bg-gray-50 rounded-lg hover:bg-pink-50 transition-all text-sm">
+                <div class="flex justify-between items-center p-2 bg-gray-50 rounded-lg hover:bg-stone-50 transition-all text-sm">
                     <div>
                         <span class="font-bold">#{{ order.order_number }}</span>
                         <span class="text-gray-500 mr-2">{{ order.user.username }}</span>
                     </div>
                     <div class="flex items-center gap-3">
-                        <span class="font-bold text-pink-500">{{ order.total|floatformat:0 }}</span>
+                        <span class="font-bold text-amber-700">{{ order.total|floatformat:0 }}</span>
                         <span class="text-gray-400 text-xs">{{ order.created_at|date:"Y/m/d" }}</span>
                     </div>
                 </div>
@@ -529,11 +529,11 @@
 
         <div class="bg-white/80 backdrop-blur-lg rounded-2xl p-6 shadow-lg">
             <h3 class="font-bold text-lg flex items-center gap-2 mb-4">
-                <i class="fas fa-heart text-pink-500"></i> آخرین علاقه‌مندی‌ها
+                <i class="fas fa-heart text-amber-700"></i> آخرین علاقه‌مندی‌ها
             </h3>
             <div class="space-y-2 max-h-60 overflow-y-auto">
                 {% for item in recent_wishlist %}
-                <div class="flex justify-between items-center p-2 bg-gray-50 rounded-lg hover:bg-pink-50 transition-all text-sm">
+                <div class="flex justify-between items-center p-2 bg-gray-50 rounded-lg hover:bg-stone-50 transition-all text-sm">
                     <div class="flex items-center gap-2">
                         <span class="font-bold">{{ item.product.name|truncatechars:30 }}</span>
                         <span class="text-gray-500 text-xs">{{ item.user.username }}</span>

@@ -1,20 +1,67 @@
-{% extends 'base.html' %}
-{% block title %}پشتیبانی{% endblock %}
+{% extends 'perfume_base.html' %}
+{% block title %}پشتیبانی | {{ settings.site_name|default:'فروشگاه عطر' }}{% endblock %}
 {% block content %}
-<div class="max-w-5xl mx-auto px-4 py-10">
-  <div class="flex items-center justify-between gap-4 mb-6">
-    <div><h1 class="text-2xl font-bold">پشتیبانی</h1><p class="text-gray-500">پیام‌ها و درخواست‌های شما</p></div>
-    <a href="{% url 'customer_care:support_create' %}" class="bg-pink-600 text-white px-5 py-3 rounded-xl">تیکت جدید</a>
-  </div>
-  <div class="space-y-3">
-    {% for ticket in tickets %}
-      <a href="{% url 'customer_care:support_detail' ticket.reference %}" class="block bg-white shadow rounded-2xl p-5">
-        <div class="flex justify-between gap-4"><b>{{ ticket.subject }}</b><span>{{ ticket.get_status_display }}</span></div>
-        <div class="text-sm text-gray-500 mt-2">{{ ticket.reference }}{% if ticket.order %} · سفارش #{{ ticket.order.order_number }}{% endif %}</div>
+<section class="p8-page">
+  <div class="p8-wrap">
+
+    <header class="p8-page-head">
+      <div>
+        <span class="p8-kicker">CLIENT SERVICE</span>
+        <h1>پشتیبانی</h1>
+        <p>پیام‌ها، درخواست‌ها و وضعیت تیکت‌های شما در یکجا.</p>
+      </div>
+      <a class="p8-primary" href="{% url 'customer_care:support_create' %}">
+        تیکت جدید
+        <i class="fa-solid fa-plus"></i>
       </a>
-    {% empty %}
-      <div class="bg-white rounded-2xl p-8 text-center text-gray-500">هنوز تیکتی ثبت نکرده‌اید.</div>
-    {% endfor %}
+    </header>
+
+    <div class="p8-support-layout">
+
+      <aside class="p8-support-side">
+        <i class="fa-solid fa-headset"></i>
+        <span class="p8-kicker">PRIVATE SERVICE</span>
+        <h2>چطور می‌توانیم کمک کنیم؟</h2>
+        <p>برای سوال درباره سفارش، ارسال، محصول یا هر درخواست دیگر یک تیکت ثبت کنید.</p>
+
+        <div>
+          <span><b>01</b> ثبت درخواست</span>
+          <span><b>02</b> بررسی توسط پشتیبانی</span>
+          <span><b>03</b> دریافت پاسخ</span>
+        </div>
+      </aside>
+
+      <section class="p8-ticket-list">
+        <div class="p8-section-head">
+          <div>
+            <span class="p8-kicker">YOUR TICKETS</span>
+            <h2>درخواست‌های شما</h2>
+          </div>
+          <span>{{ tickets|length }} تیکت</span>
+        </div>
+
+        {% for ticket in tickets %}
+        <a class="p8-ticket-row" href="{% url 'customer_care:support_detail' ticket.reference %}">
+          <div>
+            <small>{{ ticket.reference }}</small>
+            <strong>{{ ticket.subject }}</strong>
+            {% if ticket.order %}<span>سفارش #{{ ticket.order.order_number }}</span>{% endif %}
+          </div>
+          <div class="p8-ticket-status">
+            <span>{{ ticket.get_status_display }}</span>
+            <i class="fa-solid fa-arrow-left"></i>
+          </div>
+        </a>
+        {% empty %}
+        <div class="p8-empty-card compact">
+          <div class="p8-empty-icon"><i class="fa-regular fa-message"></i></div>
+          <h3>هنوز تیکتی ثبت نکرده‌اید.</h3>
+          <p>برای شروع یک درخواست جدید، از دکمه تیکت جدید استفاده کنید.</p>
+        </div>
+        {% endfor %}
+      </section>
+
+    </div>
   </div>
-</div>
+</section>
 {% endblock %}

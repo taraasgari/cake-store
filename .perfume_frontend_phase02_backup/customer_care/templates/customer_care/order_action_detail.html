@@ -1,0 +1,23 @@
+{% extends 'base.html' %}
+{% block title %}جزئیات درخواست{% endblock %}
+{% block content %}
+<div class="max-w-3xl mx-auto px-4 py-10">
+  <div class="bg-white rounded-3xl shadow p-7">
+    <h1 class="text-2xl font-bold">{{ action.get_kind_display }}</h1>
+    <div class="grid md:grid-cols-2 gap-3 mt-5">
+      <div class="bg-gray-50 p-4 rounded-xl"><b>سفارش:</b> #{{ action.order.order_number }}</div>
+      <div class="bg-gray-50 p-4 rounded-xl"><b>وضعیت:</b> {{ action.get_status_display }}</div>
+      <div class="bg-gray-50 p-4 rounded-xl"><b>دلیل:</b> {{ action.get_reason_display }}</div>
+      <div class="bg-gray-50 p-4 rounded-xl"><b>مبلغ:</b> {{ action.refund_amount }} تومان</div>
+    </div>
+    {% if action.description %}<div class="mt-4 bg-gray-50 p-4 rounded-xl">{{ action.description }}</div>{% endif %}
+    {% if action.admin_note %}<div class="mt-4 bg-purple-50 p-4 rounded-xl"><b>پیام مدیریت:</b><br>{{ action.admin_note }}</div>{% endif %}
+    {% if action.items.exists %}
+      <h2 class="font-bold mt-6 mb-2">اقلام مرجوعی</h2>
+      {% for item in action.items.all %}
+        <div class="flex justify-between border-b py-2"><span>{{ item.order_item.product_name }}</span><span>{{ item.quantity }} عدد</span></div>
+      {% endfor %}
+    {% endif %}
+  </div>
+</div>
+{% endblock %}

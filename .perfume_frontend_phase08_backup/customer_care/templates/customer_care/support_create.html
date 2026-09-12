@@ -1,0 +1,15 @@
+{% extends 'perfume_base.html' %}
+{% block title %}تیکت جدید{% endblock %}
+{% block content %}
+<div class="max-w-2xl mx-auto px-4 py-10">
+  <div class="bg-white rounded-3xl shadow p-7">
+    <h1 class="text-2xl font-bold mb-6">تیکت پشتیبانی جدید</h1>
+    <form method="post" class="space-y-4">
+      {% csrf_token %}
+      {{ form.as_p }}
+      {{ message_form.as_p }}
+      <button class="w-full bg-pink-600 text-white py-3 rounded-xl font-bold">ارسال تیکت</button>
+    </form>
+  </div>
+</div>
+{% endblock %}

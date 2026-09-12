@@ -1,4 +1,4 @@
-{% extends 'base.html' %}
+{% extends 'dashboard/perfume_admin_base.html' %}
 {% load static %}
 
 {% block title %}ویرایش {{ product.name }}{% endblock %}
@@ -351,7 +351,7 @@
         flex: none;
         border: 3px solid #fff;
         border-radius: .7rem;
-        background: #ef4444;
+        background: #9a5c4f;
         box-shadow: 0 0 0 1px #d1d5db;
     }
 
@@ -449,7 +449,7 @@
 </style>
 {% endblock %}
 
-{% block content %}
+{% block admin_content %}
 <div class="edit-product">
     <div class="flex items-center justify-between gap-4 mb-6">
         <div>
@@ -685,7 +685,7 @@
                            accept="image/jpeg,image/png,image/webp">
 
                     <span id="newMainName"
-                          class="text-xs text-pink-500 mt-2"></span>
+                          class="text-xs text-amber-700 mt-2"></span>
                 </label>
 
                 <label class="upload-box">
@@ -704,7 +704,7 @@
                            multiple>
 
                     <span id="newGalleryCount"
-                          class="text-xs text-pink-500 mt-2"></span>
+                          class="text-xs text-amber-700 mt-2"></span>
                 </label>
             </div>
 
@@ -899,12 +899,12 @@
 
                                 <input id="colorPicker"
                                        type="color"
-                                       value="#ef4444"
+                                       value="#9a5c4f"
                                        class="h-12 w-14 cursor-pointer">
 
                                 <input id="colorCode"
                                        class="edit-input"
-                                       value="#EF4444"
+                                       value="#9a5c4f"
                                        maxlength="7"
                                        dir="ltr">
                             </div>
@@ -999,7 +999,7 @@
 
         <div class="save-bar">
             <p class="field-help">
-                <i class="fas fa-circle-info text-pink-500 ml-1"></i>
+                <i class="fas fa-circle-info text-amber-700 ml-1"></i>
                 حذف تصاویر و تنوع‌ها فقط بعد از ذخیره اعمال می‌شود.
             </p>
 

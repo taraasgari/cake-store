@@ -1,0 +1,106 @@
+{% load static %}
+<!doctype html>
+<html lang="fa" dir="rtl" data-perfume-theme="night">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#090706">
+<title>{% block title %}{{ settings.site_title|default:'فروشگاه عطر' }}{% endblock %}</title>
+{% if settings.favicon %}<link rel="icon" href="{{ settings.favicon.url }}">{% endif %}
+<script>
+try{const t=localStorage.getItem('velora-theme');document.documentElement.dataset.perfumeTheme=(t==='day'||t==='night')?t:'night'}catch(e){}
+</script>
+<link rel="stylesheet" href="{% static 'vendor/vazir/font-face.css' %}">
+<link rel="stylesheet" href="{% static 'vendor/fontawesome/css/all.min.css' %}">
+<link rel="stylesheet" href="{% static 'css/perfume-phase01.css' %}">
+<link rel="stylesheet" href="{% static 'css/perfume-global-compat.css' %}">
+<link rel="stylesheet" href="{% static 'css/perfume-phase03-final.css' %}">
+<link rel="stylesheet" href="{% static 'css/perfume-phase04.css' %}">
+<link rel="stylesheet" href="{% static 'css/perfume-phase06.css' %}">
+    <link rel="stylesheet" href="{% static 'css/perfume-phase07-v2.css' %}">
+    <link rel="stylesheet" href="{% static 'css/perfume-phase08.css' %}">
+    {% block extra_css %}{% endblock %}
+</head>
+<body class="velora-body">
+<div class="p4-progress" data-p4-progress></div>
+
+<div class="p4-top-strip">
+  <div class="p4-wrap p4-top-strip-inner">
+    <span><i class="fa-solid fa-truck-fast"></i> ارسال مطمئن و بسته‌بندی حرفه‌ای</span>
+    <span><i class="fa-solid fa-shield-halved"></i> تضمین اصالت کالا</span>
+    <span><i class="fa-regular fa-gem"></i> مشاوره انتخاب رایحه</span>
+  </div>
+</div>
+
+<header class="p4-header">
+  <div class="p4-wrap">
+    <div class="p4-mainbar">
+      <a class="p4-brand" href="{% url 'first:home' %}">
+        <span class="p4-brand-mark">{% if settings.logo %}<img src="{{ settings.logo.url }}" alt="{{ settings.site_name }}">{% else %}V{% endif %}</span>
+        <span class="p4-brand-copy"><strong>{{ settings.site_name|default:'فروشگاه عطر' }}</strong><small>MAISON DE PARFUM</small></span>
+      </a>
+
+      <form class="p4-search" method="get" action="{% url 'first:search_products' %}">
+        <button type="submit" aria-label="جستجو"><i class="fa-solid fa-magnifying-glass"></i></button>
+        <input type="search" name="q" value="{{ request.GET.q|default:'' }}" placeholder="نام عطر، برند، رایحه یا نت موردنظر را جستجو کنید..." autocomplete="off">
+        <span>SEARCH</span>
+      </form>
+
+      <div class="p4-actions">
+        <button type="button" class="p4-icon" data-theme-toggle title="حالت روز و شب"><i class="fa-regular fa-moon night-i"></i><i class="fa-regular fa-sun day-i"></i></button>
+        {% if user.is_authenticated %}<a class="p4-icon" href="{% url 'first:profile' %}" title="حساب"><i class="fa-regular fa-user"></i></a>{% else %}<a class="p4-icon" href="{% url 'first:login' %}" title="ورود"><i class="fa-regular fa-user"></i></a>{% endif %}
+        <a class="p4-icon" href="{% url 'first:wishlist' %}" title="علاقه‌مندی‌ها"><i class="fa-regular fa-heart"></i></a>
+        <a class="p4-cart" href="{% url 'first:cart' %}"><i class="fa-solid fa-bag-shopping"></i><span>سبد خرید</span></a>
+        <button type="button" class="p4-menu-button" data-p4-menu-open><span></span><span></span></button>
+      </div>
+    </div>
+
+    <div class="p4-navrow">
+      <nav class="p4-nav">
+        <a href="{% url 'first:home' %}">خانه</a>
+        <a href="{% url 'first:product_list' %}">همه عطرها</a>
+        <a href="{% url 'first:best_sellers' %}">پرفروش‌ترین‌ها</a>
+        <a href="{% url 'first:discounts' %}">تخفیف‌های ویژه</a>
+        <a href="{% url 'first:customer_service' 'shopping-guide' %}">راهنمای خرید</a>
+        <a href="{% url 'customer_care:order_tracking' %}">پیگیری سفارش</a>
+      </nav>
+      <a class="p4-support" href="{% url 'customer_care:support_home' %}"><i class="fa-solid fa-headset"></i><span>پشتیبانی</span></a>
+    </div>
+  </div>
+</header>
+
+<aside class="p4-drawer" data-p4-menu>
+  <div class="p4-drawer-head"><div><strong>{{ settings.site_name|default:'فروشگاه عطر' }}</strong><small>MAISON DE PARFUM</small></div><button type="button" data-p4-menu-close>×</button></div>
+  <nav>
+    <a href="{% url 'first:home' %}"><span>01</span>خانه</a>
+    <a href="{% url 'first:product_list' %}"><span>02</span>همه عطرها</a>
+    <a href="{% url 'first:best_sellers' %}"><span>03</span>پرفروش‌ترین‌ها</a>
+    <a href="{% url 'first:discounts' %}"><span>04</span>تخفیف‌ها</a>
+    <a href="{% url 'first:customer_service' 'shopping-guide' %}"><span>05</span>راهنمای خرید</a>
+    <a href="{% url 'customer_care:order_tracking' %}"><span>06</span>پیگیری سفارش</a>
+    {% if user.is_authenticated %}<a href="{% url 'first:profile' %}"><span>07</span>حساب کاربری</a>{% else %}<a href="{% url 'first:login' %}"><span>07</span>ورود / ثبت‌نام</a>{% endif %}
+  </nav>
+</aside>
+
+{% if messages %}<div class="p4-toasts">{% for message in messages %}<div class="p4-toast"><span>{{ message }}</span><button type="button" data-p4-toast-close>×</button></div>{% endfor %}</div>{% endif %}
+
+<main class="phase-main">{% block content %}{% endblock %}</main>
+
+<footer class="p4-footer">
+  <div class="p4-wrap p4-footer-grid">
+    <div class="p4-footer-brand"><span>A HOUSE OF SCENT</span><h2>{{ settings.site_name|default:'فروشگاه عطر' }}</h2><p>رایحه‌ای که فقط انتخاب نمی‌شود؛ بخشی از هویت شما می‌شود.</p></div>
+    <div class="p4-footer-links"><span>DISCOVER</span><a href="{% url 'first:product_list' %}">همه عطرها</a><a href="{% url 'first:best_sellers' %}">پرفروش‌ها</a><a href="{% url 'first:discounts' %}">تخفیف‌ها</a></div>
+    <div class="p4-footer-links"><span>SERVICE</span><a href="{% url 'customer_care:support_home' %}">پشتیبانی</a><a href="{% url 'customer_care:order_tracking' %}">پیگیری سفارش</a><a href="{% url 'first:customer_service' 'shipping-returns' %}">ارسال و مرجوعی</a></div>
+    <div class="p4-footer-note"><span>PRIVATE NOTES</span><p>خبر کالکشن‌های تازه و پیشنهادهای محدود.</p><div><input type="email" placeholder="ایمیل شما"><button type="button">←</button></div></div>
+  </div>
+  <div class="p4-wrap p4-footer-bottom"><span>{{ settings.footer_text|default:'© 2026 PERFUME HOUSE' }}</span><span>SCENT / MEMORY / IDENTITY</span></div>
+</footer>
+
+<script src="{% static 'js/perfume-phase01.js' %}"></script>
+<script src="{% static 'js/perfume-phase03-final.js' %}"></script>
+<script src="{% static 'js/perfume-phase04.js' %}"></script>
+{% block extra_js %}{% endblock %}
+    <script src="{% static 'js/perfume-phase06.js' %}"></script>
+    <script src="{% static 'js/perfume-phase07-v2.js' %}"></script>
+</body>
+</html>
