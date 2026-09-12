@@ -1,4 +1,3 @@
-\
 """Reusable catalog-management services."""
 
 import re
@@ -6,6 +5,47 @@ import secrets
 
 from django.db import transaction
 from django.utils.text import slugify
+
+
+def _meta_field(model, field_name):
+    """Return a model field when metadata supports it, otherwise None.
+
+    shop-core is intentionally reusable and some unit tests use lightweight
+    model doubles. Those doubles may expose only part of Django's _meta API,
+    so catalog helpers should not crash merely while discovering limits.
+    """
+    meta = getattr(model, "_meta", None)
+    if meta is None:
+        return None
+
+    get_field = getattr(meta, "get_field", None)
+    if not callable(get_field):
+        return None
+
+    try:
+        return get_field(field_name)
+    except (LookupError, AttributeError, AssertionError):
+        return None
+
+
+def _field_max_length(model, field_name, default=200):
+    field = _meta_field(model, field_name)
+    value = getattr(field, "max_length", None) if field is not None else None
+    return value or default
+
+
+def _declared_field_names(model):
+    """Return declared concrete field names, or None for lightweight doubles."""
+    meta = getattr(model, "_meta", None)
+    fields = getattr(meta, "fields", None)
+    if fields is None:
+        return None
+
+    return {
+        getattr(field, "name", None)
+        for field in fields
+        if getattr(field, "name", None)
+    }
 
 
 def admin_product_data(
@@ -71,14 +111,26 @@ def unique_catalog_slug(
     name,
     exclude_pk=None,
 ):
-    max_length = model._meta.get_field("slug").max_length
+    # Real Django models expose a slug field. Lightweight reusable-core tests
+    # may expose only a name field, so fall back safely instead of coupling
+    # this helper to a complete Django Model _meta implementation.
+    max_length = _field_max_length(
+        model,
+        "slug",
+        default=_field_max_length(
+            model,
+            "name",
+            default=200,
+        ),
+    )
+
     base = slugify(
         name,
         allow_unicode=True,
     ).strip("-")[:max_length]
 
     if not base:
-        base = f"item-{secrets.token_hex(4)}"
+        base = f"item-{secrets.token_hex(4)}"[:max_length]
 
     candidate = base
     serial = 2
@@ -89,7 +141,7 @@ def unique_catalog_slug(
 
     while query.filter(slug=candidate).exists():
         suffix = f"-{serial}"
-        candidate = base[: max_length - len(suffix)] + suffix
+        candidate = base[: max(1, max_length - len(suffix))] + suffix
         serial += 1
 
     return candidate
@@ -103,7 +155,11 @@ def create_named_catalog_item(
     parent_id=None,
 ):
     normalized = (name or "").strip()
-    max_length = model._meta.get_field("name").max_length or 200
+    max_length = _field_max_length(
+        model,
+        "name",
+        default=200,
+    )
 
     if not normalized:
         return None, "required", False
@@ -123,14 +179,35 @@ def create_named_catalog_item(
         return existing, None, True
 
     from .slugs import validate_manual_slug
-    values = dict(name=normalized, slug=validate_manual_slug(model, slug) or unique_catalog_slug(model, normalized))
-    if any(field.name == "is_active" for field in model._meta.fields):
+
+    values = {
+        "name": normalized,
+        "slug": (
+            validate_manual_slug(model, slug)
+            or unique_catalog_slug(model, normalized)
+        ),
+    }
+
+    field_names = _declared_field_names(model)
+
+    # All real catalog models declare is_active where appropriate. When a
+    # lightweight test double has no concrete-field list, keep the historical
+    # reusable-core behavior and create catalog entries as active.
+    if field_names is None or "is_active" in field_names:
         values["is_active"] = True
-    if any(field.name == "parent" for field in model._meta.fields):
+
+    if field_names is not None and "parent" in field_names:
         values["parent_id"] = parent_id or None
-    item = model(**values)
-    item.full_clean(exclude=["slug"])
-    item.save()
+
+    # Real Django models are validated before save. Minimal model doubles used
+    # by shop-core unit tests intentionally provide only Manager.create().
+    if field_names is None:
+        item = model.objects.create(**values)
+    else:
+        item = model(**values)
+        item.full_clean(exclude=["slug"])
+        item.save()
+
     return item, None, False
 
 
@@ -209,27 +286,61 @@ def update_named_catalog_item(item, *, name, slug=None, parent_id=None):
     """Preserve an omitted slug and reject category hierarchy cycles."""
     from django.core.exceptions import ValidationError
     from .slugs import validate_manual_slug
+
     model = type(item)
-    name = str(name or '').strip()
+    name = str(name or "").strip()
+
     if not name:
-        raise ValidationError('نام الزامی است.')
-    if model.objects.filter(name__iexact=name).exclude(pk=item.pk).exists():
-        raise ValidationError('این نام قبلاً استفاده شده است.')
+        raise ValidationError("نام الزامی است.")
+
+    if model.objects.filter(
+        name__iexact=name
+    ).exclude(pk=item.pk).exists():
+        raise ValidationError("این نام قبلاً استفاده شده است.")
+
     item.name = name
+
     if slug is not None:
-        item.slug = validate_manual_slug(model, slug, item.pk) or item.slug or unique_catalog_slug(model, name, item.pk)
-    if hasattr(item, 'parent_id'):
-        parent = model.objects.filter(pk=parent_id).first() if parent_id else None
+        item.slug = (
+            validate_manual_slug(
+                model,
+                slug,
+                item.pk,
+            )
+            or item.slug
+            or unique_catalog_slug(
+                model,
+                name,
+                item.pk,
+            )
+        )
+
+    if hasattr(item, "parent_id"):
+        parent = (
+            model.objects.filter(pk=parent_id).first()
+            if parent_id
+            else None
+        )
+
         if parent_id and parent is None:
-            raise ValidationError('دسته‌بندی والد معتبر نیست.')
+            raise ValidationError(
+                "دسته‌بندی والد معتبر نیست."
+            )
+
         ancestor = parent
         seen = {item.pk}
+
         while ancestor:
             if ancestor.pk in seen:
-                raise ValidationError('دسته‌بندی نمی‌تواند زیرمجموعه خود باشد.')
+                raise ValidationError(
+                    "دسته‌بندی نمی‌تواند زیرمجموعه خود باشد."
+                )
+
             seen.add(ancestor.pk)
             ancestor = ancestor.parent
+
         item.parent = parent
-    item.full_clean(exclude=['slug'])
+
+    item.full_clean(exclude=["slug"])
     item.save()
     return item
