@@ -1,0 +1,5 @@
+--- a/first/templates/perfume_base.html
++++ b/first/templates/perfume_base.html
+@@
+-<link rel="stylesheet" href="{% static 'css/perfume-mobile-final.css' %}?v=1" media="(max-width: 900px)">
++<link rel="stylesheet" href="{% static 'css/perfume-mobile-final.css' %}?v=2" media="(max-width: 900px)">

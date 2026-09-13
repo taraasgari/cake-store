@@ -1,0 +1,1208 @@
+diff --git a/first/templates/perfume_base.html b/first/templates/perfume_base.html
+--- a/first/templates/perfume_base.html
++++ b/first/templates/perfume_base.html
+@@
+     <link rel="stylesheet" href="{% static 'css/perfume-phase08.css' %}">
+     <link rel="stylesheet" href="{% static 'css/perfume-phase10.css' %}">
+     <link rel="stylesheet" href="{% static 'css/perfume-account-menu.css' %}">
++    <link rel="stylesheet" href="{% static 'css/perfume-mobile-final.css' %}?v=2J" media="(max-width: 900px)">
+ <style>
+diff --git a/static/css/perfume-mobile-final.css b/static/css/perfume-mobile-final.css
+new file mode 100644
+--- /dev/null
++++ b/static/css/perfume-mobile-final.css
+@@
++/*
++ * Perfume Shop — final mobile responsive correction layer
++ * Scope: <= 900px only. Desktop styles are intentionally untouched.
++ * Generated 2026-09-13 after auditing the active storefront CSS stack.
++ */
++
++@media (max-width: 900px) {
++  html,
++  body {
++    width: 100% !important;
++    max-width: 100% !important;
++    overflow-x: hidden !important;
++    -webkit-text-size-adjust: 100%;
++    text-size-adjust: 100%;
++  }
++
++  body {
++    min-width: 0 !important;
++  }
++
++  .phase-main {
++    width: 100% !important;
++    min-width: 0 !important;
++    overflow-x: hidden !important;
++  }
++
++  .phase-main img,
++  .phase-main svg,
++  .phase-main video,
++  .phase-main canvas,
++  .phase-main iframe {
++    max-width: 100% !important;
++  }
++
++  .phase-main iframe {
++    width: 100% !important;
++  }
++
++  .phase-main table {
++    max-width: 100%;
++  }
++
++  .phase-main :where(
++    .home-product,
++    .home-shop-card,
++    .home-commerce-card,
++    .p4-product-card,
++    .p8-cart-item,
++    .p8-profile-card,
++    .p8-checkout-card,
++    .p8-checkout-summary,
++    .p10-card,
++    .p10-side
++  ) {
++    min-width: 0 !important;
++  }
++
++  /* ---------- Header ---------- */
++  .p4-wrap {
++    width: calc(100% - 28px) !important;
++    max-width: none !important;
++  }
++
++  .p4-mainbar {
++    grid-template-columns: minmax(0, 1fr) auto !important;
++    grid-template-rows: auto auto !important;
++    gap: 10px !important;
++    min-height: 0 !important;
++    padding: 11px 0 12px !important;
++  }
++
++  .p4-brand {
++    width: auto !important;
++    min-width: 0 !important;
++    gap: 9px !important;
++  }
++
++  .p4-brand-mark {
++    width: 44px !important;
++    height: 44px !important;
++    flex: 0 0 44px !important;
++    font-size: 23px !important;
++  }
++
++  .p4-brand-copy {
++    min-width: 0 !important;
++  }
++
++  .p4-brand-copy strong {
++    display: block !important;
++    max-width: 150px !important;
++    overflow: hidden !important;
++    text-overflow: ellipsis !important;
++    white-space: nowrap !important;
++    font-size: 16px !important;
++  }
++
++  .p4-brand-copy small {
++    margin-top: 3px !important;
++    font-size: 6px !important;
++    letter-spacing: .12em !important;
++  }
++
++  .p4-actions {
++    grid-column: 2 !important;
++    grid-row: 1 !important;
++    min-width: 0 !important;
++    gap: 2px !important;
++    flex-wrap: nowrap !important;
++  }
++
++  .p4-icon,
++  .p4-cart,
++  .p4-menu-button,
++  .p4-account-trigger {
++    width: 42px !important;
++    min-width: 42px !important;
++    height: 42px !important;
++    min-height: 42px !important;
++    padding: 0 !important;
++    justify-content: center !important;
++  }
++
++  /* Do not silently remove wishlist functionality on normal phone widths. */
++  .p4-actions .p4-icon[title="علاقه‌مندی‌ها"] {
++    display: grid !important;
++  }
++
++  .p4-cart span,
++  .p4-account-trigger-name,
++  .p4-account-trigger > i {
++    display: none !important;
++  }
++
++  .p4-account-trigger-avatar {
++    width: 32px !important;
++    height: 32px !important;
++    flex: 0 0 32px !important;
++  }
++
++  .p4-search {
++    grid-column: 1 / -1 !important;
++    grid-row: 2 !important;
++    grid-template-columns: 48px minmax(0, 1fr) !important;
++    width: 100% !important;
++    height: 48px !important;
++    margin: 0 !important;
++  }
++
++  .p4-search button {
++    width: 48px !important;
++    height: 46px !important;
++    font-size: 16px !important;
++  }
++
++  .p4-search input {
++    width: 100% !important;
++    min-width: 0 !important;
++    height: 46px !important;
++    padding: 0 12px !important;
++    font-size: 16px !important;
++  }
++
++  .p4-search > span {
++    display: none !important;
++  }
++
++  .p4-navrow {
++    display: none !important;
++  }
++
++  .p4-menu-button {
++    display: grid !important;
++  }
++
++  /* Mobile menu as a proper side sheet instead of an oversized desktop panel. */
++  .p4-drawer {
++    inset: 0 0 0 auto !important;
++    width: min(88vw, 390px) !important;
++    height: 100dvh !important;
++    max-height: 100dvh !important;
++    overflow-y: auto !important;
++    overscroll-behavior: contain !important;
++    padding:
++      max(20px, env(safe-area-inset-top))
++      max(18px, env(safe-area-inset-right))
++      max(24px, env(safe-area-inset-bottom))
++      max(18px, env(safe-area-inset-left)) !important;
++    box-shadow: -28px 0 70px rgba(0,0,0,.42) !important;
++  }
++
++  .p4-drawer-head {
++    position: sticky !important;
++    top: 0 !important;
++    z-index: 2 !important;
++    padding: 0 0 12px !important;
++    background: #080605 !important;
++  }
++
++  .p4-drawer-head strong {
++    font-size: 21px !important;
++  }
++
++  .p4-drawer-head button {
++    width: 44px !important;
++    height: 44px !important;
++    padding: 0 !important;
++    font-size: 34px !important;
++    line-height: 1 !important;
++  }
++
++  .p4-drawer nav {
++    margin-top: 18px !important;
++  }
++
++  .p4-drawer nav a {
++    min-height: 52px !important;
++    padding: 11px 2px !important;
++    grid-template-columns: 32px minmax(0, 1fr) !important;
++    align-items: center !important;
++    font-size: 17px !important;
++  }
++
++  .p4-account-dropdown {
++    position: fixed !important;
++    top: 110px !important;
++    right: 12px !important;
++    left: 12px !important;
++    width: auto !important;
++    max-height: calc(100dvh - 126px) !important;
++    overflow: auto !important;
++  }
++
++  .p4-toasts {
++    top: 116px !important;
++    right: 12px !important;
++    left: 12px !important;
++  }
++
++  .p4-toast {
++    width: 100% !important;
++    box-sizing: border-box !important;
++    justify-content: space-between !important;
++  }
++
++  /* ---------- Home slider ---------- */
++  .home-lux-slider {
++    width: 100% !important;
++    max-width: 100% !important;
++  }
++
++  .home-lux-slider-shell {
++    width: 100% !important;
++    max-width: 100% !important;
++  }
++
++  .home-lux-slider--managed .home-lux-slider-shell {
++    min-height: 0 !important;
++    aspect-ratio: 16 / 10 !important;
++  }
++
++  .home-lux-managed-media,
++  .home-lux-managed-media > img,
++  .home-lux-default-media,
++  .home-lux-default-media > img {
++    width: 100% !important;
++    height: 100% !important;
++  }
++
++  .home-lux-managed-media > img {
++    object-fit: contain !important;
++    object-position: center !important;
++  }
++
++  .home-lux-slide-copy--managed {
++    inset: auto 16px 58px 16px !important;
++    width: auto !important;
++    max-width: min(560px, calc(100% - 32px)) !important;
++    padding: 18px !important;
++  }
++
++  .home-lux-slide-copy--managed h1 {
++    font-size: clamp(26px, 8vw, 42px) !important;
++    line-height: 1.12 !important;
++  }
++
++  .home-lux-slide-copy--managed p {
++    max-width: 100% !important;
++    font-size: 12px !important;
++    line-height: 1.9 !important;
++  }
++
++  .home-lux-slider-arrow {
++    width: 38px !important;
++    height: 50px !important;
++    font-size: 30px !important;
++  }
++
++  .home-lux-slider-arrow--prev {
++    left: 8px !important;
++  }
++
++  .home-lux-slider-arrow--next {
++    right: 8px !important;
++  }
++
++  .home-lux-slider-ui {
++    right: 12px !important;
++    left: 12px !important;
++    bottom: 10px !important;
++    max-width: calc(100% - 24px) !important;
++    justify-content: space-between !important;
++  }
++
++  .home-lux-slider-trust {
++    display: none !important;
++  }
++
++  /* ---------- Home hero ---------- */
++  .lux-home-hero {
++    width: 100% !important;
++    height: auto !important;
++    min-height: 0 !important;
++    display: flex !important;
++    flex-direction: column !important;
++    padding: 32px 16px 42px !important;
++    overflow: hidden !important;
++  }
++
++  .hero-object {
++    order: 0 !important;
++    width: 100% !important;
++    height: 300px !important;
++    min-height: 0 !important;
++  }
++
++  .hero-copy {
++    order: 1 !important;
++    width: 100% !important;
++    min-width: 0 !important;
++  }
++
++  .hero-side,
++  .hero-note {
++    display: none !important;
++  }
++
++  .hero-arch {
++    width: 76% !important;
++    height: 42% !important;
++    left: 12% !important;
++    top: 4% !important;
++  }
++
++  .hero-product {
++    width: min(74%, 290px) !important;
++    height: 270px !important;
++  }
++
++  .hero-product-info {
++    left: 0 !important;
++    right: auto !important;
++    bottom: 4px !important;
++    max-width: 42% !important;
++  }
++
++  .hero-copy h1 {
++    margin: 14px 0 !important;
++  }
++
++  .hero-copy h1 span {
++    font-size: clamp(34px, 10.5vw, 50px) !important;
++    line-height: 1.05 !important;
++  }
++
++  .hero-copy h1 em {
++    font-size: clamp(30px, 9vw, 44px) !important;
++    line-height: 1.08 !important;
++  }
++
++  .hero-copy > p {
++    max-width: 100% !important;
++    font-size: 13px !important;
++    line-height: 2 !important;
++  }
++
++  .hero-actions {
++    display: grid !important;
++    grid-template-columns: 1fr !important;
++    gap: 9px !important;
++    width: 100% !important;
++    margin-top: 22px !important;
++  }
++
++  .hero-actions a {
++    width: 100% !important;
++    min-height: 46px !important;
++    box-sizing: border-box !important;
++    justify-content: center !important;
++  }
++
++  .trust-rail {
++    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
++  }
++
++  .trust-rail > div {
++    min-width: 0 !important;
++    min-height: 92px !important;
++    padding: 14px 12px !important;
++  }
++
++  /* ---------- Home content ---------- */
++  .signature-home,
++  .home-shop-section,
++  .home-commerce-hub,
++  .category-home {
++    width: 100% !important;
++    max-width: 100% !important;
++    padding-right: 14px !important;
++    padding-left: 14px !important;
++  }
++
++  .section-head-x,
++  .home-shop-head,
++  .home-commerce-head {
++    grid-template-columns: 1fr !important;
++    gap: 12px !important;
++    align-items: start !important;
++  }
++
++  .section-head-x h2,
++  .home-shop-head h2,
++  .home-commerce-head h2 {
++    font-size: clamp(30px, 8.5vw, 44px) !important;
++    line-height: 1.16 !important;
++  }
++
++  .home-product-grid,
++  .home-shop-grid,
++  .p4-grid,
++  .p4-grid-4 {
++    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
++    gap: 10px !important;
++  }
++
++  .home-product-grid > *:nth-child(4) {
++    display: block !important;
++  }
++
++  .home-product-media,
++  .home-shop-media,
++  .p4-product-media {
++    height: clamp(230px, 44vw, 330px) !important;
++  }
++
++  .home-product-media img,
++  .home-shop-media img,
++  .p4-product-media img {
++    max-width: 100% !important;
++    object-fit: contain !important;
++  }
++
++  .home-product-copy,
++  .home-shop-body,
++  .p4-product-info,
++  .p4-product-copy {
++    min-width: 0 !important;
++  }
++
++  .home-product-copy {
++    gap: 8px !important;
++    flex-wrap: wrap !important;
++  }
++
++  .home-product-copy > div,
++  .home-shop-bottom > *,
++  .p4-product-bottom > * {
++    min-width: 0 !important;
++  }
++
++  .home-product-copy a,
++  .home-shop-body h3,
++  .p4-product-title,
++  .p4-product-copy h3 {
++    overflow-wrap: anywhere !important;
++  }
++
++  .editorial-grid-x,
++  .craft-home,
++  .quote-home {
++    grid-template-columns: 1fr !important;
++  }
++
++  .panel-x {
++    min-height: 220px !important;
++    padding: 22px 18px !important;
++  }
++
++  .home-commerce-grid {
++    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
++    gap: 10px !important;
++  }
++
++  .home-commerce-card {
++    min-height: 210px !important;
++    padding: 20px 16px !important;
++  }
++
++  .craft-home > div {
++    padding: 34px 20px !important;
++  }
++
++  .craft-home aside {
++    height: 280px !important;
++  }
++
++  .brand-rail-x {
++    padding-right: 14px !important;
++    padding-left: 14px !important;
++  }
++
++  .brand-rail-x > div {
++    max-width: 100% !important;
++    overflow-x: auto !important;
++    -webkit-overflow-scrolling: touch;
++    scrollbar-width: none;
++  }
++
++  .brand-rail-x > div::-webkit-scrollbar {
++    display: none;
++  }
++
++  .quote-home {
++    padding: 40px 18px !important;
++  }
++
++  .quote-home blockquote {
++    font-size: clamp(24px, 7.5vw, 38px) !important;
++  }
++
++  /* ---------- Catalog / filters ---------- */
++  .p4-page-hero-grid,
++  .p4-feature-inner {
++    grid-template-columns: 1fr !important;
++    min-height: auto !important;
++    padding: 34px 0 !important;
++  }
++
++  .p4-page-hero h1,
++  .p4-feature-hero h1,
++  .p4-service-hero h1 {
++    font-size: clamp(36px, 10vw, 52px) !important;
++    line-height: 1.08 !important;
++  }
++
++  .p4-shop-layout,
++  .p4-service-layout {
++    grid-template-columns: 1fr !important;
++    gap: 20px !important;
++  }
++
++  .p4-toolbar {
++    width: 100% !important;
++    padding: 10px !important;
++    gap: 9px !important;
++    flex-wrap: wrap !important;
++  }
++
++  .p4-toolbar label,
++  .p4-toolbar select,
++  .p4-filter-open {
++    width: 100% !important;
++    max-width: 100% !important;
++    box-sizing: border-box !important;
++  }
++
++  .p4-filter-open {
++    min-height: 44px !important;
++    justify-content: center !important;
++  }
++
++  .p4-filter {
++    width: min(88vw, 340px) !important;
++    max-width: 100% !important;
++    padding-bottom: max(24px, env(safe-area-inset-bottom)) !important;
++  }
++
++  .search-lux-query {
++    width: 100% !important;
++    max-width: 100% !important;
++    box-sizing: border-box !important;
++  }
++
++  .search-lux-toolbar {
++    gap: 10px !important;
++    align-items: stretch !important;
++    flex-direction: column !important;
++  }
++
++  /* ---------- Product detail ---------- */
++  .pd-wrap {
++    width: calc(100% - 24px) !important;
++    max-width: none !important;
++    padding-top: 12px !important;
++  }
++
++  .pd-hero,
++  .pd-story-grid,
++  .pd-spec-grid,
++  .pd-review-grid {
++    grid-template-columns: 1fr !important;
++  }
++
++  .pd-gallery {
++    padding: 10px !important;
++    border-left: 0 !important;
++  }
++
++  .pd-main-media {
++    width: 100% !important;
++    height: min(105vw, 430px) !important;
++  }
++
++  .pd-main-media > img {
++    max-width: 100% !important;
++    padding: 12px !important;
++    object-fit: contain !important;
++  }
++
++  .pd-info {
++    min-width: 0 !important;
++    min-height: 0 !important;
++    padding: 22px 15px !important;
++  }
++
++  .pd-info h1 {
++    overflow-wrap: anywhere !important;
++    font-size: clamp(29px, 8.5vw, 40px) !important;
++    line-height: 1.25 !important;
++  }
++
++  .pd-buy-row {
++    grid-template-columns: 96px minmax(0, 1fr) !important;
++    gap: 9px !important;
++  }
++
++  .pd-cart-btn {
++    min-width: 0 !important;
++  }
++
++  .pd-thumbs {
++    max-width: 100% !important;
++    overflow-x: auto !important;
++    flex-wrap: nowrap !important;
++    -webkit-overflow-scrolling: touch;
++  }
++
++  /* ---------- Cart / checkout / account / support ---------- */
++  .p8-wrap,
++  .p10-shell {
++    width: calc(100% - 24px) !important;
++    max-width: none !important;
++  }
++
++  .p8-cart-layout,
++  .p8-profile-layout,
++  .p8-support-layout,
++  .p8-form-layout,
++  .p8-thread-layout,
++  .p8-checkout-layout,
++  .p10-grid,
++  .p8-profile-actions,
++  .p8-detail-grid,
++  .p8-checkout-grid {
++    grid-template-columns: 1fr !important;
++  }
++
++  .p8-summary,
++  .p8-thread-side {
++    position: static !important;
++  }
++
++  .p8-page-head {
++    min-height: 0 !important;
++    padding: 22px 17px !important;
++  }
++
++  .p8-page-head h1 {
++    overflow-wrap: anywhere !important;
++    font-size: clamp(31px, 9vw, 42px) !important;
++  }
++
++  .p8-checkout-card,
++  .p8-checkout-summary,
++  .p8-details-card,
++  .p8-profile-card,
++  .p10-card,
++  .p10-side {
++    min-width: 0 !important;
++    padding-right: 17px !important;
++    padding-left: 17px !important;
++  }
++
++  .p10-fields {
++    grid-template-columns: 1fr !important;
++  }
++
++  .p10-field.wide {
++    grid-column: auto !important;
++  }
++
++  .p10-actions {
++    flex-direction: column-reverse !important;
++  }
++
++  .p10-save,
++  .p10-outline {
++    width: 100% !important;
++    box-sizing: border-box !important;
++  }
++
++  /* ---------- Authentication ---------- */
++  .auth-lux-page,
++  .recovery-page {
++    padding: 20px 12px !important;
++  }
++
++  .auth-lux-shell,
++  .recovery-shell {
++    grid-template-columns: 1fr !important;
++    width: 100% !important;
++  }
++
++  .auth-lux-form-side {
++    padding: 0 !important;
++  }
++
++  .auth-lux-card,
++  .recovery-card {
++    width: 100% !important;
++    max-width: 100% !important;
++    min-height: 0 !important;
++    padding: 27px 18px 24px !important;
++    box-sizing: border-box !important;
++  }
++
++  .signup-grid {
++    grid-template-columns: 1fr !important;
++  }
++
++  .signup-grid .span-2 {
++    grid-column: auto !important;
++  }
++
++  .auth-lux-row {
++    gap: 10px !important;
++    align-items: flex-start !important;
++    flex-direction: column !important;
++  }
++
++  .auth-lux-visual-side,
++  .recovery-visual {
++    display: none !important;
++  }
++
++  /* ---------- Orders / tracking ---------- */
++  .orders-page,
++  .od-page,
++  .ptrack {
++    padding-right: 14px !important;
++    padding-left: 14px !important;
++  }
++
++  .od-layout,
++  .od-address,
++  .ptrack-grid {
++    grid-template-columns: 1fr !important;
++  }
++
++  .order-card {
++    grid-template-columns: 1fr 1fr !important;
++    gap: 10px !important;
++    padding: 15px !important;
++  }
++
++  .order-action {
++    grid-column: 1 / -1 !important;
++  }
++
++  .od-meta,
++  .ptrack-meta {
++    grid-template-columns: 1fr 1fr !important;
++  }
++
++  .od-table-wrap {
++    width: 100% !important;
++    max-width: 100% !important;
++    overflow-x: auto !important;
++    -webkit-overflow-scrolling: touch;
++  }
++
++  .od-items {
++    min-width: 560px !important;
++  }
++
++  .od-steps {
++    max-width: 100% !important;
++    overflow-x: auto !important;
++    -webkit-overflow-scrolling: touch;
++    scrollbar-width: none;
++  }
++
++  .od-steps::-webkit-scrollbar {
++    display: none;
++  }
++
++  /* ---------- Legacy Tailwind-like public templates ---------- */
++  .phase-main [class~="max-w-7xl"],
++  .phase-main [class~="max-w-6xl"],
++  .phase-main [class~="max-w-5xl"],
++  .phase-main [class~="max-w-4xl"],
++  .phase-main [class~="max-w-3xl"] {
++    width: calc(100% - 28px) !important;
++    max-width: none !important;
++    margin-right: auto !important;
++    margin-left: auto !important;
++  }
++
++  .phase-main [class*="grid-cols-"] {
++    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
++  }
++
++  /* ---------- Footer ---------- */
++  .p4-footer-grid {
++    grid-template-columns: 1fr 1fr !important;
++    gap: 24px 18px !important;
++  }
++
++  .p4-footer-brand,
++  .p4-footer-note {
++    grid-column: 1 / -1 !important;
++  }
++
++  .p4-footer-note form,
++  .p4-footer-note form > div {
++    width: 100% !important;
++  }
++
++  .p4-footer-note input {
++    min-width: 0 !important;
++  }
++
++  .p4-footer-bottom {
++    gap: 7px !important;
++    align-items: flex-start !important;
++    flex-direction: column !important;
++  }
++}
++
++/*
++ * Phone breakpoint.
++ * This intentionally restores the project's original single-column product layout.
++ * The previous mobile patch overrode it back to 2 columns, which caused the cramped UI.
++ */
++@media (max-width: 640px) {
++  .p4-top-strip {
++    display: none !important;
++  }
++
++  .p4-wrap {
++    width: calc(100% - 20px) !important;
++  }
++
++  .p4-mainbar {
++    gap: 6px !important;
++  }
++
++  .p4-brand-mark {
++    width: 40px !important;
++    height: 40px !important;
++    flex: 0 0 40px !important;
++  }
++
++  .p4-brand-copy strong {
++    max-width: 105px !important;
++    font-size: 14px !important;
++  }
++
++  .p4-brand-copy small {
++    display: none !important;
++  }
++
++  .p4-icon,
++  .p4-cart,
++  .p4-menu-button,
++  .p4-account-trigger {
++    width: 38px !important;
++    min-width: 38px !important;
++    height: 40px !important;
++    min-height: 40px !important;
++  }
++
++  .p4-account-trigger-avatar {
++    width: 30px !important;
++    height: 30px !important;
++    flex: 0 0 30px !important;
++  }
++
++  .p4-search {
++    height: 46px !important;
++    grid-template-columns: 46px minmax(0, 1fr) !important;
++  }
++
++  .p4-search button,
++  .p4-search input {
++    height: 44px !important;
++  }
++
++  .p4-search button {
++    width: 46px !important;
++  }
++
++  .p4-account-dropdown {
++    top: 96px !important;
++    max-height: calc(100dvh - 110px) !important;
++  }
++
++  .p4-toasts {
++    top: 100px !important;
++  }
++
++  .home-lux-slider--managed .home-lux-slider-shell {
++    aspect-ratio: 4 / 3 !important;
++  }
++
++  .home-lux-slider-arrow {
++    width: 34px !important;
++    height: 46px !important;
++    font-size: 26px !important;
++  }
++
++  .home-lux-slide-copy--managed {
++    inset: auto 12px 50px 12px !important;
++    max-width: calc(100% - 24px) !important;
++    padding: 14px !important;
++  }
++
++  .home-lux-slide-copy--managed p {
++    display: -webkit-box !important;
++    -webkit-line-clamp: 3;
++    -webkit-box-orient: vertical;
++    overflow: hidden !important;
++  }
++
++  .lux-home-hero {
++    padding: 26px 12px 36px !important;
++  }
++
++  .hero-object {
++    height: 255px !important;
++  }
++
++  .hero-product {
++    width: min(78%, 260px) !important;
++    height: 232px !important;
++  }
++
++  .hero-product-info {
++    max-width: 48% !important;
++  }
++
++  .hero-copy h1 span {
++    font-size: clamp(32px, 10.5vw, 44px) !important;
++  }
++
++  .hero-copy h1 em {
++    font-size: clamp(28px, 9.2vw, 39px) !important;
++  }
++
++  .trust-rail {
++    grid-template-columns: 1fr !important;
++  }
++
++  .trust-rail > div {
++    min-height: 72px !important;
++  }
++
++  .signature-home,
++  .home-shop-section,
++  .home-commerce-hub,
++  .category-home {
++    padding-right: 10px !important;
++    padding-left: 10px !important;
++  }
++
++  .home-product-grid,
++  .home-shop-grid,
++  .p4-grid,
++  .p4-grid-4 {
++    grid-template-columns: 1fr !important;
++    gap: 12px !important;
++  }
++
++  .home-product-media,
++  .home-shop-media,
++  .p4-product-media {
++    height: min(102vw, 410px) !important;
++  }
++
++  .home-product-copy,
++  .home-shop-body,
++  .p4-product-info,
++  .p4-product-copy {
++    padding: 13px !important;
++  }
++
++  .home-product-copy a,
++  .home-shop-body h3,
++  .p4-product-title,
++  .p4-product-copy h3 {
++    font-size: 15px !important;
++    line-height: 1.7 !important;
++  }
++
++  .home-commerce-grid {
++    grid-template-columns: 1fr !important;
++  }
++
++  .home-commerce-card {
++    min-height: 185px !important;
++  }
++
++  .craft-home aside {
++    height: 235px !important;
++  }
++
++  .p4-toolbar {
++    align-items: stretch !important;
++    flex-direction: column !important;
++  }
++
++  .pd-main-media {
++    height: min(108vw, 400px) !important;
++  }
++
++  .pd-buy-row {
++    grid-template-columns: 84px minmax(0, 1fr) !important;
++    gap: 8px !important;
++  }
++
++  .p8-cart-item {
++    grid-template-columns: 72px minmax(0, 1fr) 36px !important;
++    gap: 9px !important;
++    padding: 11px !important;
++  }
++
++  .p8-cart-image {
++    height: 80px !important;
++  }
++
++  .p8-cart-qty {
++    grid-column: 1 / -1 !important;
++  }
++
++  .p8-wishlist-grid {
++    grid-template-columns: 1fr !important;
++    gap: 11px !important;
++  }
++
++  .p8-wish-image {
++    height: min(102vw, 400px) !important;
++  }
++
++  .order-card {
++    grid-template-columns: 1fr !important;
++  }
++
++  .order-action {
++    grid-column: auto !important;
++  }
++
++  .od-meta,
++  .ptrack-meta {
++    grid-template-columns: 1fr !important;
++  }
++
++  .phase-main [class*="grid-cols-"] {
++    grid-template-columns: 1fr !important;
++  }
++
++  .p4-footer-grid {
++    grid-template-columns: 1fr !important;
++  }
++
++  .p4-footer-brand,
++  .p4-footer-note {
++    grid-column: auto !important;
++  }
++}
++
++@media (max-width: 420px) {
++  .p4-wrap {
++    width: calc(100% - 16px) !important;
++  }
++
++  .p4-brand {
++    gap: 7px !important;
++  }
++
++  .p4-brand-mark {
++    width: 38px !important;
++    height: 38px !important;
++    flex-basis: 38px !important;
++  }
++
++  .p4-brand-copy strong {
++    max-width: 88px !important;
++    font-size: 13px !important;
++  }
++
++  .p4-icon,
++  .p4-cart,
++  .p4-menu-button,
++  .p4-account-trigger {
++    width: 36px !important;
++    min-width: 36px !important;
++    height: 38px !important;
++    min-height: 38px !important;
++  }
++
++  .p4-actions {
++    gap: 0 !important;
++  }
++
++  .home-lux-slider-ui {
++    right: 8px !important;
++    left: 8px !important;
++    max-width: calc(100% - 16px) !important;
++  }
++
++  .home-lux-slider-count strong {
++    font-size: 20px !important;
++  }
++
++  .home-lux-slider-dots {
++    gap: 5px !important;
++  }
++
++  .home-lux-slider-dots button {
++    width: 20px !important;
++  }
++
++  .hero-object {
++    height: 232px !important;
++  }
++
++  .hero-product {
++    height: 210px !important;
++  }
++
++  .hero-product-info {
++    display: none !important;
++  }
++
++  .p8-cart-item {
++    grid-template-columns: 64px minmax(0, 1fr) 34px !important;
++  }
++
++  .p8-cart-image {
++    height: 72px !important;
++  }
++}
++
++@media (max-width: 340px) {
++  /* Preserve the rest of the header instead of allowing horizontal overflow. */
++  .p4-actions .p4-icon[data-theme-toggle] {
++    display: none !important;
++  }
++
++  .p4-brand-copy strong {
++    max-width: 74px !important;
++  }
++}
++
++@media (max-width: 900px) and (prefers-reduced-motion: reduce) {
++  .phase-main *,
++  .p4-drawer,
++  .p4-header * {
++    scroll-behavior: auto !important;
++    transition-duration: .01ms !important;
++    animation-duration: .01ms !important;
++    animation-iteration-count: 1 !important;
++  }
++}
