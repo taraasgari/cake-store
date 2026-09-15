@@ -1,0 +1,627 @@
+
+/* ============================================================
+   CAKE STOREFRONT V3
+   Global pastry/cake visual system for ALL customer-facing pages.
+   Loaded after page-specific CSS intentionally.
+   ============================================================ */
+
+html[data-perfume-theme="day"]{
+  --p-bg:#fff7eb !important;
+  --p-bg-2:#ffeef2 !important;
+  --p-surface:#fffdf7 !important;
+  --p-surface-2:#fff2e6 !important;
+  --p-text:#5f342f !important;
+  --p-muted:#8f7067 !important;
+  --p-gold:#df6f8c !important;
+  --p-gold-2:#f2a4b9 !important;
+  --p-line:rgba(126,68,72,.13) !important;
+  --p-line-strong:rgba(208,104,132,.26) !important;
+  --cake-page-bg:
+    radial-gradient(circle at 7% 4%,rgba(255,195,214,.34),transparent 24rem),
+    radial-gradient(circle at 92% 20%,rgba(255,226,201,.58),transparent 25rem),
+    linear-gradient(180deg,#fffaf3 0%,#fff2e8 48%,#fff8f1 100%);
+  --cake-card:rgba(255,253,248,.96);
+  --cake-card-2:#fff2ea;
+  --cake-hero:linear-gradient(145deg,#ffe8ef 0%,#fff4e6 55%,#ffeef2 100%);
+  --cake-title:#65352f;
+  --cake-copy:#896960;
+  --cake-accent:#dc6786;
+  --cake-accent-2:#f29bb2;
+  --cake-field:#fffdf8;
+  --cake-shadow:0 20px 54px rgba(106,53,62,.11);
+  color-scheme:light;
+}
+
+html[data-perfume-theme="night"]{
+  --p-bg:#171012 !important;
+  --p-bg-2:#211416 !important;
+  --p-surface:#241719 !important;
+  --p-surface-2:#301d20 !important;
+  --p-text:#fff3ed !important;
+  --p-muted:#c9aaa4 !important;
+  --p-gold:#f08aa6 !important;
+  --p-gold-2:#f6b4c4 !important;
+  --p-line:rgba(255,226,220,.10) !important;
+  --p-line-strong:rgba(242,139,166,.28) !important;
+  --cake-page-bg:
+    radial-gradient(circle at 10% 0%,rgba(160,61,87,.18),transparent 26rem),
+    radial-gradient(circle at 92% 18%,rgba(112,63,47,.22),transparent 28rem),
+    linear-gradient(180deg,#160f11 0%,#201315 52%,#181011 100%);
+  --cake-card:rgba(39,24,26,.96);
+  --cake-card-2:#311d21;
+  --cake-hero:linear-gradient(145deg,#2c191d 0%,#251817 55%,#321d22 100%);
+  --cake-title:#fff0e9;
+  --cake-copy:#c9aaa4;
+  --cake-accent:#f08aa6;
+  --cake-accent-2:#f8b7c8;
+  --cake-field:#1d1214;
+  --cake-shadow:0 24px 60px rgba(0,0,0,.36);
+  color-scheme:dark;
+}
+
+/* Global page canvas */
+html[data-perfume-theme] body.velora-body,
+html[data-perfume-theme] .phase-main,
+html[data-perfume-theme] .p8-page,
+html[data-perfume-theme] .p10-page,
+html[data-perfume-theme] .recovery-page,
+html[data-perfume-theme] .auth-lux-page{
+  background:var(--cake-page-bg) !important;
+  color:var(--p-text) !important;
+}
+
+html[data-perfume-theme] .phase-main{
+  position:relative;
+  isolation:isolate;
+}
+html[data-perfume-theme] .phase-main::before{
+  content:"";
+  position:fixed;
+  inset:0;
+  z-index:-1;
+  pointer-events:none;
+  opacity:.45;
+  background:
+    radial-gradient(circle at 16px 16px,rgba(223,111,140,.08) 0 2px,transparent 2.5px) 0 0/42px 42px;
+}
+html[data-perfume-theme="night"] .phase-main::before{opacity:.16}
+
+/* Header harmonization */
+html[data-perfume-theme="day"] .cake-topline{
+  background:linear-gradient(90deg,#ffe7ed,#ffdce5,#fff0e3) !important;
+}
+html[data-perfume-theme="night"] .cake-topline{
+  background:linear-gradient(90deg,#2b181d,#351d24,#2a1a18) !important;
+  border-color:rgba(255,255,255,.07) !important;
+}
+html[data-perfume-theme="night"] .cake-topline-inner,
+html[data-perfume-theme="night"] .cake-topline-item{color:#f1cfd5 !important}
+html[data-perfume-theme="night"] .cake-site-header{
+  background:
+    radial-gradient(circle at 8% 60%,rgba(237,116,150,.10),transparent 18rem),
+    radial-gradient(circle at 93% 15%,rgba(132,70,53,.18),transparent 22rem),
+    linear-gradient(180deg,#211416,#181011) !important;
+  border-color:rgba(255,255,255,.07) !important;
+}
+html[data-perfume-theme="night"] .cake-site-header::before{
+  opacity:.10;
+  background:radial-gradient(circle at 18px -2px,#f7d8dc 0 18px,transparent 19px) 0 0/54px 24px repeat-x !important;
+}
+html[data-perfume-theme="night"] .cake-brand-mark,
+html[data-perfume-theme="night"] .cake-icon,
+html[data-perfume-theme="night"] .cake-cart,
+html[data-perfume-theme="night"] .cake-search,
+html[data-perfume-theme="night"] .cake-nav{
+  background:rgba(41,25,28,.96) !important;
+  border-color:rgba(244,143,170,.17) !important;
+  color:#ffece9 !important;
+}
+html[data-perfume-theme="night"] .cake-brand-copy strong,
+html[data-perfume-theme="night"] .cake-nav a,
+html[data-perfume-theme="night"] .cake-search input{color:#fff0eb !important}
+html[data-perfume-theme="night"] .cake-brand-copy small,
+html[data-perfume-theme="night"] .cake-search input::placeholder{color:#c89da2 !important}
+html[data-perfume-theme="night"] .cake-account-dropdown{
+  background:#28181b !important;
+  border-color:rgba(244,143,170,.18) !important;
+}
+html[data-perfume-theme="night"] .cake-account-dropdown a,
+html[data-perfume-theme="night"] .cake-account-dropdown button{color:#f7dfdc !important}
+
+/* Shared heroes / section headers */
+html[data-perfume-theme] .p4-page-hero,
+html[data-perfume-theme] .p4-feature-hero,
+html[data-perfume-theme] .p4-service-hero,
+html[data-perfume-theme] .p8-page-head,
+html[data-perfume-theme] .p10-hero{
+  background:var(--cake-hero) !important;
+  border-color:var(--p-line) !important;
+  color:var(--p-text) !important;
+}
+html[data-perfume-theme] .p4-page-hero h1,
+html[data-perfume-theme] .p4-feature-hero h1,
+html[data-perfume-theme] .p4-service-hero h1,
+html[data-perfume-theme] .p8-page-head h1,
+html[data-perfume-theme] .p10-hero h1,
+html[data-perfume-theme] .p4-listing-head h2,
+html[data-perfume-theme] .p8-section-head h2{
+  color:var(--cake-title) !important;
+}
+html[data-perfume-theme] .p4-page-hero p,
+html[data-perfume-theme] .p4-feature-hero p,
+html[data-perfume-theme] .p4-service-hero p,
+html[data-perfume-theme] .p8-page-head p,
+html[data-perfume-theme] .p10-hero p{
+  color:var(--cake-copy) !important;
+}
+html[data-perfume-theme] .p4-kicker,
+html[data-perfume-theme] .p8-kicker,
+html[data-perfume-theme] .p10-kicker,
+html[data-perfume-theme] .recovery-kicker,
+html[data-perfume-theme] .auth-lux-heading>span{
+  color:var(--cake-accent) !important;
+}
+html[data-perfume-theme] em{color:var(--cake-accent)}
+
+/* Catalog / filters / generic product cards */
+html[data-perfume-theme] .p4-shop-layout,
+html[data-perfume-theme] .p4-listing,
+html[data-perfume-theme] .p4-service-layout{
+  color:var(--p-text) !important;
+}
+html[data-perfume-theme] .p4-filter,
+html[data-perfume-theme] .p4-toolbar,
+html[data-perfume-theme] .p4-service-menu,
+html[data-perfume-theme] .p4-service-content,
+html[data-perfume-theme] .p4-empty,
+html[data-perfume-theme] .p4-product-card{
+  background:var(--cake-card) !important;
+  border-color:var(--p-line) !important;
+  box-shadow:var(--cake-shadow) !important;
+}
+html[data-perfume-theme] .p4-filter-section,
+html[data-perfume-theme] .p4-service-content,
+html[data-perfume-theme] .p4-service-menu a,
+html[data-perfume-theme] .p4-toolbar label{
+  color:var(--p-text) !important;
+}
+html[data-perfume-theme] .p4-filter-section>span,
+html[data-perfume-theme] .p4-product-info small,
+html[data-perfume-theme] .p4-price span,
+html[data-perfume-theme] .p4-empty p{
+  color:var(--p-muted) !important;
+}
+html[data-perfume-theme] .p4-filter input,
+html[data-perfume-theme] .p4-toolbar select{
+  background:var(--cake-field) !important;
+  color:var(--p-text) !important;
+  border-color:var(--p-line-strong) !important;
+}
+html[data-perfume-theme] .p4-filter button,
+html[data-perfume-theme] .p4-round,
+html[data-perfume-theme] .p4-outline{
+  border-color:var(--cake-accent) !important;
+  color:var(--cake-accent) !important;
+}
+html[data-perfume-theme] .p4-filter button:hover,
+html[data-perfume-theme] .p4-round:hover,
+html[data-perfume-theme] .p4-outline:hover{
+  background:var(--cake-accent) !important;
+  color:#fff !important;
+}
+html[data-perfume-theme] .p4-product-media{
+  background:linear-gradient(145deg,var(--cake-card-2),var(--cake-card)) !important;
+}
+html[data-perfume-theme] .p4-product-title,
+html[data-perfume-theme] .p4-price strong{color:var(--cake-title) !important}
+html[data-perfume-theme] .p4-product-badges span{
+  background:var(--cake-accent) !important;
+  border-color:transparent !important;
+  color:#fff !important;
+}
+html[data-perfume-theme] .p4-product-badges .sale{background:#b74759 !important}
+html[data-perfume-theme] .p4-empty-bottle{
+  background:linear-gradient(160deg,#ffe5ed,#fff5e9) !important;
+  color:#b64e6b !important;
+  border-color:rgba(223,111,140,.28) !important;
+}
+html[data-perfume-theme="night"] .p4-empty-bottle{
+  background:linear-gradient(160deg,#3a2027,#26181a) !important;
+  color:#f2a6ba !important;
+}
+
+/* Feature circles / decorative marks */
+html[data-perfume-theme] .p4-feature-circle,
+html[data-perfume-theme] .p4-stat,
+html[data-perfume-theme] .p4-service-orbit,
+html[data-perfume-theme] .p8-head-mark,
+html[data-perfume-theme] .p10-seal{
+  background:radial-gradient(circle,var(--cake-card) 0 48%,var(--cake-card-2) 49% 100%) !important;
+  border-color:var(--p-line-strong) !important;
+  color:var(--cake-accent) !important;
+}
+
+/* P8: cart, wishlist, profile, checkout */
+html[data-perfume-theme] .p8-cart-item,
+html[data-perfume-theme] .p8-summary,
+html[data-perfume-theme] .p8-empty-card,
+html[data-perfume-theme] .p8-wish-card,
+html[data-perfume-theme] .p8-profile-card,
+html[data-perfume-theme] .p8-details-card,
+html[data-perfume-theme] .p8-profile-actions>a,
+html[data-perfume-theme] .p8-checkout-card,
+html[data-perfume-theme] .p8-checkout-summary{
+  background:var(--cake-card) !important;
+  border-color:var(--p-line) !important;
+  box-shadow:var(--cake-shadow) !important;
+  color:var(--p-text) !important;
+}
+html[data-perfume-theme] .p8-cart-image,
+html[data-perfume-theme] .p8-wish-image,
+html[data-perfume-theme] .p8-avatar{
+  background:linear-gradient(145deg,var(--cake-card-2),var(--cake-card)) !important;
+  border-color:var(--p-line) !important;
+}
+html[data-perfume-theme] .p8-cart-copy h3,
+html[data-perfume-theme] .p8-wish-title,
+html[data-perfume-theme] .p8-summary h2,
+html[data-perfume-theme] .p8-profile-card h2,
+html[data-perfume-theme] .p8-profile-actions strong,
+html[data-perfume-theme] .p8-details-card strong{
+  color:var(--cake-title) !important;
+}
+html[data-perfume-theme] .p8-cart-copy small,
+html[data-perfume-theme] .p8-cart-copy span,
+html[data-perfume-theme] .p8-summary-row,
+html[data-perfume-theme] .p8-profile-card p,
+html[data-perfume-theme] .p8-profile-actions small,
+html[data-perfume-theme] .p8-detail-grid small{
+  color:var(--p-muted) !important;
+}
+html[data-perfume-theme] .p8-primary,
+html[data-perfume-theme] .p8-checkout-submit{
+  background:linear-gradient(135deg,var(--cake-accent),var(--cake-accent-2)) !important;
+  border-color:transparent !important;
+  color:white !important;
+  box-shadow:0 12px 28px rgba(215,94,128,.22) !important;
+}
+html[data-perfume-theme] .p8-secondary{
+  background:var(--cake-card-2) !important;
+  border-color:var(--p-line-strong) !important;
+  color:var(--cake-title) !important;
+}
+html[data-perfume-theme] .p8-field input,
+html[data-perfume-theme] .p8-field textarea,
+html[data-perfume-theme] .p8-payment,
+html[data-perfume-theme] .p8-payment-option{
+  background:var(--cake-field) !important;
+  color:var(--p-text) !important;
+  border-color:var(--p-line-strong) !important;
+  border-radius:14px !important;
+}
+html[data-perfume-theme] .p8-payment-option:hover{border-color:var(--cake-accent)!important}
+html[data-perfume-theme] .p8-checkout-title i,
+html[data-perfume-theme] .p8-field label i,
+html[data-perfume-theme] .p8-payment-option i,
+html[data-perfume-theme] .p8-order-item strong,
+html[data-perfume-theme] .p8-checkout-total strong{
+  color:var(--cake-accent) !important;
+}
+
+/* Profile edit / p10 */
+html[data-perfume-theme] .p10-side,
+html[data-perfume-theme] .p10-card{
+  background:var(--cake-card) !important;
+  border-color:var(--p-line) !important;
+  box-shadow:var(--cake-shadow) !important;
+  color:var(--p-text) !important;
+}
+html[data-perfume-theme] .p10-control input,
+html[data-perfume-theme] .p10-control textarea,
+html[data-perfume-theme] .p10-control select{
+  background:var(--cake-field) !important;
+  border-color:var(--p-line-strong) !important;
+  color:var(--p-text) !important;
+  border-radius:14px !important;
+}
+html[data-perfume-theme] .p10-save{
+  background:linear-gradient(135deg,var(--cake-accent),var(--cake-accent-2)) !important;
+  color:#fff !important;
+  border:0 !important;
+}
+html[data-perfume-theme] .p10-outline{
+  border-color:var(--cake-accent) !important;
+  color:var(--cake-accent) !important;
+}
+
+/* Product detail */
+html[data-perfume-theme] .pd-wrap{color:var(--p-text)!important}
+html[data-perfume-theme] .pd-main-media,
+html[data-perfume-theme] .pd-info,
+html[data-perfume-theme] .pd-story-grid,
+html[data-perfume-theme] .pd-specs,
+html[data-perfume-theme] .pd-reviews,
+html[data-perfume-theme] .pd-similar{
+  background:var(--cake-card) !important;
+  border-color:var(--p-line) !important;
+  box-shadow:var(--cake-shadow) !important;
+}
+html[data-perfume-theme] .pd-main-media{
+  background:linear-gradient(145deg,var(--cake-card-2),var(--cake-card)) !important;
+}
+html[data-perfume-theme] .pd-info h1,
+html[data-perfume-theme] .pd-story-title h2,
+html[data-perfume-theme] .pd-section-head h2,
+html[data-perfume-theme] .pd-spec-grid strong{
+  color:var(--cake-title) !important;
+}
+html[data-perfume-theme] .pd-lead,
+html[data-perfume-theme] .pd-story-copy,
+html[data-perfume-theme] .pd-section-head p,
+html[data-perfume-theme] .pd-rating>span:last-child,
+html[data-perfume-theme] .pd-spec-grid small{
+  color:var(--p-muted) !important;
+}
+html[data-perfume-theme] .pd-price strong,
+html[data-perfume-theme] .pd-stars{color:var(--cake-accent) !important}
+html[data-perfume-theme] .pd-variants button,
+html[data-perfume-theme] .pd-qty,
+html[data-perfume-theme] .pd-actions button,
+html[data-perfume-theme] .pd-actions a,
+html[data-perfume-theme] .pd-review-form,
+html[data-perfume-theme] .pd-review-grid article{
+  background:var(--cake-field) !important;
+  color:var(--p-text) !important;
+  border-color:var(--p-line-strong) !important;
+}
+html[data-perfume-theme] .pd-variants button:hover,
+html[data-perfume-theme] .pd-variants button.active{border-color:var(--cake-accent)!important}
+html[data-perfume-theme] .pd-cart-btn,
+html[data-perfume-theme] .pd-review-form button{
+  background:linear-gradient(135deg,var(--cake-accent),var(--cake-accent-2)) !important;
+  color:#fff !important;
+  border-color:transparent !important;
+}
+html[data-perfume-theme] .pd-thumbs button{background:var(--cake-field)!important;border-color:var(--p-line)!important}
+html[data-perfume-theme] .pd-thumbs button.active{border-color:var(--cake-accent)!important}
+html[data-perfume-theme] .pd-empty-bottle{
+  background:linear-gradient(150deg,var(--cake-card-2),var(--cake-card)) !important;
+  color:var(--cake-accent)!important;
+}
+
+/* Login / signup */
+html[data-perfume-theme] .auth-lux-shell{
+  background:var(--cake-card) !important;
+  border:1px solid var(--p-line) !important;
+  box-shadow:var(--cake-shadow) !important;
+}
+html[data-perfume-theme] .auth-lux-form-side,
+html[data-perfume-theme] .auth-lux-card{background:transparent !important}
+html[data-perfume-theme] .auth-lux-heading h1,
+html[data-perfume-theme] .auth-visual-copy h2{color:var(--cake-title)!important}
+html[data-perfume-theme] .auth-lux-heading p,
+html[data-perfume-theme] .auth-visual-copy p{color:var(--p-muted)!important}
+html[data-perfume-theme] .auth-lux-visual-side{
+  background:
+    radial-gradient(circle at 25% 25%,rgba(255,255,255,.35),transparent 14rem),
+    linear-gradient(145deg,var(--cake-card-2),#f6b4c4) !important;
+  border-color:var(--p-line)!important;
+}
+html[data-perfume-theme="night"] .auth-lux-visual-side{
+  background:
+    radial-gradient(circle at 25% 25%,rgba(240,138,166,.16),transparent 14rem),
+    linear-gradient(145deg,#311c22,#211416) !important;
+}
+html[data-perfume-theme] .auth-input{
+  background:var(--cake-field)!important;
+  border-color:var(--p-line-strong)!important;
+  border-radius:15px!important;
+}
+html[data-perfume-theme] .auth-input input{color:var(--p-text)!important}
+html[data-perfume-theme] .auth-input i,
+html[data-perfume-theme] .auth-lux-row a,
+html[data-perfume-theme] .auth-switch a{color:var(--cake-accent)!important}
+html[data-perfume-theme] .auth-submit{
+  background:linear-gradient(135deg,var(--cake-accent),var(--cake-accent-2))!important;
+  color:#fff!important;
+  border:0!important;
+}
+html[data-perfume-theme] .auth-bottle{
+  background:linear-gradient(145deg,#fff0e7,#e991a9)!important;
+  border-color:rgba(255,255,255,.45)!important;
+}
+html[data-perfume-theme="night"] .auth-bottle{
+  background:linear-gradient(145deg,#6f3545,#2a181c)!important;
+}
+
+/* Recovery */
+html[data-perfume-theme] .recovery-shell,
+html[data-perfume-theme] .recovery-card{
+  background:var(--cake-card)!important;
+  border-color:var(--p-line)!important;
+  box-shadow:var(--cake-shadow)!important;
+}
+html[data-perfume-theme] .recovery-card h1,
+html[data-perfume-theme] .recovery-visual-copy h2{color:var(--cake-title)!important}
+html[data-perfume-theme] .recovery-lead,
+html[data-perfume-theme] .recovery-visual-copy p{color:var(--p-muted)!important}
+html[data-perfume-theme] .recovery-input{
+  background:var(--cake-field)!important;
+  border-color:var(--p-line-strong)!important;
+  border-radius:15px!important;
+}
+html[data-perfume-theme] .recovery-input input{color:var(--p-text)!important}
+html[data-perfume-theme] .recovery-submit{
+  background:linear-gradient(135deg,var(--cake-accent),var(--cake-accent-2))!important;
+  color:#fff!important;
+  border:0!important;
+}
+html[data-perfume-theme] .recovery-visual{
+  background:linear-gradient(145deg,var(--cake-card-2),#ffdbe4)!important;
+}
+html[data-perfume-theme="night"] .recovery-visual{
+  background:linear-gradient(145deg,#321e23,#211416)!important;
+}
+
+/* Order list/detail/success: override old hard-coded black/gold styles */
+html[data-perfume-theme] .orders-page,
+html[data-perfume-theme] .od-page,
+html[data-perfume-theme] .p8-success-shell{color:var(--p-text)!important}
+html[data-perfume-theme] .order-card,
+html[data-perfume-theme] .orders-empty,
+html[data-perfume-theme] .od-card,
+html[data-perfume-theme] .od-side-card,
+html[data-perfume-theme] .od-summary-card,
+html[data-perfume-theme] .p8-success-card{
+  background:var(--cake-card)!important;
+  border-color:var(--p-line)!important;
+  box-shadow:var(--cake-shadow)!important;
+}
+html[data-perfume-theme] .orders-head h1,
+html[data-perfume-theme] .order-number,
+html[data-perfume-theme] .od-card h1,
+html[data-perfume-theme] .od-card h2,
+html[data-perfume-theme] .od-side-card h3,
+html[data-perfume-theme] .p8-success-main h1{
+  color:var(--cake-title)!important;
+}
+html[data-perfume-theme] .orders-head p,
+html[data-perfume-theme] .order-label,
+html[data-perfume-theme] .order-date,
+html[data-perfume-theme] .od-card p,
+html[data-perfume-theme] .od-side-card p,
+html[data-perfume-theme] .p8-success-main p{
+  color:var(--p-muted)!important;
+}
+html[data-perfume-theme] .orders-head span,
+html[data-perfume-theme] .order-price,
+html[data-perfume-theme] .p8-success-kicker,
+html[data-perfume-theme] .p8-success-number strong{
+  color:var(--cake-accent)!important;
+}
+html[data-perfume-theme] .order-action,
+html[data-perfume-theme] .od-btn{
+  border-color:var(--cake-accent)!important;
+  color:var(--cake-accent)!important;
+  background:transparent!important;
+}
+html[data-perfume-theme] .order-action:hover,
+html[data-perfume-theme] .od-btn:hover{
+  background:var(--cake-accent)!important;
+  color:white!important;
+}
+html[data-perfume-theme] .order-status{
+  border-color:rgba(223,111,140,.3)!important;
+  background:rgba(223,111,140,.08)!important;
+  color:var(--cake-accent)!important;
+}
+
+/* Service page */
+html[data-perfume-theme] .p4-service-menu a:hover,
+html[data-perfume-theme] .p4-service-menu a.active{
+  background:var(--cake-card-2)!important;
+  color:var(--cake-accent)!important;
+}
+html[data-perfume-theme] .p4-steps section,
+html[data-perfume-theme] .p4-info section,
+html[data-perfume-theme] .p4-prose{
+  background:var(--cake-card)!important;
+  border-color:var(--p-line)!important;
+  color:var(--p-text)!important;
+}
+html[data-perfume-theme] .p4-steps b,
+html[data-perfume-theme] .p4-info i,
+html[data-perfume-theme] .p4-service-index{color:var(--cake-accent)!important}
+
+/* Generic form fields throughout public storefront */
+html[data-perfume-theme] .phase-main input:not([type="checkbox"]):not([type="radio"]),
+html[data-perfume-theme] .phase-main textarea,
+html[data-perfume-theme] .phase-main select{
+  border-color:var(--p-line-strong);
+}
+html[data-perfume-theme="day"] .phase-main input:not([type="checkbox"]):not([type="radio"]),
+html[data-perfume-theme="day"] .phase-main textarea,
+html[data-perfume-theme="day"] .phase-main select{
+  background:#fffdf8;
+  color:#633730;
+}
+html[data-perfume-theme="night"] .phase-main input:not([type="checkbox"]):not([type="radio"]),
+html[data-perfume-theme="night"] .phase-main textarea,
+html[data-perfume-theme="night"] .phase-main select{
+  background:#1e1315;
+  color:#fff0eb;
+}
+
+/* Creamy day mode should feel intentional, not washed out */
+html[data-perfume-theme="day"] .phase-main{
+  box-shadow:inset 0 22px 60px rgba(224,125,145,.035);
+}
+html[data-perfume-theme="day"] .p4-page-hero,
+html[data-perfume-theme="day"] .p4-feature-hero,
+html[data-perfume-theme="day"] .p4-service-hero{
+  border-bottom:1px solid rgba(215,100,132,.15)!important;
+}
+html[data-perfume-theme="day"] .p4-product-card,
+html[data-perfume-theme="day"] .p8-cart-item,
+html[data-perfume-theme="day"] .p8-summary,
+html[data-perfume-theme="day"] .p8-wish-card,
+html[data-perfume-theme="day"] .p8-profile-card,
+html[data-perfume-theme="day"] .p10-card{
+  background:
+    linear-gradient(145deg,rgba(255,255,255,.94),rgba(255,244,235,.96))!important;
+}
+
+/* Night mode: dark chocolate rather than neutral black */
+html[data-perfume-theme="night"] .phase-main{
+  box-shadow:inset 0 30px 90px rgba(93,39,51,.08);
+}
+html[data-perfume-theme="night"] .p4-product-card,
+html[data-perfume-theme="night"] .p8-cart-item,
+html[data-perfume-theme="night"] .p8-summary,
+html[data-perfume-theme="night"] .p8-wish-card,
+html[data-perfume-theme="night"] .p8-profile-card,
+html[data-perfume-theme="night"] .p10-card,
+html[data-perfume-theme="night"] .pd-info,
+html[data-perfume-theme="night"] .pd-story-grid,
+html[data-perfume-theme="night"] .pd-specs,
+html[data-perfume-theme="night"] .pd-reviews{
+  background:linear-gradient(145deg,#28191c,#211416)!important;
+}
+
+/* Decorative cake/pastry feel without extra image assets */
+html[data-perfume-theme] .p4-page-hero::after,
+html[data-perfume-theme] .p4-feature-hero::after,
+html[data-perfume-theme] .p8-page-head::after,
+html[data-perfume-theme] .p10-hero::after{
+  content:"";
+  position:absolute;
+  width:210px;height:210px;
+  left:4%;top:50%;
+  transform:translateY(-50%);
+  pointer-events:none;
+  opacity:.25;
+  background:
+    radial-gradient(circle at 50% 46%,var(--cake-accent) 0 7%,transparent 8%),
+    radial-gradient(circle at 37% 58%,#fff 0 7%,transparent 8%),
+    radial-gradient(circle at 63% 58%,#fff 0 7%,transparent 8%),
+    radial-gradient(circle at 50% 70%,#fff 0 7%,transparent 8%);
+  filter:blur(.1px);
+}
+html[data-perfume-theme="night"] .p4-page-hero::after,
+html[data-perfume-theme="night"] .p4-feature-hero::after,
+html[data-perfume-theme="night"] .p8-page-head::after,
+html[data-perfume-theme="night"] .p10-hero::after{opacity:.10}
+
+/* Responsive polish */
+@media(max-width:760px){
+  html[data-perfume-theme] .p4-page-hero::after,
+  html[data-perfume-theme] .p4-feature-hero::after,
+  html[data-perfume-theme] .p8-page-head::after,
+  html[data-perfume-theme] .p10-hero::after{display:none}
+  html[data-perfume-theme] .p4-filter,
+  html[data-perfume-theme] .p4-toolbar,
+  html[data-perfume-theme] .p8-summary,
+  html[data-perfume-theme] .p8-profile-card,
+  html[data-perfume-theme] .p10-side,
+  html[data-perfume-theme] .p10-card{border-radius:22px!important}
+}

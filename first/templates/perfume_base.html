@@ -26,98 +26,126 @@ try{
 <link rel="stylesheet" href="{% static 'css/perfume-account-menu.css' %}">
 <link rel="stylesheet" href="{% static 'css/cake-storefront-v2.css' %}">
 {% block extra_css %}{% endblock %}
+<link rel="stylesheet" href="{% static 'css/cake-storefront-v3.css' %}?v=3">
+<link rel="stylesheet" href="{% static 'css/cake-storefront-v4.css' %}?v=4">
 </head>
 <body class="velora-body">
 
-<div class="cake-topline">
-  <div class="cake-wrap cake-topline-inner">
-    <span class="cake-topline-item"><i class="fa-regular fa-heart"></i> با هر خرید، یک حال خوب شیرین هدیه بدهید</span>
-    <span class="cake-topline-divider"></span>
-    <span class="cake-topline-item"><i class="fa-solid fa-gift"></i> ارسال رایگان سفارش‌های بالای ۵۰۰ هزار تومان</span>
-    <span class="cake-topline-divider"></span>
-    <span class="cake-topline-item"><i class="fa-solid fa-shield-heart"></i> تضمین کیفیت و تازگی</span>
-    <span class="cake-topline-divider"></span>
-    <span class="cake-topline-item"><i class="fa-regular fa-gem"></i> مشاوره انتخاب کیک</span>
-    <span class="cake-topline-divider"></span>
-    <span class="cake-topline-item"><i class="fa-solid fa-headset"></i> پشتیبانی سفارش‌ها</span>
-  </div>
-</div>
 
-<header class="cake-site-header" data-bsg-edit="site-header" data-bsg-name="هدر سایت" data-bsg-kind="box">
-  <div class="cake-wrap">
-    <div class="cake-mainbar">
-      <a class="cake-brand" href="{% url 'first:home' %}">
-        <span class="cake-brand-mark">
-          {% if settings.logo %}
-            <img src="{{ settings.logo.url }}" alt="{{ settings.site_name|default:'شیرین‌خانه' }}">
-          {% else %}
-            <i class="fa-solid fa-cake-candles cake-brand-cupcake"></i>
-          {% endif %}
-        </span>
-        <span class="cake-brand-copy">
-          <strong>{{ settings.site_name|default:'شیرین‌خانه' }}</strong>
-          <small>CAKE & SWEET SHOP</small>
-        </span>
-      </a>
+<header class="fantasy-cake-header" data-bsg-edit="site-header" data-bsg-name="هدر سایت" data-bsg-kind="box">
+  <div class="fantasy-desktop-header">
+    <div class="fantasy-header-stage">
+      <img class="fantasy-header-art" src="{% static 'images/cake-header-fantasy.png' %}" alt="" aria-hidden="true">
+      <div class="fantasy-night-wash" aria-hidden="true"></div>
 
-      <div class="cake-search-shell">
-        <div class="cake-search-decor"></div>
-        <form class="cake-search" method="get" action="{% url 'first:search_products' %}">
-          <input type="search" name="q" value="{{ request.GET.q|default:'' }}" placeholder="نام کیک، شیرینی، طعم یا محصول موردنظر را جستجو کنید..." autocomplete="off">
-          <button type="submit" aria-label="جستجو"><i class="fa-solid fa-magnifying-glass"></i></button>
-        </form>
+      <div class="fantasy-trust-overlay">
+        <span><i class="fa-solid fa-heart"></i> با هر خرید، شیرینیِ حال خوب را هدیه دهید</span>
+        <i class="fantasy-sep"></i>
+        <span><i class="fa-solid fa-gift"></i> ارسال رایگان سفارش‌های بالای ۵۰۰ هزار تومان</span>
+        <i class="fantasy-sep"></i>
+        <span><i class="fa-solid fa-shield-heart"></i> تضمین تازگی و کیفیت</span>
+        <i class="fantasy-sep"></i>
+        <span><i class="fa-regular fa-gem"></i> مشاوره انتخاب کیک و شیرینی</span>
+        <i class="fantasy-sep"></i>
+        <span><i class="fa-solid fa-headset"></i> پشتیبانی سفارش‌ها</span>
       </div>
 
-      <div class="cake-actions">
-        <button type="button" class="cake-icon" data-theme-toggle title="حالت روز و شب">
-          <i class="fa-regular fa-moon night-i"></i>
-          <i class="fa-regular fa-sun day-i"></i>
-        </button>
+      <a class="fantasy-brand-hotspot" href="{% url 'first:home' %}" aria-label="شیرین‌خانه"></a>
 
-        {% if user.is_authenticated %}
-        <details class="cake-account-menu">
-          <summary class="cake-icon" title="حساب کاربری"><i class="fa-regular fa-user"></i></summary>
-          <div class="cake-account-dropdown">
-            <a href="{% url 'first:profile' %}"><i class="fa-regular fa-user"></i> پروفایل من</a>
-            <a href="{% url 'first:user_orders' %}"><i class="fa-solid fa-box"></i> سفارش‌های من</a>
-            <a href="{% url 'first:wishlist' %}"><i class="fa-regular fa-heart"></i> علاقه‌مندی‌ها</a>
-            {% if user|has_permission:'dashboard' %}
-            <a href="{% url 'first:admin_dashboard' %}"><i class="fa-solid fa-gauge-high"></i> پنل مدیریت</a>
-            {% endif %}
-            {% if user.is_owner or user.is_superuser %}
-            <a href="{% url 'first:customizer' %}"><i class="fa-solid fa-wand-magic-sparkles"></i> طراحی ظاهری سایت</a>
-            {% endif %}
-            <form method="post" action="{% url 'first:logout' %}">
-              {% csrf_token %}
-              <button type="submit"><i class="fa-solid fa-arrow-right-from-bracket"></i> خروج</button>
-            </form>
+      <form class="fantasy-search-form" method="get" action="{% url 'first:search_products' %}">
+        <input
+          type="search"
+          name="q"
+          value="{{ request.GET.q|default:'' }}"
+          placeholder="نام کیک، شیرینی، طعم یا محصول موردنظر را جستجو کنید..."
+          autocomplete="off"
+          aria-label="جستجوی محصولات"
+        >
+        <button type="submit" aria-label="جستجو"></button>
+      </form>
+
+      <button class="fantasy-action fantasy-theme-action" type="button" data-theme-toggle aria-label="تغییر حالت روز و شب"></button>
+
+      {% if user.is_authenticated %}
+      <details class="fantasy-account">
+        <summary class="fantasy-account-trigger" aria-label="حساب کاربری"></summary>
+        <div class="fantasy-account-dropdown">
+          <div class="fantasy-account-head">
+            <span class="fantasy-account-avatar">{{ user.username|first|upper }}</span>
+            <div>
+              <strong>{{ user.get_full_name|default:user.username }}</strong>
+              <small>{{ user.email|default:'حساب کاربری' }}</small>
+            </div>
           </div>
-        </details>
-        {% else %}
-        <a class="cake-icon" href="{% url 'first:login' %}" title="ورود"><i class="fa-regular fa-user"></i></a>
-        {% endif %}
+          <a href="{% url 'first:profile' %}"><i class="fa-regular fa-user"></i> پروفایل من</a>
+          <a href="{% url 'first:user_orders' %}"><i class="fa-solid fa-box"></i> سفارش‌های من</a>
+          <a href="{% url 'first:wishlist' %}"><i class="fa-regular fa-heart"></i> علاقه‌مندی‌ها</a>
+          {% if user|has_permission:'dashboard' %}
+          <a href="{% url 'first:admin_dashboard' %}"><i class="fa-solid fa-gauge-high"></i> پنل مدیریت</a>
+          {% endif %}
+          {% if user.is_owner or user.is_superuser %}
+          <a href="{% url 'first:customizer' %}"><i class="fa-solid fa-wand-magic-sparkles"></i> طراحی ظاهری سایت</a>
+          {% endif %}
+          <form method="post" action="{% url 'first:logout' %}">
+            {% csrf_token %}
+            <button type="submit"><i class="fa-solid fa-arrow-right-from-bracket"></i> خروج</button>
+          </form>
+        </div>
+      </details>
+      {% else %}
+      <a class="fantasy-action fantasy-profile-action" href="{% url 'first:login' %}" aria-label="ورود به حساب"></a>
+      {% endif %}
 
-        <a class="cake-icon" href="{% url 'first:wishlist' %}" title="علاقه‌مندی‌ها"><i class="fa-regular fa-heart"></i></a>
-        <a class="cake-cart" href="{% url 'first:cart' %}">
-          <i class="fa-solid fa-bag-shopping"></i><span>سبد خرید</span>
-        </a>
-      </div>
-    </div>
+      <a class="fantasy-action fantasy-wishlist-action" href="{% url 'first:wishlist' %}" aria-label="علاقه‌مندی‌ها"></a>
+      <a class="fantasy-action fantasy-cart-action" href="{% url 'first:cart' %}" aria-label="سبد خرید"></a>
 
-    <div class="cake-nav-shell">
-      <nav class="cake-nav">
-        <a href="{% url 'first:home' %}"><i class="fa-solid fa-house"></i> خانه</a>
-        <a href="{% url 'first:product_list' %}"><i class="fa-solid fa-cake-candles"></i> همه محصولات</a>
-        <a href="{% url 'first:best_sellers' %}"><i class="fa-regular fa-star"></i> پرفروش‌ترین‌ها</a>
-        <a href="{% url 'first:discounts' %}"><i class="fa-solid fa-percent"></i> تخفیف‌های ویژه</a>
-        <a href="{% url 'first:customer_service' 'shopping-guide' %}"><i class="fa-regular fa-book-open"></i> راهنمای خرید</a>
-        <a href="{% url 'first:home' %}#cake-story"><i class="fa-regular fa-rectangle-list"></i> مجله شیرین‌خانه</a>
-        <a href="{% url 'customer_care:order_tracking' %}"><i class="fa-solid fa-truck-fast"></i> پیگیری سفارش</a>
-        <a href="{% url 'customer_care:support_home' %}"><i class="fa-solid fa-headset"></i> پشتیبانی</a>
+      <nav class="fantasy-nav-overlay" aria-label="منوی اصلی">
+        <a href="{% url 'first:home' %}"><i class="fa-solid fa-house"></i><span>خانه</span></a>
+        <a href="{% url 'first:product_list' %}"><i class="fa-solid fa-cake-candles"></i><span>همه محصولات</span></a>
+        <a href="{% url 'first:best_sellers' %}"><i class="fa-regular fa-star"></i><span>پرفروش‌ترین‌ها</span></a>
+        <a href="{% url 'first:discounts' %}"><i class="fa-solid fa-percent"></i><span>تخفیف‌های ویژه</span></a>
+        <a href="{% url 'first:customer_service' 'shopping-guide' %}"><i class="fa-regular fa-book-open"></i><span>راهنمای خرید</span></a>
+        <a href="{% url 'first:home' %}#cake-story"><i class="fa-regular fa-rectangle-list"></i><span>مجله شیرین‌خانه</span></a>
+        <a href="{% url 'customer_care:order_tracking' %}"><i class="fa-solid fa-truck-fast"></i><span>پیگیری سفارش</span></a>
+        <a href="{% url 'customer_care:support_home' %}"><i class="fa-solid fa-headset"></i><span>پشتیبانی</span></a>
       </nav>
     </div>
   </div>
+
+  <div class="fantasy-mobile-header">
+    <div class="fantasy-mobile-top">
+      <a class="fantasy-mobile-brand" href="{% url 'first:home' %}">
+        <span class="fantasy-mobile-logo"><i class="fa-solid fa-cake-candles"></i></span>
+        <span><strong>شیرین‌خانه</strong><small>CAKE & SWEET SHOP</small></span>
+      </a>
+      <div class="fantasy-mobile-actions">
+        <button type="button" data-theme-toggle aria-label="حالت روز و شب"><i class="fa-regular fa-moon"></i></button>
+        <a href="{% url 'first:wishlist' %}" aria-label="علاقه‌مندی‌ها"><i class="fa-regular fa-heart"></i></a>
+        <a href="{% url 'first:cart' %}" aria-label="سبد خرید"><i class="fa-solid fa-bag-shopping"></i></a>
+        {% if user.is_authenticated %}
+        <a href="{% url 'first:profile' %}" aria-label="حساب کاربری"><i class="fa-regular fa-user"></i></a>
+        {% else %}
+        <a href="{% url 'first:login' %}" aria-label="ورود"><i class="fa-regular fa-user"></i></a>
+        {% endif %}
+      </div>
+    </div>
+
+    <form class="fantasy-mobile-search" method="get" action="{% url 'first:search_products' %}">
+      <input type="search" name="q" value="{{ request.GET.q|default:'' }}" placeholder="کیک یا شیرینی موردنظرت را جستجو کن...">
+      <button type="submit" aria-label="جستجو"><i class="fa-solid fa-magnifying-glass"></i></button>
+    </form>
+
+    <nav class="fantasy-mobile-nav">
+      <a href="{% url 'first:home' %}">خانه</a>
+      <a href="{% url 'first:product_list' %}">محصولات</a>
+      <a href="{% url 'first:best_sellers' %}">پرفروش‌ها</a>
+      <a href="{% url 'first:discounts' %}">تخفیف‌ها</a>
+      <a href="{% url 'customer_care:order_tracking' %}">پیگیری سفارش</a>
+      <a href="{% url 'customer_care:support_home' %}">پشتیبانی</a>
+    </nav>
+  </div>
 </header>
+
 
 {% if messages %}
 <div class="cake-toast-wrap">

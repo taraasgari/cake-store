@@ -1,0 +1,407 @@
+
+/* ============================================================
+   CAKE STOREFRONT V4 — fantasy illustrated header
+   Uses the supplied header artwork while keeping links/search functional.
+   ============================================================ */
+
+.fantasy-cake-header{
+  position:relative;
+  z-index:90;
+  width:100%;
+  background:#fff7f2;
+}
+.fantasy-desktop-header{display:block}
+.fantasy-header-stage{
+  position:relative;
+  width:100%;
+  aspect-ratio:2172 / 470;
+  min-height:330px;
+  overflow:hidden;
+  isolation:isolate;
+  background:#fff7f2;
+}
+.fantasy-header-art{
+  position:absolute;
+  inset:0;
+  width:100%;
+  height:100%;
+  object-fit:cover;
+  display:block;
+  z-index:0;
+  pointer-events:none;
+  user-select:none;
+}
+.fantasy-night-wash{
+  position:absolute;
+  inset:0;
+  z-index:1;
+  pointer-events:none;
+  opacity:0;
+  transition:opacity .25s ease;
+  background:
+    linear-gradient(180deg,rgba(30,12,17,.26),rgba(32,14,18,.38)),
+    radial-gradient(circle at 78% 40%,rgba(109,37,58,.18),transparent 38%);
+}
+html[data-perfume-theme="night"] .fantasy-header-art{
+  filter:brightness(.58) saturate(.82) contrast(1.04);
+}
+html[data-perfume-theme="night"] .fantasy-night-wash{opacity:1}
+
+/* Correct, live trust text on top of the artwork */
+.fantasy-trust-overlay{
+  position:absolute;
+  z-index:5;
+  top:0;
+  right:0;
+  left:0;
+  height:14.3%;
+  display:flex;
+  align-items:center;
+  justify-content:space-around;
+  gap:14px;
+  padding:0 4%;
+  direction:rtl;
+  color:#81514a;
+  background:rgba(255,231,234,.94);
+  border-radius:0 0 26px 26px;
+  border-bottom:1px solid rgba(207,109,130,.14);
+  box-shadow:0 6px 18px rgba(118,65,70,.06);
+  font-size:clamp(10px,1.05vw,15px);
+  font-weight:800;
+  white-space:nowrap;
+}
+.fantasy-trust-overlay span{
+  display:inline-flex;
+  align-items:center;
+  gap:9px;
+}
+.fantasy-trust-overlay span i{
+  color:#df6d89;
+  font-size:1.25em;
+}
+.fantasy-sep{
+  width:1px;
+  height:36%;
+  flex:0 0 auto;
+  background:rgba(132,72,76,.15);
+}
+html[data-perfume-theme="night"] .fantasy-trust-overlay{
+  color:#f3d8d9;
+  background:rgba(42,24,28,.95);
+  border-color:rgba(255,255,255,.06);
+}
+html[data-perfume-theme="night"] .fantasy-trust-overlay span i{color:#f28da8}
+html[data-perfume-theme="night"] .fantasy-sep{background:rgba(255,255,255,.09)}
+
+/* Search is real; the fantasy cream/chocolate frame remains part of the art. */
+.fantasy-search-form{
+  position:absolute;
+  z-index:8;
+  left:34.3%;
+  top:42%;
+  width:34.6%;
+  height:15%;
+  direction:ltr;
+}
+.fantasy-search-form input{
+  position:absolute;
+  left:0;
+  top:15%;
+  width:79%;
+  height:70%;
+  padding:0 2.2%;
+  border:0;
+  outline:0;
+  direction:rtl;
+  text-align:right;
+  color:#77534b;
+  background:rgba(255,250,245,.95);
+  font:700 clamp(10px,1.05vw,15px)/1.5 Vazir,Tahoma,sans-serif;
+  border-radius:16px;
+}
+.fantasy-search-form input::placeholder{color:#9b7a70;opacity:1}
+.fantasy-search-form button{
+  position:absolute;
+  right:0;
+  top:0;
+  width:17%;
+  height:100%;
+  border:0;
+  outline:0;
+  padding:0;
+  cursor:pointer;
+  background:transparent;
+  border-radius:28%;
+}
+.fantasy-search-form button:focus-visible{
+  box-shadow:0 0 0 3px rgba(255,255,255,.95),0 0 0 6px #dc6885;
+}
+html[data-perfume-theme="night"] .fantasy-search-form input{
+  color:#f4dfda;
+  background:rgba(42,25,27,.94);
+}
+html[data-perfume-theme="night"] .fantasy-search-form input::placeholder{color:#c2a4a0}
+
+/* Hotspots over the illustrated action buttons */
+.fantasy-action,
+.fantasy-brand-hotspot,
+.fantasy-account{
+  position:absolute;
+  z-index:9;
+}
+.fantasy-action,
+.fantasy-brand-hotspot,
+.fantasy-account-trigger{
+  cursor:pointer;
+  background:transparent;
+  border:0;
+  outline:0;
+}
+.fantasy-action:focus-visible,
+.fantasy-brand-hotspot:focus-visible,
+.fantasy-account-trigger:focus-visible{
+  box-shadow:0 0 0 3px rgba(255,255,255,.9),0 0 0 6px #de6a88;
+  border-radius:18px;
+}
+.fantasy-theme-action{left:3.8%;top:38.6%;width:3.9%;height:15.5%}
+.fantasy-profile-action{left:8.1%;top:38.6%;width:3.9%;height:15.5%}
+.fantasy-wishlist-action{left:12.1%;top:38.6%;width:4.1%;height:15.5%}
+.fantasy-cart-action{left:16.5%;top:38.6%;width:8.2%;height:15.5%}
+.fantasy-brand-hotspot{right:14.2%;top:31%;width:13.5%;height:30%}
+
+/* Authenticated profile dropdown on top of the person icon */
+.fantasy-account{
+  left:8.1%;
+  top:38.6%;
+  width:3.9%;
+  height:15.5%;
+}
+.fantasy-account>summary{
+  position:absolute;
+  inset:0;
+  list-style:none;
+}
+.fantasy-account>summary::-webkit-details-marker{display:none}
+.fantasy-account-dropdown{
+  position:absolute;
+  top:105%;
+  left:-34px;
+  width:270px;
+  padding:12px;
+  direction:rtl;
+  border:1px solid rgba(130,72,76,.13);
+  border-radius:20px;
+  background:rgba(255,253,248,.98);
+  box-shadow:0 24px 60px rgba(83,38,47,.18);
+}
+.fantasy-account-head{
+  display:flex;
+  align-items:center;
+  gap:10px;
+  padding:8px 8px 13px;
+  margin-bottom:6px;
+  border-bottom:1px solid rgba(130,72,76,.10);
+}
+.fantasy-account-avatar{
+  width:40px;height:40px;display:grid;place-items:center;border-radius:14px;
+  color:#fff;background:linear-gradient(135deg,#ef8aa4,#d95d7f);font-weight:900;
+}
+.fantasy-account-head strong{display:block;color:#63342f;font-size:13px}
+.fantasy-account-head small{display:block;margin-top:3px;color:#97756d;font-size:10px}
+.fantasy-account-dropdown>a,
+.fantasy-account-dropdown form button{
+  width:100%;
+  display:flex;
+  align-items:center;
+  gap:9px;
+  padding:10px 11px;
+  border:0;
+  border-radius:11px;
+  background:transparent;
+  color:#673832;
+  font:800 12px Vazir,Tahoma,sans-serif;
+  text-align:right;
+  cursor:pointer;
+}
+.fantasy-account-dropdown>a:hover,
+.fantasy-account-dropdown form button:hover{
+  background:#fff0f3;
+  color:#d85f80;
+}
+html[data-perfume-theme="night"] .fantasy-account-dropdown{
+  background:#28181c;
+  border-color:rgba(255,255,255,.08);
+}
+html[data-perfume-theme="night"] .fantasy-account-head strong,
+html[data-perfume-theme="night"] .fantasy-account-dropdown>a,
+html[data-perfume-theme="night"] .fantasy-account-dropdown form button{color:#f8e4df}
+html[data-perfume-theme="night"] .fantasy-account-head small{color:#c29d9d}
+html[data-perfume-theme="night"] .fantasy-account-dropdown>a:hover,
+html[data-perfume-theme="night"] .fantasy-account-dropdown form button:hover{background:#382027}
+
+/* Bottom navigation: real labels/links, artwork still supplies the fantasy scene. */
+.fantasy-nav-overlay{
+  position:absolute;
+  z-index:7;
+  left:.38%;
+  right:.38%;
+  bottom:1.4%;
+  height:16.6%;
+  display:flex;
+  align-items:center;
+  justify-content:space-evenly;
+  gap:0;
+  padding:0 2.1%;
+  direction:rtl;
+  border:1px solid rgba(131,73,70,.12);
+  border-radius:28px;
+  background:rgba(255,251,246,.96);
+  box-shadow:0 11px 28px rgba(97,47,55,.10);
+  overflow:hidden;
+}
+.fantasy-nav-overlay a{
+  min-width:0;
+  height:100%;
+  flex:1 1 0;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  gap:9px;
+  position:relative;
+  color:#63352f;
+  font-size:clamp(9px,.95vw,14px);
+  font-weight:900;
+  white-space:nowrap;
+  transition:.2s ease;
+}
+.fantasy-nav-overlay a:not(:last-child)::after{
+  content:"";
+  position:absolute;
+  left:0;
+  width:1px;
+  height:36%;
+  background:rgba(118,65,66,.14);
+}
+.fantasy-nav-overlay a i{
+  color:#7d3a31;
+  font-size:1.18em;
+}
+.fantasy-nav-overlay a:hover{
+  color:#d95d7f;
+  background:linear-gradient(180deg,transparent,rgba(246,181,196,.16));
+}
+.fantasy-nav-overlay a:hover i{color:#d95d7f}
+html[data-perfume-theme="night"] .fantasy-nav-overlay{
+  background:rgba(42,25,27,.95);
+  border-color:rgba(255,255,255,.07);
+}
+html[data-perfume-theme="night"] .fantasy-nav-overlay a{color:#f6ded9}
+html[data-perfume-theme="night"] .fantasy-nav-overlay a i{color:#f09ab0}
+html[data-perfume-theme="night"] .fantasy-nav-overlay a:not(:last-child)::after{background:rgba(255,255,255,.08)}
+
+/* Mobile version remains functional rather than shrinking the illustrated desktop banner. */
+.fantasy-mobile-header{display:none}
+
+@media(max-width:900px){
+  .fantasy-desktop-header{display:none}
+  .fantasy-mobile-header{
+    display:block;
+    padding:12px 13px 10px;
+    background:
+      radial-gradient(circle at 88% 0%,rgba(255,198,215,.56),transparent 14rem),
+      linear-gradient(180deg,#fff6f3,#ffe7ed);
+    border-bottom:1px solid rgba(208,104,132,.16);
+  }
+  html[data-perfume-theme="night"] .fantasy-mobile-header{
+    background:
+      radial-gradient(circle at 88% 0%,rgba(168,69,94,.18),transparent 14rem),
+      linear-gradient(180deg,#28181c,#1c1114);
+    border-color:rgba(255,255,255,.07);
+  }
+  .fantasy-mobile-top{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:12px;
+  }
+  .fantasy-mobile-brand{
+    display:flex;
+    align-items:center;
+    gap:10px;
+    min-width:0;
+  }
+  .fantasy-mobile-logo{
+    width:48px;height:48px;flex:0 0 48px;display:grid;place-items:center;
+    border-radius:16px;color:#d85f7e;background:#fff8f4;border:1px solid rgba(216,95,126,.16);
+    box-shadow:0 8px 22px rgba(104,52,60,.09);
+  }
+  .fantasy-mobile-brand strong{display:block;color:#67362f;font-size:18px}
+  .fantasy-mobile-brand small{display:block;color:#c66c80;font-size:8px;letter-spacing:.14em}
+  html[data-perfume-theme="night"] .fantasy-mobile-brand strong{color:#fff0eb}
+  html[data-perfume-theme="night"] .fantasy-mobile-logo{background:#301c20;color:#f3a0b5;border-color:rgba(255,255,255,.08)}
+  .fantasy-mobile-actions{display:flex;gap:6px}
+  .fantasy-mobile-actions a,.fantasy-mobile-actions button{
+    width:40px;height:40px;display:grid;place-items:center;border-radius:13px;
+    border:1px solid rgba(124,69,71,.12);background:#fffaf5;color:#6d3932;
+  }
+  html[data-perfume-theme="night"] .fantasy-mobile-actions a,
+  html[data-perfume-theme="night"] .fantasy-mobile-actions button{
+    background:#2c1a1e;color:#f7ded9;border-color:rgba(255,255,255,.08);
+  }
+  .fantasy-mobile-search{
+    margin-top:11px;
+    height:54px;
+    display:flex;
+    overflow:hidden;
+    border:1px solid rgba(214,104,132,.22);
+    border-radius:18px;
+    background:#fffdf8;
+    box-shadow:0 9px 24px rgba(104,52,61,.08);
+  }
+  .fantasy-mobile-search input{
+    flex:1;
+    min-width:0;
+    border:0;
+    outline:0;
+    padding:0 15px;
+    background:transparent;
+    color:#6e413a;
+    font:700 12px Vazir,Tahoma,sans-serif;
+  }
+  .fantasy-mobile-search button{
+    width:58px;border:0;color:#fff;background:linear-gradient(145deg,#ed86a0,#d85f7f);
+  }
+  html[data-perfume-theme="night"] .fantasy-mobile-search{background:#27171a;border-color:rgba(244,139,166,.17)}
+  html[data-perfume-theme="night"] .fantasy-mobile-search input{color:#f8e8e4}
+  .fantasy-mobile-nav{
+    display:flex;
+    gap:8px;
+    overflow:auto;
+    scrollbar-width:none;
+    margin-top:10px;
+    padding-bottom:2px;
+  }
+  .fantasy-mobile-nav::-webkit-scrollbar{display:none}
+  .fantasy-mobile-nav a{
+    flex:0 0 auto;
+    padding:9px 14px;
+    border-radius:999px;
+    color:#6a3932;
+    background:rgba(255,255,255,.72);
+    border:1px solid rgba(126,69,72,.11);
+    font-size:11px;
+    font-weight:900;
+  }
+  html[data-perfume-theme="night"] .fantasy-mobile-nav a{
+    color:#f2d7d4;background:#2b191d;border-color:rgba(255,255,255,.08);
+  }
+}
+
+@media(min-width:901px) and (max-width:1200px){
+  .fantasy-trust-overlay{font-size:10px;gap:8px;padding-inline:2%}
+  .fantasy-nav-overlay a{font-size:9px;gap:5px}
+}
+
+@media(prefers-reduced-motion:reduce){
+  .fantasy-header-art,.fantasy-night-wash,.fantasy-nav-overlay a{transition:none!important}
+}
