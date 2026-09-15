@@ -1,0 +1,38 @@
+
+<header class="cake-header-v6">
+  <div class="cake-header-v6-bg">
+    <img src="{% static 'images/cake-header-bg.png' %}" alt="">
+
+    <div class="cake-v6-benefits">
+      <span>❤️ با هر خرید، شیرینی حال خوب را هدیه دهید</span>
+      <span>🎁 ارسال رایگان سفارش‌های بالای ۵۰۰ هزار تومان</span>
+      <span>🛡 تضمین تازگی و کیفیت</span>
+      <span>💎 مشاوره انتخاب کیک و شیرینی</span>
+      <span>🎧 پشتیبانی سفارش‌ها</span>
+    </div>
+
+    <a class="cake-v6-logo" href="{% url 'first:home' %}"></a>
+
+    <form class="cake-v6-search" method="get" action="{% url 'first:search_products' %}">
+      <input name="q" placeholder="نام کیک، شیرینی، طعم یا محصول موردنظر را جستجو کنید...">
+      <button><i class="fa-solid fa-magnifying-glass"></i></button>
+    </form>
+
+    <div class="cake-v6-icons">
+      <button data-theme-toggle><i class="fa-regular fa-moon"></i></button>
+      <a href="{% url 'first:profile' %}"><i class="fa-regular fa-user"></i></a>
+      <a href="{% url 'first:wishlist' %}"><i class="fa-regular fa-heart"></i></a>
+      <a href="{% url 'first:cart' %}"><i class="fa-solid fa-bag-shopping"></i></a>
+    </div>
+
+    <nav class="cake-v6-menu">
+      <a href="{% url 'first:home' %}">خانه</a>
+      <a href="{% url 'first:product_list' %}">همه محصولات</a>
+      <a href="{% url 'first:best_sellers' %}">پرفروش‌ترین‌ها</a>
+      <a href="{% url 'first:discounts' %}">تخفیف‌های ویژه</a>
+      <a href="{% url 'first:customer_service' 'shopping-guide' %}">راهنمای خرید</a>
+      <a href="{% url 'customer_care:order_tracking' %}">پیگیری سفارش</a>
+      <a href="{% url 'customer_care:support_home' %}">پشتیبانی</a>
+    </nav>
+  </div>
+</header>

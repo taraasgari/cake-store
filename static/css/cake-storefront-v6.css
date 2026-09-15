@@ -1,0 +1,144 @@
+
+.cake-header-v6{position:relative;z-index:100}
+.cake-header-v6-bg{
+position:relative;
+width:100%;
+aspect-ratio:2172/470;
+overflow:hidden;
+}
+.cake-header-v6-bg>img{
+position:absolute;
+inset:0;
+width:100%;
+height:100%;
+object-fit:cover;
+}
+
+.cake-v6-benefits{
+position:absolute;
+top:0;
+left:0;
+right:0;
+height:14%;
+display:flex;
+align-items:center;
+justify-content:space-around;
+direction:rtl;
+background:#ffe8ec;
+color:#81433d;
+font-weight:800;
+font-size:clamp(11px,1vw,15px);
+}
+
+.cake-v6-logo{
+position:absolute;
+right:13%;
+top:29%;
+width:18%;
+height:28%;
+}
+
+.cake-v6-search{
+position:absolute;
+left:31%;
+top:41%;
+width:38%;
+height:16%;
+display:flex;
+direction:ltr;
+}
+
+.cake-v6-search input{
+flex:1;
+border:0;
+background:#fffaf5;
+border-radius:30px 0 0 30px;
+padding:0 25px;
+direction:rtl;
+text-align:right;
+font-family:inherit;
+}
+
+.cake-v6-search button{
+width:18%;
+border:0;
+background:#df6d8c;
+color:white;
+font-size:24px;
+border-radius:0 25px 25px 0;
+}
+
+.cake-v6-icons{
+position:absolute;
+left:4%;
+top:39%;
+display:flex;
+gap:10px;
+direction:ltr;
+}
+
+.cake-v6-icons a,
+.cake-v6-icons button{
+width:52px;
+height:52px;
+border-radius:18px;
+border:1px solid #e7cbbb;
+background:#fff8f1;
+color:#6b392f;
+display:grid;
+place-items:center;
+}
+
+.cake-v6-menu{
+position:absolute;
+bottom:2%;
+left:1%;
+right:1%;
+height:15%;
+background:#fffaf5;
+border-radius:30px;
+display:flex;
+justify-content:space-around;
+align-items:center;
+direction:rtl;
+}
+
+.cake-v6-menu a{
+color:#63352f;
+font-weight:900;
+font-size:clamp(10px,1vw,15px);
+}
+
+html[data-perfume-theme="night"] .cake-header-v6-bg img{
+filter:brightness(.55) saturate(.8);
+}
+
+html[data-perfume-theme="night"] .cake-v6-benefits,
+html[data-perfume-theme="night"] .cake-v6-menu{
+background:#28181c;
+}
+
+html[data-perfume-theme="night"] .cake-v6-benefits,
+html[data-perfume-theme="night"] .cake-v6-menu a{
+color:#f8dddd;
+}
+
+html[data-perfume-theme="night"] .cake-v6-icons a,
+html[data-perfume-theme="night"] .cake-v6-icons button{
+background:#301b20;
+color:#f6d8d8;
+}
+
+@media(max-width:900px){
+.cake-header-v6-bg{height:300px}
+.cake-v6-benefits{display:none}
+.cake-v6-search{left:5%;width:90%;top:45%}
+.cake-v6-logo{right:5%;top:8%;width:35%}
+.cake-v6-icons{top:8%;left:5%}
+.cake-v6-menu{
+overflow:auto;
+justify-content:flex-start;
+gap:25px;
+padding:0 20px;
+}
+}
