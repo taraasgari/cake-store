@@ -1,0 +1,107 @@
+
+:root{
+--cream:#fff7ed;
+--pink:#ffc4d6;
+--berry:#ff668b;
+--brown:#633b25;
+}
+
+body{
+background:var(--cream);
+color:var(--brown);
+}
+
+.cake-loader{
+position:fixed;
+inset:0;
+background:#fff8ef;
+z-index:999;
+display:flex;
+align-items:center;
+justify-content:center;
+gap:20px;
+font-size:70px;
+}
+
+.hero-v4{
+min-height:100vh;
+display:flex;
+align-items:center;
+justify-content:space-around;
+overflow:hidden;
+}
+
+.hero-copy h1{
+font-size:clamp(45px,7vw,100px);
+line-height:1;
+}
+
+.cake-btn{
+display:inline-block;
+padding:15px 40px;
+background:var(--berry);
+color:white;
+border-radius:50px;
+}
+
+.hero-cake{
+font-size:80px;
+position:relative;
+}
+
+.falling-cherry{
+position:absolute;
+top:-120px;
+left:50%;
+animation:fall 3s infinite;
+}
+
+.cake-body div{
+width:280px;
+height:75px;
+background:linear-gradient(#fff,#f3b29d);
+border-radius:50%;
+margin:-12px;
+box-shadow:0 20px 30px #0002;
+}
+
+.cream-transition{
+height:120px;
+background:white;
+border-radius:50% 50% 0 0;
+}
+
+.story,.products,.custom{
+padding:100px 8%;
+text-align:center;
+}
+
+.product-showcase{
+display:grid;
+grid-template-columns:repeat(3,1fr);
+gap:30px;
+}
+
+.product-card{
+background:white;
+border-radius:40px;
+padding:50px;
+font-size:70px;
+transition:.4s;
+}
+
+.product-card:hover{
+transform:translateY(-20px) rotateY(8deg);
+}
+
+@keyframes fall{
+0%{transform:translateY(-100px)}
+55%{transform:translateY(180px)}
+70%{transform:translateY(160px)}
+100%{transform:translateY(-100px)}
+}
+
+@media(max-width:800px){
+.hero-v4{flex-direction:column}
+.product-showcase{grid-template-columns:1fr}
+}

@@ -1,0 +1,92 @@
+:root{
+--cream:#fff8ef;
+--pink:#ffc8da;
+--berry:#ff6f91;
+--brown:#6b3e26;
+}
+
+body{
+background:var(--cream);
+color:var(--brown);
+}
+
+.cake-hero{
+min-height:90vh;
+display:flex;
+align-items:center;
+justify-content:space-around;
+overflow:hidden;
+position:relative;
+}
+
+.cake-hero:after{
+content:"";
+position:absolute;
+bottom:-1px;
+left:0;
+width:100%;
+height:90px;
+background:white;
+border-radius:50% 50% 0 0;
+}
+
+.hero-text h1{
+font-size:clamp(40px,6vw,80px);
+line-height:1.1;
+}
+
+.cake-btn{
+display:inline-block;
+padding:15px 35px;
+border-radius:999px;
+background:var(--berry);
+color:white;
+}
+
+.cake-stage{
+position:relative;
+font-size:170px;
+}
+
+.cake{
+animation:float 3s ease-in-out infinite;
+}
+
+.cherry{
+position:absolute;
+top:-100px;
+animation:drop 2.5s infinite;
+}
+
+@keyframes drop{
+0%{transform:translateY(-80px)}
+60%{transform:translateY(120px)}
+75%{transform:translateY(100px)}
+100%{transform:translateY(-80px)}
+}
+
+@keyframes float{
+50%{transform:translateY(-15px)}
+}
+
+.sweet-section{
+padding:100px 8%;
+}
+
+.cake-grid,.category-grid{
+display:grid;
+grid-template-columns:repeat(4,1fr);
+gap:25px;
+}
+
+.cake-card,.category-grid div{
+background:white;
+padding:40px;
+border-radius:35px;
+box-shadow:0 20px 50px #0001;
+}
+
+@media(max-width:800px){
+.cake-hero{flex-direction:column}
+.cake-grid,.category-grid{grid-template-columns:1fr}
+}

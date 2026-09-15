@@ -1505,64 +1505,65 @@
                     </span>
                 </a>
 
-                <nav
-                    class="desktop-nav"
-                    aria-label="منوی اصلی"
-                    data-bsg-edit="main-menu"
-                    data-bsg-name="لینک‌های منوی اصلی"
-                >
-                    <a
-                        class="nav-link-pink"
-                        href="{% url 'first:home' %}"
-                        data-bsg-edit="menu-home"
-                        data-bsg-name="لینک خانه"
-                    >
-                        <i class="fas fa-house"></i>
-                        خانه
-                    </a>
+                <header class="cake-header" dir="rtl">
 
-                    <a
-                        class="nav-link-pink"
-                        href="{% url 'first:product_list' %}"
-                        data-bsg-edit="menu-products"
-                        data-bsg-name="لینک محصولات"
-                    >
-                        <i class="fas fa-border-all"></i>
-                        محصولات
-                    </a>
+    <div class="cake-benefits">
+        <div>❤️ با هر خرید، شیرینی حال خوب را هدیه دهید</div>
+        <div>🎁 ارسال رایگان سفارش‌های بالای ۵۰۰ هزار تومان</div>
+        <div>🛡 تضمین اصالت کالا</div>
+        <div>💎 مشاوره انتخاب محصول</div>
+        <div>🎧 پشتیبانی ۲۴ ساعته</div>
+    </div>
 
-                    <a
-                        class="nav-link-pink"
-                        href="{% url 'first:discounts' %}"
-                        data-bsg-edit="menu-discounts"
-                        data-bsg-name="لینک تخفیف‌ها"
-                    >
-                        <i class="fas fa-tags"></i>
-                        تخفیف‌ها
-                    </a>
 
-                    <a
-                        class="nav-link-pink"
-                        href="{% url 'first:best_sellers' %}"
-                        data-bsg-edit="menu-bestsellers"
-                        data-bsg-name="لینک پرفروش‌ها"
-                    >
-                        <i class="fas fa-crown"></i>
-                        پرفروش‌ها
-                    </a>
+    <div class="cake-main-header">
 
-                    {% if user.is_authenticated %}
-                        <a
-                            class="nav-link-pink"
-                            href="{% url 'first:user_orders' %}"
-                            data-bsg-edit="menu-orders"
-                            data-bsg-name="لینک سفارش‌ها"
-                        >
-                            <i class="fas fa-bag-shopping"></i>
-                            سفارش‌ها
-                        </a>
-                    {% endif %}
-                </nav>
+        <div class="cake-actions">
+            <a href="#">♡</a>
+            <a href="#">👤</a>
+            <a href="#">
+                🛒
+                <span>۰</span>
+            </a>
+        </div>
+
+
+        <div class="cake-search">
+
+            <input 
+            type="text"
+            placeholder="نام کیک، شیرینی یا محصول مورد نظر را جستجو کنید...">
+
+            <button>
+                🔍
+            </button>
+
+        </div>
+
+
+        <div class="cake-logo">
+            <h1>شیرین خانه</h1>
+            <span>CAKE SHOP</span>
+        </div>
+
+    </div>
+
+
+    <nav class="cake-menu">
+
+        <a>خانه</a>
+        <a>همه محصولات</a>
+        <a>پرفروش‌ترین‌ها</a>
+        <a>تخفیف‌های ویژه</a>
+        <a>راهنمای خرید</a>
+        <a>وبلاگ شیرین خانه</a>
+        <a>پیگیری سفارش</a>
+        <a>پشتیبانی</a>
+
+    </nav>
+
+
+</header>
 
                 <form
                     class="global-nav-search"
